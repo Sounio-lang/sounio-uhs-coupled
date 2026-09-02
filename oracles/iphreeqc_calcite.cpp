@@ -140,41 +140,8 @@ double need(const char* s, const char* name) {
 
 }  // namespace
 
-int main(int argc, char** argv) {
-    std::string db, db_sha;
-    double temp_c = 25.0, nacl = 0.0, h2_fug = 0.0, co2_fug = 0.0;
-    bool have_co2 = false, header = false;
-    bool decouple = false;   // treat H2 as redox-inert (H(0) fixed)
-    double h2_molal = 0.0;
-
-    for (int i = 1; i < argc; ++i) {
-        std::string a = argv[i];
-        auto nxt = [&]() -> const char* { return (i + 1 < argc) ? argv[++i] : nullptr; };
-        if (a == "--db")             { const char* v = nxt(); if (!v) die("--db needs a path"); db = v; }
-        else if (a == "--db-sha256") { const char* v = nxt(); if (!v) die("--db-sha256 needs a hex digest"); db_sha = v; }
-        else if (a == "--temp-c")    temp_c = need(nxt(), "--temp-c");
-        else if (a == "--nacl-molal") nacl = need(nxt(), "--nacl-molal");
-        else if (a == "--h2-fugacity") h2_fug = need(nxt(), "--h2-fugacity");
-        else if (a == "--co2-fugacity") { co2_fug = need(nxt(), "--co2-fugacity"); have_co2 = true; }
-        else if (a == "--header")    header = true;
-        else if (a == "--decouple-redox") decouple = true;
-        else if (a == "--h2-molal")  h2_molal = need(nxt(), "--h2-molal");
-        else die("unknown argument: " + a);
-    }
-    if (db.empty()) die("--db is required; the database is not guessed");
-    if (db_sha.empty())
-        die("--db-sha256 is required: three different files named phreeqc.dat ship "
-            "with IPhreeqc, so the database is pinned by content, not by path");
-
-    bool ok = false;
-    std::string got = sha256_file(db, &ok);
-    if (!ok) die("cannot read database: " + db);
-    if (got != db_sha)
-        die("database hash mismatch for " + db + "\n  expected " + db_sha + "\n  got      " + got);
-
-    IPhreeqc ip;
-    check(ip, ip.LoadDatabase(db.c_str()), "LoadDatabase");
-
+static std::string build_input(double temp_c, double nacl, double h2_fug,
+                               double co2_fug, bool have_co2, bool decouple) {
     std::ostringstream in;
     in << std::setprecision(17);
     // Redox decoupling, when asked for, is done the way PHREEQC's own Amm.dat
@@ -235,6 +202,12 @@ int main(int argc, char** argv) {
         in << "    CO2(g)     " << std::log10(co2_fug) << "  10.0\n";
     in << "SELECTED_OUTPUT\n"
        << "    -reset     false\n"
+       // Without this the output carries 6 significant digits, and a 1 ppm
+       // perturbation lands in the 7th -- so a resolution probe would measure
+       // the formatter and report a spread of exactly zero. That mistake, print
+       // resolution read as the resolution of the quantity, is on record in the
+       // predecessor cross-validation and is not repeated here.
+       << "    -high_precision true\n"
        << "    -temperature true\n"
        << "    -pH        true\n"
        << "    -ionic_strength true\n"
@@ -243,8 +216,136 @@ int main(int argc, char** argv) {
        << "    -saturation_indices Calcite\n"
        << "END\n";
 
+    return in.str();
+}
+
+
+// Pull one whitespace-separated field out of the LAST data row of the selected
+// output. Returns false rather than a default if the row or field is absent:
+// a missing value must not be reported as a number.
+static bool field_of(const std::string& so, int idx, double* out) {
+    std::istringstream lines(so);
+    std::string line, last;
+    bool first = true;
+    while (std::getline(lines, line)) {
+        if (first) { first = false; continue; }
+        if (!line.empty()) last = line;
+    }
+    if (last.empty()) return false;
+    std::istringstream f(last);
+    std::string tok;
+    for (int i = 0; i <= idx; ++i) if (!(f >> tok)) return false;
+    try { *out = std::stod(tok); } catch (...) { return false; }
+    return true;
+}
+
+// The oracle's resolution, measured IN REGIME rather than assumed.
+//
+// An equilibrium solver's answer is not a smooth function of the state it is
+// started from, so its resolution has no value independent of that state and
+// must be measured over an ensemble, every time, at the setting actually used.
+// This perturbs each input by +/- 1 ppm and reports the resulting spread as an
+// INTERVAL. A residual smaller than this interval is not agreement; it is below
+// the instrument.
+static int resolution_probe(IPhreeqc& ip, double temp_c, double nacl,
+                            double h2_fug, double co2_fug, bool have_co2,
+                            bool decouple, int col, const char* col_name) {
+    const double eps = 1e-6;
+    struct St { double t, m, f; const char* what; };
+    const St states[10] = {
+        {temp_c, nacl, h2_fug, "nominal"},
+        {temp_c*(1+eps), nacl, h2_fug, "T +1ppm"},
+        {temp_c*(1-eps), nacl, h2_fug, "T -1ppm"},
+        {temp_c, nacl*(1+eps), h2_fug, "m +1ppm"},
+        {temp_c, nacl*(1-eps), h2_fug, "m -1ppm"},
+        {temp_c, nacl, h2_fug*(1+eps), "f +1ppm"},
+        {temp_c, nacl, h2_fug*(1-eps), "f -1ppm"},
+        {temp_c*(1+eps), nacl*(1+eps), h2_fug*(1+eps), "all +1ppm"},
+        {temp_c*(1-eps), nacl*(1-eps), h2_fug*(1-eps), "all -1ppm"},
+        {temp_c*(1+eps), nacl*(1-eps), h2_fug*(1+eps), "mixed"},
+    };
+    double lo = 0, hi = 0, nominal = 0;
+    bool have = false;
+    std::cout << "# resolution probe, " << col_name
+              << ", 10 states perturbed by +/-1 ppm\n";
+    for (int i = 0; i < 10; ++i) {
+        const St& st = states[i];
+        std::string in = build_input(st.t, st.m, st.f, co2_fug, have_co2, decouple);
+        if (ip.RunString(in.c_str()) != 0) {
+            std::cerr << "FAIL: state " << st.what << " did not run\n"
+                      << ip.GetErrorString() << "\n";
+            return 1;
+        }
+        const char* so = ip.GetSelectedOutputString();
+        double v = 0;
+        if (!so || !field_of(so, col, &v)) {
+            std::cerr << "FAIL: state " << st.what
+                      << " produced no usable value; refusing to report\n";
+            return 1;
+        }
+        if (i == 0) nominal = v;
+        if (!have) { lo = hi = v; have = true; }
+        if (v < lo) lo = v;
+        if (v > hi) hi = v;
+        std::cout << "  " << std::setw(10) << st.what << "  "
+                  << std::setprecision(12) << v << "\n";
+    }
+    const double spread = hi - lo;
+    std::cout << std::setprecision(6)
+              << "nominal   = " << nominal << "\n"
+              << "interval  = [" << lo << ", " << hi << "]\n"
+              << "spread    = " << spread << "\n";
+    if (nominal != 0.0)
+        std::cout << "spread/nominal = " << (spread / nominal) << "\n";
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    std::string db, db_sha;
+    double temp_c = 25.0, nacl = 0.0, h2_fug = 0.0, co2_fug = 0.0;
+    bool have_co2 = false, header = false, probe = false;
+    bool decouple = false;   // treat H2 as redox-inert (H(0) fixed)
+    double h2_molal = 0.0;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string a = argv[i];
+        auto nxt = [&]() -> const char* { return (i + 1 < argc) ? argv[++i] : nullptr; };
+        if (a == "--db")             { const char* v = nxt(); if (!v) die("--db needs a path"); db = v; }
+        else if (a == "--db-sha256") { const char* v = nxt(); if (!v) die("--db-sha256 needs a hex digest"); db_sha = v; }
+        else if (a == "--temp-c")    temp_c = need(nxt(), "--temp-c");
+        else if (a == "--nacl-molal") nacl = need(nxt(), "--nacl-molal");
+        else if (a == "--h2-fugacity") h2_fug = need(nxt(), "--h2-fugacity");
+        else if (a == "--co2-fugacity") { co2_fug = need(nxt(), "--co2-fugacity"); have_co2 = true; }
+        else if (a == "--header")    header = true;
+        else if (a == "--resolution-probe") probe = true;
+        else if (a == "--decouple-redox") decouple = true;
+        else if (a == "--h2-molal")  h2_molal = need(nxt(), "--h2-molal");
+        else die("unknown argument: " + a);
+    }
+    if (db.empty()) die("--db is required; the database is not guessed");
+    if (db_sha.empty())
+        die("--db-sha256 is required: three different files named phreeqc.dat ship "
+            "with IPhreeqc, so the database is pinned by content, not by path");
+
+    bool ok = false;
+    std::string got = sha256_file(db, &ok);
+    if (!ok) die("cannot read database: " + db);
+    if (got != db_sha)
+        die("database hash mismatch for " + db + "\n  expected " + db_sha + "\n  got      " + got);
+
+    IPhreeqc ip;
+    check(ip, ip.LoadDatabase(db.c_str()), "LoadDatabase");
+
+    if (probe) {
+        // column 5 is dissolved H2 (Hdg when decoupled, H(0) when not)
+        ip.SetSelectedOutputStringOn(true);
+        return resolution_probe(ip, temp_c, nacl, h2_fug, co2_fug, have_co2,
+                                decouple, 5, decouple ? "Hdg" : "H(0)");
+    }
+
+    std::string input = build_input(temp_c, nacl, h2_fug, co2_fug, have_co2, decouple);
     ip.SetSelectedOutputStringOn(true);
-    check(ip, ip.RunString(in.str().c_str()), "RunString");
+    check(ip, ip.RunString(input.c_str()), "RunString");
 
     const char* so = ip.GetSelectedOutputString();
     if (!so || !*so) die("selected output is empty; refusing to report a value");

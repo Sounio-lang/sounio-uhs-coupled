@@ -209,3 +209,66 @@ oracle: choosing is the assumption.
 At a single point the agreement (5.5 % at 1 molal, against Chabab's own reported
 AAD of 3.13 %) would have looked like corroboration and nothing more. Sweeping
 the parameter is what exposed the structure.
+
+---
+
+## The oracle's resolution, measured in regime
+
+A residual has no meaning until it is compared against the resolution of the
+instrument that produced it, and that resolution is not a constant. It is
+measured here at the setting actually used, over an ensemble of **10 states each
+perturbed by ±1 ppm** in temperature, salinity and imposed fugacity, and reported
+as an **interval**.
+
+```sh
+./iphreeqc_calcite --db <pinned> --db-sha256 59373961... \
+    --temp-c 40 --nacl-molal 1 --decouple-redox --h2-fugacity 91 --resolution-probe
+```
+
+Dissolved H₂, 40 °C, f(H₂) = 91 bar:
+
+| m_NaCl | nominal (mol/kgw) | spread | relative |
+|---|---|---|---|
+| 0 | 0.0678158708318 | 1.35632e-07 | **2.00e-06** |
+| 1 | 0.0538579539494 | 1.14133e-07 | **2.11915e-06** |
+| 2 | 0.0427807445777 | 1.00507e-07 | **2.34936e-06** |
+| 3 | 0.0339826351945 | 8.76603e-08 | **2.57956e-06** |
+
+**The resolution is not constant — it varies by 29 % across these four regimes**,
+rising monotonically with salinity. A single measurement, reused, would have
+misstated the instrument at three of the four points. This is why it is measured
+每 regime rather than once.
+
+### The first attempt measured the formatter, not the oracle
+
+Run without `-high_precision`, the probe returned a spread of **exactly zero** at
+every regime. That was not a result: PHREEQC's selected output carries six
+significant digits by default, so a 1 ppm perturbation falls in the seventh and
+is invisible. The measurement was of the print, not the quantity.
+
+That error — a number's print resolution taken for the resolution of the thing
+it names — is on record in the predecessor GRI-Mech cross-validation as the cause
+of a misdiagnosed disagreement. It is recorded again here because it recurred,
+in a different code, on the first attempt, and only a spread of *exactly* zero
+gave it away.
+
+### What this licenses
+
+The Sounio engine's residual against this oracle, per `sio/h2_solubility.sio`:
+
+| m_NaCl | residual | oracle resolution | ratio |
+|---|---|---|---|
+| 0 | +7.42 % | 2.00e-06 | **37 100×** |
+| 1 | +5.47 % | 2.12e-06 | **25 800×** |
+| 2 | +1.64 % | 2.35e-06 | **6 980×** |
+| 3 | −3.89 % | 2.58e-06 | **15 100×** |
+
+Every residual stands four orders of magnitude above the instrument, so the
+disagreement between the engine's correlation and the oracle's physics is
+**established as real, not attributed to it**. It is a difference between two
+solubility models — one virial, fitted to H₂–brine data; one Henry's law with a
+Debye–Hückel activity term — and not arithmetic, not implementation, and not
+noise.
+
+Had the residual come out near 2e-06, nothing could have been claimed either way,
+and this is the measurement that would have said so.

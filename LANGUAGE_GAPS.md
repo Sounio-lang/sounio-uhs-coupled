@@ -262,3 +262,76 @@ obtained through `bin/souc`, is not evidence.
 seed when one is present and newer, or the harness taking an explicit engine
 binary and refusing to guess. Neither is done here — this study does not modify
 the wrapper other projects depend on.
+
+---
+
+## G9 — A module-level `let` holding a negative f64 is silently wrong
+
+**Status: OPEN. Found by porting a real correlation; it produced a wrong number
+that looked entirely healthy.**
+
+Minimal reproduction, compiled with `gen3.elf` at `origin/main` + the qd128
+branch, printed as value × 100 so the sign and magnitude are both visible:
+
+```sio
+let  M_LET_EXPR: f64 = 0.0 - 1.25     //  0     WRONG, want -125
+let  M_LET_LIT:  f64 = -1.25          // +125   WRONG, sign dropped
+var  M_VAR_EXPR: f64 = 0.0 - 1.25     // -125   correct
+var  M_VAR_LIT:  f64 = -1.25          // -125   correct
+let  M_INT_EXPR: i64 = 0 - 7          //   -7   correct
+let  M_INT_LIT:  i64 = -7             //   -7   correct
+// and inside a function body:
+let  local_expr: f64 = 0.0 - 1.25     // -125   correct
+```
+
+**The defect is exactly one combination: module scope, `let`, type f64, negative
+value.** It fails in two different ways depending on how the value is written —
+a computed expression collapses to `0.0`, and a leading-minus literal keeps the
+magnitude and loses the sign. `var` is correct at module scope, `i64` is correct
+at module scope, and `let` is correct inside a function.
+
+Note also that `-1.25` is accepted at all. The language documents that it has no
+unary minus and that one must write `0 - x`; here the rejected form is not
+rejected, it silently yields the positive value.
+
+### How it surfaced
+
+Porting Chabab's Model 2 for H₂ solubility. The Sounio result agreed with the C++
+replica exactly at zero salinity and diverged as salinity rose:
+
+| m_NaCl | Sounio (before) | C++ replica | ratio |
+|---|---|---|---|
+| 0 | 6.313448550e-02 | 6.31344855e-02 | 1.0000 |
+| 1 | 5.058345798e-02 | 5.10647712e-02 | 1.00952 |
+| 2 | 4.052755323e-02 | 4.20922e-02 | 1.03862 |
+| 3 | 3.247074510e-02 | 3.53597e-02 | 1.08897 |
+
+The ratios are exactly `exp(0.009470244669 · m²)`, and the correlation's
+`ζ_H2−c−a` is `−0.009470244669`, declared as a module-level `let`. It had
+evaluated to zero, so the ζ term vanished from the model. After changing that one
+declaration to `var`, every point matches the replica to all printed digits.
+
+### Why this one is serious
+
+It is silent, and it lands where a scientific model keeps its constants.
+Enthalpies of reaction, Gibbs energies, log K values, activation energies and the
+`ATP_energy` figures in the reference microbial model are **all negative**, and
+the idiomatic place to write them is a module-level constant. The compiler
+reported no error, no warning, and a tier summary of `PLATINUM=1940 (98%)`.
+
+Had the divergence not grown with a swept parameter, a single-point comparison
+would have shown 5 % disagreement between the model and an oracle — a plausible
+number to attribute to physics, since two genuinely different solubility models
+already disagree by that much (see `oracles/README.md`). **The parameter sweep is
+what separated a compiler defect from a modelling difference.**
+
+### Mitigation in this study
+
+Every negative f64 constant is a module-level `var` or is assigned inside a
+function; none is a module-level `let`. This is stated in the header of each
+`.sio` file that has one. That is a discipline, not a fix — it depends on
+remembering, which is the wrong place to put a correctness argument.
+
+**What would close it**: the compiler either evaluating module-level `let`
+initialisers correctly, or rejecting the forms it cannot evaluate. Either is
+acceptable; silently returning zero is not.

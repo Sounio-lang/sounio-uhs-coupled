@@ -1,0 +1,208 @@
+// H2 solubility in NaCl brine — Chabab et al. Model 2 (Duan-type / Pitzer),
+// in Sounio. This is the ENGINE, not an oracle and not a replica.
+//
+// Trust direction, stated once and not violated anywhere below:
+//   IPhreeqc            the ORACLE — independent physics (Henry's law plus a
+//                       Debye-Huckel activity model). It supplies reference
+//                       values. This file never supplies values to it.
+//   chabab_solubility.cpp  a REPLICA of the same correlation in another
+//                       language. It is a DIAGNOSTIC for this port -- it can
+//                       localise a transcription error -- and it is NOT a
+//                       reference value, because agreeing with it only proves
+//                       two implementations of one correlation agree.
+//
+// Coefficients: Table 4 of the Chabab accepted manuscript
+// (HAL hal-04623907, sha256 6e1d8712...), read from the PDF and verified.
+// Version of record is paywalled; these are pre-copyedit values.
+//
+// Published equation 8, rearranged. With f_H2 = y_H2 * phi_H2 * P the fugacity
+// coefficient cancels, so the result depends on the imposed fugacity alone:
+//     ln(m_H2) = ln(f_H2) - mu0/RT - sum 2*lambda*m - sum sum zeta*m*m
+// Equation 11 gives each parameter's T,P dependence:
+//     Par(T,P) = C1 + C2 T + C3/T + C4 T^2 + C5 P + C6 P/T^2
+//                + C7/P + C8 T/P + C9 T^2/P + C10 T^3/P
+//
+// Units as published: P in bar, m in mol per kg of WATER, T in K.
+//
+// UNITS ARE TYPED HERE ON PURPOSE. The reference data for this study states
+// aqueous concentrations two different ways -- the GWB input script uses mg/L
+// of SOLUTION while its own data dictionary reports mmol/kg of WATER -- and at
+// TDS 127744 those differ by several percent through a density that is never
+// stated. `molal` and `molar` below have different dimensions, so the checker
+// refuses to substitute one for the other.
+
+unit molal = mol / kg;
+unit molar = mol / L;
+
+// ── Table 4, model 2 ────────────────────────────────────────────────────────
+// Module-level arrays, splat-initialised and mutated only from within this
+// module: the pattern that compiles on this lane. Arrays of structs segfault
+// and module-level arrays passed through `&!` miscompile, so neither is used.
+
+var C_MU0: [f64; 10] = [0.0; 10]
+var C_LAM: [f64; 10] = [0.0; 10]
+var CHABAB_READY: bool = false
+
+// lambda_H2-anion is exactly zero and zeta is constant: Table 4 leaves their
+// C2..C10 cells blank, meaning no T or P dependence at all, not zero-filled.
+// `var`, not `let`, and the reason is a compiler defect this port found:
+// a module-level `let` of type f64 holding a NEGATIVE value is silently wrong.
+// `let X: f64 = 0.0 - 1.25` yields 0.0, and `let X: f64 = -1.25` yields +1.25.
+// Module-level `var` is correct, module-level `let` of i64 is correct, and a
+// local `let` is correct -- it is exactly this one combination. See
+// LANGUAGE_GAPS.md G9. Every negative f64 constant in this study is a `var`
+// for that reason, and none is a module-level `let`.
+var LAMBDA_H2_A: f64 = 0.0
+var ZETA_H2_C_A: f64 = 0.0 - 0.009470244669
+
+// Measured range of the fit. NOT an authors' statement of validity -- the paper
+// gives none -- so anything outside it is refused rather than returned.
+var T_MIN_K: f64 = 298.0
+var T_MAX_K: f64 = 373.0
+var P_MAX_BAR: f64 = 200.0
+var M_MAX_MOLAL: f64 = 4.0
+
+fn chabab_init() with Mut {
+    C_MU0[0] = 41.8266086
+    C_MU0[1] = 0.0 - 8.24713967e-2
+    C_MU0[2] = 0.0 - 4.60318630e+3
+    C_MU0[3] = 6.03537635e-5
+    C_MU0[4] = 4.12979459e-4
+    C_MU0[5] = 1.82081207e+1
+    C_MU0[6] = 3.73478602e+1
+    C_MU0[7] = 0.0 - 3.87633253e-1
+    C_MU0[8] = 1.34370747e-3
+    C_MU0[9] = 0.0 - 1.55621990e-6
+
+    C_LAM[0] = 0.0 - 7.74829265312071
+    C_LAM[1] = 0.0226221702021589
+    C_LAM[2] = 923.092396500207
+    C_LAM[3] = 0.0 - 2.21140172559128e-5
+    C_LAM[4] = 7.40868321886585e-5
+    C_LAM[5] = 0.0 - 12.3509724808910
+    C_LAM[6] = 0.0 - 47.3816790140829
+    C_LAM[7] = 0.469165009435218
+    C_LAM[8] = 0.0 - 0.0015626314758
+    C_LAM[9] = 1.75015662317748e-6
+
+    CHABAB_READY = true
+}
+
+// Equation 11, evaluated in the published term order. `which` selects the
+// coefficient row: 0 = mu0/RT, 1 = lambda_H2-cation.
+fn chabab_par(which: i64, t_k: f64, p_bar: f64) -> f64 with Mut, Div, Panic {
+    var c0 = 0.0
+    var c1 = 0.0
+    var c2 = 0.0
+    var c3 = 0.0
+    var c4 = 0.0
+    var c5 = 0.0
+    var c6 = 0.0
+    var c7 = 0.0
+    var c8 = 0.0
+    var c9 = 0.0
+    if which == 0 {
+        c0 = C_MU0[0]  c1 = C_MU0[1]  c2 = C_MU0[2]  c3 = C_MU0[3]  c4 = C_MU0[4]
+        c5 = C_MU0[5]  c6 = C_MU0[6]  c7 = C_MU0[7]  c8 = C_MU0[8]  c9 = C_MU0[9]
+    } else {
+        c0 = C_LAM[0]  c1 = C_LAM[1]  c2 = C_LAM[2]  c3 = C_LAM[3]  c4 = C_LAM[4]
+        c5 = C_LAM[5]  c6 = C_LAM[6]  c7 = C_LAM[7]  c8 = C_LAM[8]  c9 = C_LAM[9]
+    }
+    let t2 = t_k * t_k
+    let t3 = t2 * t_k
+    c0 + c1 * t_k + c2 / t_k + c3 * t2 + c4 * p_bar + c5 * p_bar / t2
+       + c6 / p_bar + c7 * t_k / p_bar + c8 * t2 / p_bar + c9 * t3 / p_bar
+}
+
+// Returns dissolved H2 in mol per kg of water, or a negative sentinel when the
+// request lies outside the fitted range. FAILS CLOSED: it does not extrapolate
+// and call the answer a solubility.
+//   -1.0  temperature outside the fitted range
+//   -2.0  pressure above the fitted ceiling
+//   -3.0  salinity above the fitted ceiling
+//   -4.0  coefficients not initialised
+fn h2_molality(t_k: f64, p_bar: f64, m_nacl: f64, f_h2_bar: f64) -> f64 with Mut, Div, Panic {
+    if !CHABAB_READY { return 0.0 - 4.0 }
+    if t_k < T_MIN_K { return 0.0 - 1.0 }
+    if t_k > T_MAX_K { return 0.0 - 1.0 }
+    if p_bar > P_MAX_BAR { return 0.0 - 2.0 }
+    if m_nacl > M_MAX_MOLAL { return 0.0 - 3.0 }
+
+    let mu0 = chabab_par(0, t_k, p_bar)
+    let lam_c = chabab_par(1, t_k, p_bar)
+
+    // NaCl: m(Na+) = m(Cl-) = m_nacl
+    let sum_lambda = 2.0 * lam_c * m_nacl + 2.0 * LAMBDA_H2_A * m_nacl
+    let sum_zeta = ZETA_H2_C_A * m_nacl * m_nacl
+
+    let ln_m = log(f_h2_bar) - mu0 - sum_lambda - sum_zeta
+    exp(ln_m)
+}
+
+// ── printing ───────────────────────────────────────────────────────────────
+// There is no float formatter, so a value is emitted as a scaled integer with
+// its exponent stated, the way the earlier cross-validation work did it. The
+// digit count is chosen so the comparison is limited by the arithmetic and not
+// by the printer -- an under-resolved print was previously mistaken for a
+// disagreement in exactly this kind of study, and that is not repeated here.
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+
+fn pu64(x: i64) with IO, Mut, Div, Panic {
+    if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) }
+}
+
+fn pi64(x: i64) with IO, Mut, Div, Panic {
+    if x < 0 { print("-") pu64(0 - x) } else { pu64(x) }
+}
+
+// Emit v as an integer mantissa scaled by 1e15, with the decade printed, so a
+// reader can reconstruct the value exactly and compare it digit by digit.
+fn emit_scaled(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label)
+    print(" ")
+    if v < 0.0 {
+        print("SENTINEL ")
+        pi64(v as i64)
+        println("")
+        return
+    }
+    var m = v
+    var e: i64 = 0
+    while m >= 10.0 { m = m / 10.0  e = e + 1 }
+    while m < 1.0 && m > 0.0 { m = m * 10.0  e = e - 1 }
+    pi64((m * 1.0e15) as i64)
+    print("e")
+    pi64(e - 15)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    chabab_init()
+
+    println("CHABAB MODEL 2 -- H2 solubility in NaCl brine, Sounio engine")
+    println("mantissa scaled to 16 significant digits, mol per kg water")
+    println("T = 313.15 K (40 C), f(H2) = 91 bar, P = 91 bar")
+
+    let t_k = 313.15
+    let p_bar = 91.0
+    let f_h2 = 91.0
+
+    emit_scaled("m_nacl=0.0", h2_molality(t_k, p_bar, 0.0, f_h2))
+    emit_scaled("m_nacl=1.0", h2_molality(t_k, p_bar, 1.0, f_h2))
+    emit_scaled("m_nacl=2.0", h2_molality(t_k, p_bar, 2.0, f_h2))
+    emit_scaled("m_nacl=3.0", h2_molality(t_k, p_bar, 3.0, f_h2))
+
+    // Fail-closed controls: each must return its sentinel, not a number.
+    println("-- refusal controls (negative = refused, as intended) --")
+    emit_scaled("T=400K_out_of_range", h2_molality(400.0, p_bar, 1.0, f_h2))
+    emit_scaled("P=250bar_above_ceiling", h2_molality(t_k, 250.0, 1.0, f_h2))
+    emit_scaled("m=5_above_ceiling", h2_molality(t_k, p_bar, 5.0, f_h2))
+
+    0
+}

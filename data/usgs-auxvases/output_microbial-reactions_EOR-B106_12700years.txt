@@ -1,0 +1,2670 @@
+Disclaimer: Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.
+
+          Step #     0             Xi = 0.0000
+          Time = 0 secs  (0 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  6.100
+          Ionic strength      =    2.327881 molal
+          Activity of water   =    0.925391
+          Solvent mass        =      1.0000 kg
+          Solution mass       =      1.1390 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.837e-05 /bar
+            expansivity       =   0.0002595 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385995 molal
+          Dissolved solids    =      122001 mg/kg sol'n
+          Hardness            =    14257.55 mg/kg sol'n as CaCO3
+            carbonate         =       42.81 mg/kg sol'n as CaCO3
+            non-carbonate     =    14214.74 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=       42.81 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =        0.00 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =       2e-06 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.1616   -2.7026
+   2 e-  + 2 H+  = H2(aq)                                -0.4212   -7.0444
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.0990   -1.6558
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                           0.000          --            --       2.880e-20
+   microbe-SRB                                           0.000          --            --       4.220e-20
+   Cl- (charge rebalancing)                              0.000         0.000          --           0.000
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.000e-06         39.90        -34.73   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14     1.000e-06         45.65        -43.11   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  No minerals in system.
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.987e+04      0.5986        0.1283
+   Na+                                     2.020     4.077e+04      0.6746        0.1343
+   CaCl+                                 0.06247         4143.      0.6746       -1.3753
+   NaCl                                  0.04926         2528.      1.0000       -1.3075
+   H2(aq)                                0.04226         74.79      1.6784       -1.1492
+   Mg++                                  0.03691         787.8      0.2929       -1.9661
+   Ca++                                  0.03207         1129.      0.2048       -2.1826
+   MgCl+                                 0.02942         1544.      0.6746       -1.7023
+   K+                                   0.005713         196.1      0.5986       -2.4660
+   NaSO4-                               0.003745         391.5      0.6746       -2.5975
+   SO4--                                0.003276         276.3      0.1127       -3.4326
+   CO2(aq)                             0.0008281         32.00      1.0000       -3.0819
+   NaHCO3                              0.0007171         52.89      1.0000       -3.1444
+   MgSO4                               0.0007005         74.02      1.0000       -3.1546
+   HCO3-                               0.0005818         31.17      0.7063       -3.3862
+   CaSO4                               0.0005337         63.79      1.0000       -3.2727
+   SiO2(aq)                            0.0002324         12.26      1.6784       -3.4090
+   KCl                                 0.0001244         8.140      1.0000       -3.9053
+   MgHCO3+                             6.897e-05         5.166      0.6746       -4.3324
+   CaHCO3+                             5.974e-05         5.303      0.7451       -4.3515
+   KSO4-                               1.356e-05         1.609      0.6746       -5.0387
+   NaH3SiO4                            1.353e-06        0.1403      1.0000       -5.8688
+   H+                                  8.978e-07     0.0007945      0.8847       -6.1000
+   CaCO3                               2.704e-07       0.02376      1.0000       -6.5680
+   MgCO3                               2.216e-07       0.01641      1.0000       -6.6544
+   CO3--                               1.758e-07      0.009262      0.1355       -7.6232
+   NaCO3-                              1.436e-07       0.01047      0.6746       -7.0137
+   H3SiO4-                             1.053e-07      0.008794      0.6746       -7.1485
+   HSO4-                               4.655e-08      0.003967      0.6746       -7.5031
+   MgOH+                               3.981e-08      0.001444      0.6746       -7.5710
+   OH-                                 2.337e-08     0.0003490      0.6389       -7.8259
+   NaOH                                1.286e-08     0.0004515      1.0000       -7.8909
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Quartz                            0.5467s/sat   Anhydrite                        -1.3073     
+   Tridymite                         0.3840s/sat   Halite                           -1.3359     
+   Chalcedony                        0.2782s/sat   Magnesite                        -1.6042     
+   Cristobalite                      0.0026s/sat   Bassanite                        -1.9531     
+   Amrph^silica                     -0.7185        CaSO4^1/2H2O(beta)               -2.1178     
+   Dolomite                         -1.1272        Monohydrocalcite                 -2.1698     
+   Dolomite-ord                     -1.1272        Mirabilite                       -2.5572     
+   Calcite                          -1.1336        Dolomite-dis                     -2.6497     
+   Gypsum                           -1.2283        Thenardite                       -2.9195     
+   Aragonite                        -1.2978     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   90.93         91.00         1.001      1.9590
+   Steam                                 0.03637       0.03469        0.9537     -1.4598
+   CO2(g)                                0.02445       0.02433        0.9951     -1.6139
+   CH4(g)                              1.002e-06     1.000e-06        0.9983     -6.0000
+   H2S(g)                              2.643e-10     2.624e-10        0.9926     -9.5811
+   S2(g)                               1.396e-27     1.396e-27         1.000*   -26.8552
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.51        55.51   8.780e+05
+   CH4(aq)                           9.005e-10    9.005e-10   1.268e-05
+   Ca++                                0.09513      0.09513       3348.
+   Cl-                                   2.386        2.386   7.427e+04
+   H+                                0.0008267    0.0008267      0.7316
+   H2(aq)                              0.04226      0.04226       74.79
+   HCO3-                              0.002257     0.002257       120.9
+   HS-                               3.203e-11    3.203e-11   9.299e-07
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06711       1432.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.008270     0.008270       697.4
+   SiO2(aq)                          0.0002338    0.0002338       12.33
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09513       3348.
+   Carbon                             0.002257     0.002257       23.80
+   Chlorine                              2.386        2.386   7.427e+04
+   Hydrogen                              111.1        111.1   9.832e+04
+   Magnesium                           0.06711      0.06711       1432.
+   Oxygen                                55.55        55.55   7.803e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    0.0002338       5.766
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #     0             Xi = 0.0000
+          Time = 0 secs  (0 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  6.101
+          Ionic strength      =    2.327881 molal
+          Activity of water   =    0.925391
+          Solvent mass        =      1.0000 kg
+          Solution mass       =      1.1389 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.837e-05 /bar
+            expansivity       =   0.0002595 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385995 molal
+          Dissolved solids    =      121993 mg/kg sol'n
+          Hardness            =    14257.67 mg/kg sol'n as CaCO3
+            carbonate         =       42.86 mg/kg sol'n as CaCO3
+            non-carbonate     =    14214.81 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=       42.86 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =     0.00380 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =       2e-06 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.1616   -2.7035
+   2 e-  + 2 H+  = H2(aq)                                -0.4212   -7.0452
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.0991   -1.6568
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                           0.000          --            --       2.880e-20
+   microbe-SRB                                           0.000          --            --       4.220e-20
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.000e-06         39.90        -34.73   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14     1.000e-06         45.65        -43.11   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Quartz                              0.0001674     -3.776        0.01006        0.003798
+                                                              _____________   _____________
+   (total)                                                         0.01006           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.987e+04      0.5986        0.1283
+   Na+                                     2.020     4.077e+04      0.6746        0.1343
+   CaCl+                                 0.06247         4143.      0.6746       -1.3753
+   NaCl                                  0.04926         2528.      1.0000       -1.3075
+   H2(aq)                                0.04226         74.79      1.6784       -1.1492
+   Mg++                                  0.03691         787.8      0.2929       -1.9661
+   Ca++                                  0.03207         1129.      0.2048       -2.1826
+   MgCl+                                 0.02942         1544.      0.6746       -1.7023
+   K+                                   0.005713         196.1      0.5986       -2.4660
+   NaSO4-                               0.003745         391.5      0.6746       -2.5975
+   SO4--                                0.003276         276.3      0.1127       -3.4326
+   CO2(aq)                             0.0008270         31.96      1.0000       -3.0825
+   NaHCO3                              0.0007176         52.93      1.0000       -3.1441
+   MgSO4                               0.0007005         74.02      1.0000       -3.1546
+   HCO3-                               0.0005823         31.19      0.7063       -3.3859
+   CaSO4                               0.0005337         63.79      1.0000       -3.2727
+   KCl                                 0.0001244         8.140      1.0000       -3.9053
+   MgHCO3+                             6.902e-05         5.170      0.6746       -4.3320
+   SiO2(aq)                            6.599e-05         3.481      1.6784       -3.9556
+   CaHCO3+                             5.978e-05         5.307      0.7451       -4.3512
+   KSO4-                               1.356e-05         1.609      0.6746       -5.0387
+   H+                                  8.960e-07     0.0007929      0.8847       -6.1009
+   NaH3SiO4                            3.850e-07       0.03992      1.0000       -6.4146
+   CaCO3                               2.711e-07       0.02383      1.0000       -6.5669
+   MgCO3                               2.222e-07       0.01645      1.0000       -6.6532
+   CO3--                               1.763e-07      0.009288      0.1355       -7.6220
+   NaCO3-                              1.440e-07       0.01050      0.6746       -7.0125
+   HSO4-                               4.645e-08      0.003959      0.6746       -7.5040
+   MgOH+                               3.989e-08      0.001447      0.6746       -7.5701
+   H3SiO4-                             2.997e-08      0.002503      0.6746       -7.6943
+   OH-                                 2.342e-08     0.0003497      0.6389       -7.8251
+   NaOH                                1.288e-08     0.0004524      1.0000       -7.8900
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Quartz                            0.0000 sat    Anhydrite                        -1.3073     
+   Tridymite                        -0.1627        Halite                           -1.3359     
+   Chalcedony                       -0.2685        Magnesite                        -1.6030     
+   Cristobalite                     -0.5441        Bassanite                        -1.9531     
+   Dolomite                         -1.1248        CaSO4^1/2H2O(beta)               -2.1178     
+   Dolomite-ord                     -1.1249        Monohydrocalcite                 -2.1687     
+   Calcite                          -1.1324        Mirabilite                       -2.5572     
+   Gypsum                           -1.2283        Dolomite-dis                     -2.6473     
+   Amrph^silica                     -1.2652        Thenardite                       -2.9195     
+   Aragonite                        -1.2967     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   90.93         91.00         1.001      1.9590
+   Steam                                 0.03637       0.03469        0.9537     -1.4598
+   CO2(g)                                0.02442       0.02430        0.9951     -1.6144
+   CH4(g)                              1.002e-06     1.000e-06        0.9983     -6.0000
+   H2S(g)                              2.642e-10     2.623e-10        0.9926     -9.5812
+   S2(g)                               1.392e-27     1.392e-27         1.000*   -26.8563
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.51        55.51   8.780e+05
+   CH4(aq)                           9.005e-10    9.005e-10   1.268e-05
+   Ca++                                0.09513      0.09513       3348.
+   Cl-                                   2.386        2.386   7.427e+04
+   H+                                0.0008267    0.0008267      0.7316
+   H2(aq)                              0.04226      0.04226       74.79
+   HCO3-                              0.002257     0.002257       120.9
+   HS-                               3.203e-11    3.203e-11   9.299e-07
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06711       1432.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.008270     0.008270       697.5
+   SiO2(aq)                          0.0002338    6.641e-05       3.503
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09513       3348.
+   Carbon                             0.002257     0.002257       23.80
+   Chlorine                              2.386        2.386   7.427e+04
+   Hydrogen                              111.1        111.1   9.832e+04
+   Magnesium                           0.06711      0.06711       1432.
+   Oxygen                                55.55        55.55   7.803e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    6.641e-05       1.637
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   106             Xi = 0.1000
+          Time = 4.00782e+10 secs  (463868 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  6.103
+          Ionic strength      =    2.327880 molal
+          Activity of water   =    0.925391
+          Solvent mass        =      1.0000 kg
+          Solution mass       =      1.1389 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.837e-05 /bar
+            expansivity       =   0.0002595 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385995 molal
+          Dissolved solids    =      121993 mg/kg sol'n
+          Hardness            =    14257.67 mg/kg sol'n as CaCO3
+            carbonate         =       42.97 mg/kg sol'n as CaCO3
+            non-carbonate     =    14214.71 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=       42.97 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =     0.00380 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =      0.0065 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.1662   -2.7793
+   2 e-  + 2 H+  = H2(aq)                                -0.4213   -7.0471
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.1335   -2.2335
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       2.603e-09          --            --       1.229e-19
+   microbe-SRB                                       1.260e-06          --            --       2.739e-16
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     4.269e-06         39.90        -34.14   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14      0.006492         45.65        -38.51   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Quartz                              0.0001674     -3.776        0.01006        0.003798
+                                                              _____________   _____________
+   (total)                                                         0.01006           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.987e+04      0.5986        0.1283
+   Na+                                     2.020     4.077e+04      0.6746        0.1343
+   CaCl+                                 0.06247         4143.      0.6746       -1.3753
+   NaCl                                  0.04926         2528.      1.0000       -1.3075
+   H2(aq)                                0.04225         74.78      1.6784       -1.1493
+   Mg++                                  0.03691         787.8      0.2929       -1.9661
+   Ca++                                  0.03207         1129.      0.2048       -2.1826
+   MgCl+                                 0.02942         1544.      0.6746       -1.7023
+   K+                                   0.005713         196.1      0.5986       -2.4660
+   NaSO4-                               0.003745         391.4      0.6746       -2.5975
+   SO4--                                0.003276         276.3      0.1127       -3.4326
+   CO2(aq)                             0.0008247         31.87      1.0000       -3.0837
+   NaHCO3                              0.0007188         53.02      1.0000       -3.1434
+   MgSO4                               0.0007003         74.01      1.0000       -3.1547
+   HCO3-                               0.0005832         31.24      0.7063       -3.3852
+   CaSO4                               0.0005336         63.78      1.0000       -3.2728
+   KCl                                 0.0001244         8.140      1.0000       -3.9053
+   MgHCO3+                             6.913e-05         5.178      0.6746       -4.3313
+   SiO2(aq)                            6.599e-05         3.481      1.6784       -3.9556
+   CaHCO3+                             5.988e-05         5.315      0.7451       -4.3505
+   KSO4-                               1.356e-05         1.609      0.6746       -5.0388
+   H2S(aq)                             1.043e-06       0.03120      1.0000       -5.9818
+   H+                                  8.921e-07     0.0007895      0.8847       -6.1028
+   NaH3SiO4                            3.866e-07       0.04009      1.0000       -6.4127
+   CaCO3                               2.727e-07       0.02397      1.0000       -6.5643
+   MgCO3                               2.236e-07       0.01655      1.0000       -6.6506
+   HS-                                 2.168e-07      0.006294      0.6389       -6.8585
+   CO3--                               1.773e-07      0.009343      0.1355       -7.6194
+   NaCO3-                              1.449e-07       0.01056      0.6746       -7.0099
+   HSO4-                               4.624e-08      0.003941      0.6746       -7.5059
+   MgOH+                               4.007e-08      0.001453      0.6746       -7.5682
+   H3SiO4-                             3.010e-08      0.002514      0.6746       -7.6924
+   OH-                                 2.352e-08     0.0003512      0.6389       -7.8231
+   NaOH                                1.294e-08     0.0004544      1.0000       -7.8881
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Quartz                            0.0000 sat    Anhydrite                        -1.3074     
+   Tridymite                        -0.1627        Halite                           -1.3359     
+   Chalcedony                       -0.2685        Magnesite                        -1.6004     
+   Cristobalite                     -0.5441        Bassanite                        -1.9531     
+   Dolomite                         -1.1196        CaSO4^1/2H2O(beta)               -2.1179     
+   Dolomite-ord                     -1.1197        Monohydrocalcite                 -2.1661     
+   Calcite                          -1.1298        Mirabilite                       -2.5572     
+   Gypsum                           -1.2283        Dolomite-dis                     -2.6421     
+   Amrph^silica                     -1.2652        Thenardite                       -2.9195     
+   Aragonite                        -1.2941     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   90.92         90.99         1.001      1.9590
+   Steam                                 0.03637       0.03469        0.9537     -1.4598
+   CO2(g)                                0.02435       0.02423        0.9951     -1.6156
+   H2S(g)                              1.038e-05     1.031e-05        0.9926     -4.9869
+   CH4(g)                              3.897e-06     3.891e-06        0.9983     -5.4100
+   S2(g)                               1.080e-20     1.080e-20         1.000*   -19.9667
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.51        55.51   8.780e+05
+   CH4(aq)                           3.503e-09    3.503e-09   4.935e-05
+   Ca++                                0.09513      0.09513       3348.
+   Cl-                                   2.386        2.386   7.427e+04
+   H+                                0.0008254    0.0008254      0.7304
+   H2(aq)                              0.04225      0.04225       74.78
+   HCO3-                              0.002257     0.002257       120.9
+   HS-                               1.260e-06    1.260e-06     0.03657
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06711       1432.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.008268     0.008268       697.3
+   SiO2(aq)                          0.0002338    6.641e-05       3.503
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09513       3348.
+   Carbon                             0.002257     0.002257       23.80
+   Chlorine                              2.386        2.386   7.427e+04
+   Hydrogen                              111.1        111.1   9.832e+04
+   Magnesium                           0.06711      0.06711       1432.
+   Oxygen                                55.55        55.55   7.803e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    6.641e-05       1.638
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   166             Xi = 0.1613
+          Time = 6.46472e+10 secs  (748232 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  6.548
+          Ionic strength      =    2.327686 molal
+          Activity of water   =    0.925392
+          Solvent mass        =      1.0000 kg
+          Solution mass       =      1.1389 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.837e-05 /bar
+            expansivity       =   0.0002595 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385967 molal
+          Dissolved solids    =      121982 mg/kg sol'n
+          Hardness            =    14257.24 mg/kg sol'n as CaCO3
+            carbonate         =       67.40 mg/kg sol'n as CaCO3
+            non-carbonate     =    14189.84 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=       67.40 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =     0.00394 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =        1.41 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.1981   -3.3132
+   2 e-  + 2 H+  = H2(aq)                                -0.4476   -7.4865
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.1835   -3.0698
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       7.481e-09          --            --       2.993e-19
+   microbe-SRB                                       0.0002758          --            --       5.953e-14
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.039e-05         39.90        -33.39   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         1.411         45.65        -35.33   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Dolomite                            2.506e-06     -5.601      0.0004621       0.0001613
+   Quartz                              0.0001667     -3.778        0.01001        0.003781
+                                                              _____________   _____________
+   (total)                                                         0.01048           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.987e+04      0.5986        0.1283
+   Na+                                     2.020     4.077e+04      0.6746        0.1343
+   CaCl+                                 0.06246         4142.      0.6746       -1.3754
+   NaCl                                  0.04926         2528.      1.0000       -1.3075
+   H2(aq)                                0.04115         72.84      1.6783       -1.1607
+   Mg++                                  0.03691         787.8      0.2929       -1.9661
+   Ca++                                  0.03207         1129.      0.2048       -2.1826
+   MgCl+                                 0.02942         1544.      0.6746       -1.7023
+   K+                                   0.005714         196.1      0.5986       -2.4659
+   NaSO4-                               0.003620         378.4      0.6746       -2.6122
+   SO4--                                0.003167         267.1      0.1127       -3.4473
+   NaHCO3                              0.0009359         69.03      1.0000       -3.0288
+   HCO3-                               0.0007594         40.68      0.7062       -3.2706
+   MgSO4                               0.0006771         71.56      1.0000       -3.1693
+   CaSO4                               0.0005159         61.67      1.0000       -3.2874
+   CO2(aq)                             0.0003853         14.89      1.0000       -3.4142
+   H2S(aq)                             0.0001746         5.224      1.0000       -3.7579
+   KCl                                 0.0001244         8.141      1.0000       -3.9053
+   HS-                                 0.0001012         2.938      0.6389       -4.1895
+   MgHCO3+                             9.001e-05         6.743      0.6746       -4.2167
+   CaHCO3+                             7.797e-05         6.921      0.7451       -4.2359
+   SiO2(aq)                            6.599e-05         3.481      1.6783       -3.9556
+   KSO4-                               1.311e-05         1.556      0.6746       -5.0534
+   NaH3SiO4                            1.078e-06        0.1117      1.0000       -5.9675
+   CaCO3                               9.898e-07       0.08699      1.0000       -6.0044
+   MgCO3                               8.114e-07       0.06007      1.0000       -6.0908
+   CO3--                               6.436e-07       0.03391      0.1355       -7.0596
+   NaCO3-                              5.259e-07       0.03832      0.6746       -6.4501
+   H+                                  3.201e-07     0.0002833      0.8847       -6.5479
+   MgOH+                               1.117e-07      0.004051      0.6746       -7.1230
+   H3SiO4-                             8.390e-08      0.007006      0.6746       -7.2472
+   OH-                                 6.555e-08     0.0009789      0.6389       -7.3780
+   NaOH                                3.606e-08      0.001266      1.0000       -7.4430
+   HSO4-                               1.604e-08      0.001367      0.6746       -7.9658
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Quartz                            0.0000 sat    Amrph^silica                     -1.2652     
+   Dolomite                          0.0000 sat    Anhydrite                        -1.3220     
+   Dolomite-ord                     -0.0000        Halite                           -1.3360     
+   Tridymite                        -0.1627        Dolomite-dis                     -1.5225     
+   Chalcedony                       -0.2685        Monohydrocalcite                 -1.6063     
+   Cristobalite                     -0.5441        Sulfur-Rhmb                      -1.7081     
+   Calcite                          -0.5700        Bassanite                        -1.9678     
+   Aragonite                        -0.7343        CaSO4^1/2H2O(beta)               -2.1326     
+   Magnesite                        -1.0406        Mirabilite                       -2.5719     
+   Gypsum                           -1.2430        Thenardite                       -2.9342     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   88.55         88.62         1.001      1.9475
+   Steam                                 0.03637       0.03469        0.9537     -1.4598
+   CO2(g)                                0.01138       0.01132        0.9951     -1.9462
+   H2S(g)                               0.001739      0.001726        0.9926     -2.7630
+   CH4(g)                              9.323e-06     9.307e-06        0.9983     -5.0312
+   S2(g)                               8.252e-18     8.252e-18         1.000*   -17.0834
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.51        55.51   8.780e+05
+   CH4(aq)                           8.381e-09    8.381e-09   0.0001181
+   Ca++                                0.09513      0.09513       3348.
+   Cl-                                   2.386        2.386   7.427e+04
+   H+                                0.0005509    0.0005559      0.4919
+   H2(aq)                              0.04115      0.04115       72.84
+   HCO3-                              0.002257     0.002252       120.6
+   HS-                               0.0002758    0.0002758       8.007
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06711       1432.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.007994     0.007994       674.2
+   SiO2(aq)                          0.0002338    6.716e-05       3.543
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09513       3348.
+   Carbon                             0.002257     0.002252       23.74
+   Chlorine                              2.386        2.386   7.427e+04
+   Hydrogen                              111.1        111.1   9.832e+04
+   Magnesium                           0.06711      0.06711       1432.
+   Oxygen                                55.55        55.55   7.803e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    6.716e-05       1.656
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   205             Xi = 0.1844
+          Time = 7.38856e+10 secs  (855158 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  7.182
+          Ionic strength      =    2.325396 molal
+          Activity of water   =    0.925376
+          Solvent mass        =      1.0001 kg
+          Solution mass       =      1.1388 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.838e-05 /bar
+            expansivity       =   0.0002594 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385680 molal
+          Dissolved solids    =      121749 mg/kg sol'n
+          Hardness            =    14101.47 mg/kg sol'n as CaCO3
+            carbonate         =       18.31 mg/kg sol'n as CaCO3
+            non-carbonate     =    14083.16 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=       18.31 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =      0.0616 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =        10.3 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.2465   -4.1234
+   2 e-  + 2 H+  = H2(aq)                                -0.4831   -8.0799
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.2357   -3.9415
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.077e-08          --            --       4.179e-19
+   microbe-SRB                                        0.002037          --            --       4.349e-13
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.451e-05         39.90        -31.65   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         10.35         45.65        -33.11   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Dolomite                            0.0008981     -3.047         0.1656         0.05781
+   Quartz                              0.0001567     -3.805       0.009418        0.003556
+   Talc                                1.509e-06     -5.821      0.0005724       0.0002057
+                                                              _____________   _____________
+   (total)                                                          0.1756           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.991e+04      0.5986        0.1284
+   Na+                                     2.021     4.081e+04      0.6745        0.1345
+   CaCl+                                 0.06198         4112.      0.6745       -1.3787
+   NaCl                                  0.04929         2530.      1.0000       -1.3073
+   Mg++                                  0.03653         779.8      0.2929       -1.9707
+   H2(aq)                                0.03410         60.37      1.6776       -1.2425
+   Ca++                                  0.03182         1120.      0.2048       -2.1861
+   MgCl+                                 0.02912         1528.      0.6745       -1.7068
+   K+                                   0.005716         196.3      0.5986       -2.4658
+   NaSO4-                               0.002827         295.6      0.6745       -2.7196
+   SO4--                                0.002472         208.5      0.1128       -3.5549
+   HS-                                  0.001454         42.24      0.6389       -3.0319
+   H2S(aq)                             0.0005826         17.44      1.0000       -3.2346
+   MgSO4                               0.0005229         55.28      1.0000       -3.2815
+   CaSO4                               0.0003995         47.76      1.0000       -3.3985
+   NaHCO3                              0.0002194         16.19      1.0000       -3.6588
+   HCO3-                               0.0001779         9.536      0.7062       -3.9008
+   KCl                                 0.0001244         8.147      1.0000       -3.9051
+   SiO2(aq)                            6.602e-05         3.484      1.6776       -3.9556
+   CO2(aq)                             2.096e-05        0.8100      1.0000       -4.6787
+   MgHCO3+                             2.087e-05         1.564      0.6745       -4.8515
+   CaHCO3+                             1.813e-05         1.609      0.7450       -4.8695
+   KSO4-                               1.024e-05         1.215      0.6745       -5.1609
+   NaH3SiO4                            4.644e-06        0.4817      1.0000       -5.3331
+   CaCO3                               9.911e-07       0.08712      1.0000       -6.0039
+   MgCO3                               8.103e-07       0.06000      1.0000       -6.0913
+   CO3--                               6.495e-07       0.03423      0.1355       -7.0556
+   NaCO3-                              5.311e-07       0.03871      0.6745       -6.4459
+   MgOH+                               4.761e-07       0.01727      0.6745       -6.4934
+   H3SiO4-                             3.614e-07       0.03019      0.6745       -6.6130
+   OH-                                 2.824e-07      0.004218      0.6389       -6.7437
+   NaOH                                1.554e-07      0.005459      1.0000       -6.8085
+   H+                                  7.432e-08     6.578e-05      0.8846       -7.1822
+   CaOH+                               3.645e-08      0.001827      0.6745       -7.6094
+   CH4(aq)                             1.167e-08     0.0001644      1.6776       -7.7084
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Halite                           -1.3357     
+   Talc                              0.0000 sat    Gypsum                           -1.3541     
+   Quartz                            0.0000 sat    Anhydrite                        -1.4331     
+   Dolomite-ord                     -0.0000        Dolomite-dis                     -1.5225     
+   Tridymite                        -0.1627        Monohydrocalcite                 -1.6057     
+   Chalcedony                       -0.2685        Sulfur-Rhmb                      -1.6597     
+   Cristobalite                     -0.5441        Chrysotile                       -2.0164     
+   Calcite                          -0.5695        Bassanite                        -2.0789     
+   Aragonite                        -0.7337        CaSO4^1/2H2O(beta)               -2.2436     
+   Magnesite                        -1.0411        Mirabilite                       -2.6792     
+   Amrph^silica                     -1.2652        Enstatite                        -2.8971     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   73.35         73.41         1.001      1.8657
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                               0.005801      0.005758        0.9926     -2.2397
+   CO2(g)                              0.0006187     0.0006157        0.9951     -3.2106
+   CH4(g)                              1.297e-05     1.295e-05        0.9983     -4.8878
+   S2(g)                               1.031e-17     1.031e-17         1.000*   -16.9865
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.52        55.52   8.783e+05
+   CH4(aq)                           1.167e-08    1.167e-08   0.0001644
+   Ca++                                0.09513      0.09424       3317.
+   Cl-                                   2.386        2.386   7.428e+04
+   H+                                -0.001211    0.0005948      0.5264
+   H2(aq)                              0.03411      0.03411       60.37
+   HCO3-                              0.002257    0.0004603       24.66
+   HS-                                0.002037     0.002037       59.16
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06621       1413.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.006232     0.006232       525.7
+   SiO2(aq)                          0.0002338    7.104e-05       3.748
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09424       3317.
+   Carbon                             0.002257    0.0004603       4.855
+   Chlorine                              2.386        2.386   7.428e+04
+   Hydrogen                              111.1        111.1   9.833e+04
+   Magnesium                           0.06711      0.06621       1413.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    7.104e-05       1.752
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   209             Xi = 0.1854
+          Time = 7.42879e+10 secs  (859814 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  7.183
+          Ionic strength      =    2.325186 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0001 kg
+          Solution mass       =      1.1388 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.839e-05 /bar
+            expansivity       =   0.0002594 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385656 molal
+          Dissolved solids    =      121736 mg/kg sol'n
+          Hardness            =    14091.20 mg/kg sol'n as CaCO3
+            carbonate         =       18.31 mg/kg sol'n as CaCO3
+            non-carbonate     =    14072.89 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=       18.31 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =      0.0634 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =        11.3 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.2466   -4.1246
+   2 e-  + 2 H+  = H2(aq)                                -0.4828   -8.0755
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.2361   -3.9482
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.094e-08          --            --       4.240e-19
+   microbe-SRB                                        0.002220          --            --       4.735e-13
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.472e-05         39.90        -31.61   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         11.27         45.65        -33.02   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Dolomite                            0.0008982     -3.047         0.1656         0.05781
+   Talc                                4.069e-05     -4.390        0.01543        0.005545
+                                                              _____________   _____________
+   (total)                                                          0.1811           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.991e+04      0.5986        0.1284
+   Na+                                     2.021     4.081e+04      0.6745        0.1345
+   CaCl+                                 0.06199         4112.      0.6745       -1.3787
+   NaCl                                  0.04929         2530.      1.0000       -1.3073
+   Mg++                                  0.03647         778.6      0.2929       -1.9714
+   H2(aq)                                0.03337         59.08      1.6775       -1.2520
+   Ca++                                  0.03182         1120.      0.2048       -2.1860
+   MgCl+                                 0.02908         1526.      0.6745       -1.7075
+   K+                                   0.005716         196.3      0.5986       -2.4658
+   NaSO4-                               0.002745         287.0      0.6745       -2.7325
+   SO4--                                0.002399         202.4      0.1128       -3.5678
+   HS-                                  0.001585         46.05      0.6389       -2.9944
+   H2S(aq)                             0.0006346         18.99      1.0000       -3.1975
+   MgSO4                               0.0005068         53.58      1.0000       -3.2951
+   CaSO4                               0.0003878         46.37      1.0000       -3.4114
+   NaHCO3                              0.0002194         16.18      1.0000       -3.6588
+   HCO3-                               0.0001779         9.535      0.7062       -3.9009
+   KCl                                 0.0001244         8.147      1.0000       -3.9051
+   SiO2(aq)                            6.602e-05         3.484      1.6775       -3.9557
+   CO2(aq)                             2.094e-05        0.8093      1.0000       -4.6791
+   MgHCO3+                             2.084e-05         1.561      0.6745       -4.8522
+   CaHCO3+                             1.813e-05         1.609      0.7450       -4.8695
+   KSO4-                               9.937e-06         1.180      0.6745       -5.1738
+   NaH3SiO4                            4.648e-06        0.4821      1.0000       -5.3327
+   CaCO3                               9.919e-07       0.08720      1.0000       -6.0035
+   MgCO3                               8.097e-07       0.05996      1.0000       -6.0917
+   CO3--                               6.499e-07       0.03425      0.1355       -7.0553
+   NaCO3-                              5.315e-07       0.03874      0.6745       -6.4456
+   MgOH+                               4.757e-07       0.01726      0.6745       -6.4937
+   H3SiO4-                             3.617e-07       0.03021      0.6745       -6.6127
+   OH-                                 2.826e-07      0.004222      0.6389       -6.7434
+   NaOH                                1.555e-07      0.005464      1.0000       -6.8082
+   H+                                  7.426e-08     6.573e-05      0.8846       -7.1825
+   CaOH+                               3.648e-08      0.001829      0.6745       -7.6090
+   CH4(aq)                             1.183e-08     0.0001667      1.6775       -7.7022
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Talc                              0.0000 sat    Halite                           -1.3357     
+   Dolomite                          0.0000 sat    Gypsum                           -1.3669     
+   Quartz                           -0.0000        Anhydrite                        -1.4460     
+   Dolomite-ord                     -0.0000        Dolomite-dis                     -1.5225     
+   Tridymite                        -0.1627        Monohydrocalcite                 -1.6053     
+   Chalcedony                       -0.2685        Sulfur-Rhmb                      -1.6352     
+   Cristobalite                     -0.5441        Chrysotile                       -2.0164     
+   Calcite                          -0.5691        Bassanite                        -2.0917     
+   Aragonite                        -0.7333        CaSO4^1/2H2O(beta)               -2.2565     
+   Magnesite                        -1.0415        Mirabilite                       -2.6921     
+   Amrph^silica                     -1.2652        Enstatite                        -2.8971     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   71.77         71.83         1.001      1.8563
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                               0.006319      0.006272        0.9926     -2.2026
+   CO2(g)                              0.0006181     0.0006151        0.9951     -3.2110
+   CH4(g)                              1.316e-05     1.314e-05        0.9983     -4.8815
+   S2(g)                               1.154e-17     1.154e-17         1.000*   -16.9377
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.52        55.52   8.783e+05
+   CH4(aq)                           1.184e-08    1.184e-08   0.0001667
+   Ca++                                0.09513      0.09424       3317.
+   Cl-                                   2.386        2.386   7.428e+04
+   H+                                -0.001394    0.0006468      0.5724
+   H2(aq)                              0.03337      0.03337       59.08
+   HCO3-                              0.002257    0.0004602       24.66
+   HS-                                0.002220     0.002220       64.48
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06609       1411.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.006049     0.006049       510.3
+   SiO2(aq)                          0.0002338    7.104e-05       3.748
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09424       3317.
+   Carbon                             0.002257    0.0004603       4.854
+   Chlorine                              2.386        2.386   7.428e+04
+   Hydrogen                              111.1        111.1   9.833e+04
+   Magnesium                           0.06711      0.06609       1411.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    7.104e-05       1.752
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   242             Xi = 0.1884
+          Time = 7.55268e+10 secs  (874153 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  7.617
+          Ionic strength      =    2.324804 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0002 kg
+          Solution mass       =      1.1387 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.839e-05 /bar
+            expansivity       =   0.0002594 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385544 molal
+          Dissolved solids    =      121670 mg/kg sol'n
+          Hardness            =    14061.61 mg/kg sol'n as CaCO3
+            carbonate         =        7.11 mg/kg sol'n as CaCO3
+            non-carbonate     =    14054.50 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        7.11 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =      0.0754 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =        14.6 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.2792   -4.6697
+   2 e-  + 2 H+  = H2(aq)                                -0.5077   -8.4915
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.2672   -4.4682
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.147e-08          --            --       4.433e-19
+   microbe-SRB                                        0.002891          --            --       6.135e-13
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.540e-05         39.90        -30.57   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         14.63         45.65        -32.19   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          6.881e-07     -6.162       0.001561        0.001204
+   Dolomite                             0.001045     -2.981         0.1927         0.06726
+   Talc                                5.108e-05     -4.292        0.01937        0.006959
+                                                              _____________   _____________
+   (total)                                                          0.2136           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.991e+04      0.5986        0.1284
+   Na+                                     2.021     4.082e+04      0.6745        0.1346
+   CaCl+                                 0.06193         4109.      0.6745       -1.3791
+   NaCl                                  0.04930         2530.      1.0000       -1.3072
+   Mg++                                  0.03640         777.1      0.2929       -1.9722
+   Ca++                                  0.03179         1119.      0.2048       -2.1865
+   H2(aq)                                0.03069         54.33      1.6774       -1.2884
+   MgCl+                                 0.02902         1523.      0.6745       -1.7083
+   K+                                   0.005717         196.3      0.5986       -2.4657
+   HS-                                  0.002519         73.17      0.6388       -2.7933
+   NaSO4-                               0.002441         255.3      0.6745       -2.7834
+   SO4--                                0.002133         180.0      0.1128       -3.6188
+   MgSO4                               0.0004498         47.56      1.0000       -3.3470
+   H2S(aq)                             0.0003710         11.10      1.0000       -3.4306
+   CaSO4                               0.0003445         41.20      1.0000       -3.4628
+   KCl                                 0.0001244         8.149      1.0000       -3.9050
+   NaHCO3                              8.085e-05         5.966      1.0000       -4.0923
+   HCO3-                               6.557e-05         3.514      0.7061       -4.3344
+   SiO2(aq)                            1.476e-05        0.7789      1.6774       -4.6063
+   KSO4-                               8.838e-06         1.049      0.6745       -5.2247
+   MgHCO3+                             7.663e-06        0.5743      0.6745       -5.2866
+   CaHCO3+                             6.673e-06        0.5925      0.7450       -5.3035
+   CO2(aq)                             2.839e-06        0.1097      1.0000       -5.5469
+   NaH3SiO4                            2.824e-06        0.2929      1.0000       -5.5491
+   MgOH+                               1.290e-06       0.04682      0.6745       -6.0603
+   CaCO3                               9.924e-07       0.08724      1.0000       -6.0033
+   MgCO3                               8.093e-07       0.05993      1.0000       -6.0919
+   OH-                                 7.681e-07       0.01147      0.6388       -6.3092
+   CO3--                               6.509e-07       0.03431      0.1355       -7.0546
+   NaCO3-                              5.323e-07       0.03881      0.6745       -6.4448
+   NaOH                                4.228e-07       0.01485      1.0000       -6.3739
+   H3SiO4-                             2.197e-07       0.01836      0.6745       -6.8291
+   CaOH+                               9.905e-08      0.004966      0.6745       -7.1752
+   H+                                  2.732e-08     2.419e-05      0.8845       -7.6168
+   CH4(aq)                             1.237e-08     0.0001743      1.6774       -7.6829
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Talc                              0.0000 sat    Halite                           -1.3356     
+   Antigorite                        0.0000 sat    Gypsum                           -1.4183     
+   Dolomite                          0.0000 sat    Anhydrite                        -1.4974     
+   Dolomite-ord                     -0.0000        Dolomite-dis                     -1.5225     
+   Calcite                          -0.5689        Monohydrocalcite                 -1.6051     
+   Quartz                           -0.6507        Amrph^silica                     -1.9159     
+   Chrysotile                       -0.7150        Sulfur-Rhmb                      -2.0399     
+   Aragonite                        -0.7331        Bassanite                        -2.1431     
+   Tridymite                        -0.8134        CaSO4^1/2H2O(beta)               -2.3079     
+   Chalcedony                       -0.9192        Enstatite                        -2.6802     
+   Magnesite                        -1.0417        Mirabilite                       -2.7429     
+   Cristobalite                     -1.1948     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   65.99         66.05         1.001      1.8198
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                               0.003694      0.003667        0.9926     -2.4357
+   CO2(g)                              8.381e-05     8.341e-05        0.9951     -4.0788
+   CH4(g)                              1.375e-05     1.373e-05        0.9983     -4.8623
+   S2(g)                               1.791e-18     1.791e-18         1.000*   -17.7470
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.52        55.52   8.783e+05
+   CH4(aq)                           1.237e-08    1.237e-08   0.0001743
+   Ca++                                0.09513      0.09409       3312.
+   Cl-                                   2.386        2.386   7.428e+04
+   H+                                -0.002064    0.0003653      0.3234
+   H2(aq)                              0.03069      0.03069       54.33
+   HCO3-                              0.002257    0.0001666       8.927
+   HS-                                0.002891     0.002891       83.95
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06589       1406.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.005379     0.005379       453.7
+   SiO2(aq)                          0.0002338    1.781e-05      0.9395
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09409       3312.
+   Carbon                             0.002257    0.0001666       1.757
+   Chlorine                              2.386        2.386   7.428e+04
+   Hydrogen                              111.1        111.1   9.834e+04
+   Magnesium                           0.06711      0.06589       1406.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    1.781e-05      0.4391
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   247             Xi = 0.1894
+          Time = 7.59053e+10 secs  (878534 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  7.619
+          Ionic strength      =    2.324569 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0002 kg
+          Solution mass       =      1.1387 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.839e-05 /bar
+            expansivity       =   0.0002594 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385514 molal
+          Dissolved solids    =      121653 mg/kg sol'n
+          Hardness            =    14049.74 mg/kg sol'n as CaCO3
+            carbonate         =        7.09 mg/kg sol'n as CaCO3
+            non-carbonate     =    14042.66 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        7.09 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =      0.0895 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =        15.8 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.2794   -4.6730
+   2 e-  + 2 H+  = H2(aq)                                -0.5074   -8.4866
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.2677   -4.4774
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.164e-08          --            --       4.494e-19
+   microbe-SRB                                        0.003133          --            --       6.640e-13
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.561e-05         39.90        -30.51   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         15.85         45.65        -32.07   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.272e-05     -4.896        0.02884         0.02224
+   Dolomite                             0.001045     -2.981         0.1928         0.06728
+                                                              _____________   _____________
+   (total)                                                          0.2216           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.992e+04      0.5986        0.1284
+   Na+                                     2.021     4.082e+04      0.6745        0.1346
+   CaCl+                                 0.06194         4109.      0.6745       -1.3791
+   NaCl                                  0.04930         2531.      1.0000       -1.3072
+   Mg++                                  0.03634         775.7      0.2928       -1.9730
+   Ca++                                  0.03179         1119.      0.2048       -2.1864
+   H2(aq)                                0.02972         52.62      1.6773       -1.3024
+   MgCl+                                 0.02897         1521.      0.6745       -1.7091
+   K+                                   0.005717         196.3      0.5986       -2.4657
+   HS-                                  0.002732         79.35      0.6388       -2.7581
+   NaSO4-                               0.002332         243.8      0.6745       -2.8034
+   SO4--                                0.002038         171.9      0.1128       -3.6387
+   MgSO4                               0.0004289         45.34      1.0000       -3.3677
+   H2S(aq)                             0.0004004         11.98      1.0000       -3.3975
+   CaSO4                               0.0003291         39.35      1.0000       -3.4827
+   KCl                                 0.0001245         8.149      1.0000       -3.9050
+   NaHCO3                              8.053e-05         5.942      1.0000       -4.0940
+   HCO3-                               6.531e-05         3.500      0.7061       -4.3361
+   SiO2(aq)                            1.460e-05        0.7704      1.6773       -4.6111
+   KSO4-                               8.442e-06         1.002      0.6745       -5.2446
+   MgHCO3+                             7.619e-06        0.5710      0.6745       -5.2891
+   CaHCO3+                             6.647e-06        0.5903      0.7450       -5.3052
+   CO2(aq)                             2.814e-06        0.1088      1.0000       -5.5507
+   NaH3SiO4                            2.807e-06        0.2911      1.0000       -5.5518
+   MgOH+                               1.294e-06       0.04696      0.6745       -6.0590
+   CaCO3                               9.934e-07       0.08733      1.0000       -6.0029
+   MgCO3                               8.085e-07       0.05988      1.0000       -6.0923
+   OH-                                 7.718e-07       0.01153      0.6388       -6.3071
+   CO3--                               6.514e-07       0.03434      0.1355       -7.0543
+   NaCO3-                              5.328e-07       0.03884      0.6745       -6.4445
+   NaOH                                4.248e-07       0.01492      1.0000       -6.3718
+   H3SiO4-                             2.184e-07       0.01824      0.6745       -6.8318
+   CaOH+                               9.954e-08      0.004991      0.6745       -7.1731
+   H+                                  2.719e-08     2.407e-05      0.8845       -7.6188
+   CH4(aq)                             1.254e-08     0.0001767      1.6773       -7.6771
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Antigorite                        0.0000 sat    Halite                           -1.3356     
+   Dolomite                          0.0000 sat    Gypsum                           -1.4382     
+   Dolomite-ord                     -0.0000        Anhydrite                        -1.5173     
+   Talc                             -0.0090        Dolomite-dis                     -1.5225     
+   Calcite                          -0.5685        Monohydrocalcite                 -1.6047     
+   Quartz                           -0.6555        Amrph^silica                     -1.9207     
+   Chrysotile                       -0.7144        Sulfur-Rhmb                      -2.0211     
+   Aragonite                        -0.7327        Bassanite                        -2.1630     
+   Tridymite                        -0.8182        CaSO4^1/2H2O(beta)               -2.3278     
+   Chalcedony                       -0.9240        Enstatite                        -2.6816     
+   Magnesite                        -1.0421        Mirabilite                       -2.7629     
+   Cristobalite                     -1.1996     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   63.91         63.96         1.001      1.8059
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                               0.003987      0.003957        0.9926     -2.4026
+   CO2(g)                              8.308e-05     8.268e-05        0.9951     -4.0826
+   CH4(g)                              1.394e-05     1.392e-05        0.9983     -4.8564
+   S2(g)                               1.953e-18     1.953e-18         1.000*   -17.7094
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.52        55.52   8.783e+05
+   CH4(aq)                           1.254e-08    1.254e-08   0.0001767
+   Ca++                                0.09513      0.09409       3312.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.002306    0.0003947      0.3494
+   H2(aq)                              0.02972      0.02972       52.62
+   HCO3-                              0.002257    0.0001659       8.892
+   HS-                                0.003133     0.003133       90.98
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06576       1404.
+   Na+                                   2.074        2.074   4.186e+04
+   SO4--                              0.005137     0.005137       433.3
+   SiO2(aq)                          0.0002338    1.763e-05      0.9300
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09409       3312.
+   Carbon                             0.002257    0.0001660       1.750
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.834e+04
+   Magnesium                           0.06711      0.06576       1404.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    1.763e-05      0.4347
+   Sodium                                2.074        2.074   4.186e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   325             Xi = 0.1917
+          Time = 7.6832e+10 secs  (889260 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.139
+          Ionic strength      =    2.324364 molal
+          Activity of water   =    0.925377
+          Solvent mass        =      1.0002 kg
+          Solution mass       =      1.1387 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.839e-05 /bar
+            expansivity       =   0.0002593 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.385403 molal
+          Dissolved solids    =      121599 mg/kg sol'n
+          Hardness            =    14033.70 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    14033.27 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =      0.0965 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.87e-11 cm2
+          Total biomass       =        19.2 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.3931   -6.5745
+   2 e-  + 2 H+  = H2(aq)                                -0.5970   -9.9856
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.3715   -6.2127
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.207e-08          --            --       4.647e-19
+   microbe-SRB                                        0.003812          --            --       8.040e-13
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.614e-05         39.90        -27.29   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         19.24         45.65        -30.18   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                             1.912e-06     -5.718      0.0001115       4.709e-05
+   Dolomite                             0.001124     -2.949         0.2073         0.07237
+                                                              _____________   _____________
+   (total)                                                          0.2386           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.992e+04      0.5986        0.1284
+   Na+                                     2.022     4.083e+04      0.6745        0.1347
+   CaCl+                                 0.06191         4108.      0.6745       -1.3793
+   NaCl                                  0.04930         2531.      1.0000       -1.3071
+   Mg++                                  0.03629         774.8      0.2928       -1.9736
+   Ca++                                  0.03178         1119.      0.2048       -2.1866
+   MgCl+                                 0.02893         1519.      0.6745       -1.7097
+   H2(aq)                                0.02700         47.81      1.6772       -1.3440
+   K+                                   0.005718         196.4      0.5986       -2.4656
+   HS-                                  0.003794         110.2      0.6388       -2.6156
+   NaSO4-                               0.002024         211.6      0.6745       -2.8648
+   SO4--                                0.001768         149.2      0.1128       -3.7003
+   MgSO4                               0.0003717         39.30      1.0000       -3.4298
+   CaSO4                               0.0002855         34.14      1.0000       -3.5444
+   KCl                                 0.0001245         8.151      1.0000       -3.9050
+   MgOH+                               4.278e-05         1.552      0.6745       -4.5398
+   OH-                                 2.555e-05        0.3816      0.6388       -4.7873
+   H2S(aq)                             1.680e-05        0.5028      1.0000       -4.7747
+   NaOH                                1.406e-05        0.4941      1.0000       -4.8519
+   KSO4-                               7.328e-06        0.8700      0.6745       -5.3061
+   CaOH+                               3.293e-06        0.1651      0.6745       -5.6534
+   NaHCO3                              2.436e-06        0.1797      1.0000       -5.6134
+   HCO3-                               1.975e-06        0.1058      0.7061       -5.8556
+   CaCO3                               9.938e-07       0.08737      1.0000       -6.0027
+   MgCO3                               8.081e-07       0.05985      1.0000       -6.0925
+   CO3--                               6.520e-07       0.03437      0.1355       -7.0539
+   NaCO3-                              5.333e-07       0.03888      0.6745       -6.4441
+   S--                                 3.213e-07      0.009048      0.1586       -7.2929
+   MgHCO3+                             2.301e-07       0.01724      0.6745       -6.8091
+   CaHCO3+                             2.009e-07       0.01784      0.7450       -6.8248
+   CH4(aq)                             1.296e-08     0.0001827      1.6772       -7.6627
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Antigorite                        0.0000 sat    Gypsum                           -1.4999     
+   Dolomite                          0.0000 sat    Dolomite-dis                     -1.5225     
+   Brucite                           0.0000 sat    Anhydrite                        -1.5790     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.6045     
+   Chrysotile                       -0.1781        Bassanite                        -2.2247     
+   Calcite                          -0.5683        Artinite                         -2.2512     
+   Aragonite                        -0.7325        CaSO4^1/2H2O(beta)               -2.3895     
+   Magnesite                        -1.0423        Mg2Cl(OH)3^4H2O                  -2.6208     
+   Halite                           -1.3355        Mirabilite                       -2.8243     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   58.07         58.11         1.001      1.7643
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                              0.0001673     0.0001660        0.9926     -3.7798
+   CH4(g)                              1.441e-05     1.439e-05        0.9983     -4.8420
+   CO2(g)                              7.591e-08     7.554e-08        0.9951     -7.1218
+   S2(g)                               4.723e-22     4.723e-22         1.000*   -21.3258
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.52        55.52   8.784e+05
+   CH4(aq)                           1.297e-08    1.297e-08   0.0001827
+   Ca++                                0.09513      0.09401       3309.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.002985   -7.222e-05    -0.06392
+   H2(aq)                              0.02701      0.02701       47.81
+   HCO3-                              0.002257    7.833e-06      0.4197
+   HS-                                0.003812     0.003812       110.7
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06565       1401.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                              0.004458     0.004458       376.1
+   SiO2(aq)                          0.0002338    5.880e-09   0.0003103
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09401       3309.
+   Carbon                             0.002257    7.846e-06     0.08276
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.834e+04
+   Magnesium                           0.06711      0.06565       1401.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.880e-09   0.0001450
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.8
+
+
+          Step #   388             Xi = 0.2000
+          Time = 8.01563e+10 secs  (927735 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.144
+          Ionic strength      =    2.321160 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002593 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384919 molal
+          Dissolved solids    =      121335 mg/kg sol'n
+          Hardness            =    13869.08 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13868.65 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.143 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        38.1 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.3938   -6.5870
+   2 e-  + 2 H+  = H2(aq)                                -0.5868   -9.8140
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.3801   -6.3566
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.371e-08          --            --       5.237e-19
+   microbe-SRB                                        0.007572          --            --       1.426e-12
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     1.819e-05         39.90        -25.82   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         38.10         45.65        -27.66   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.001890     -2.724         0.1102         0.04655
+   Dolomite                             0.001124     -2.949         0.2073         0.07237
+                                                              _____________   _____________
+   (total)                                                          0.3488           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6744        0.1349
+   CaCl+                                 0.06206         4119.      0.6744       -1.3783
+   NaCl                                  0.04932         2533.      1.0000       -1.3070
+   Mg++                                  0.03541         756.2      0.2928       -1.9843
+   Ca++                                  0.03185         1122.      0.2048       -2.1856
+   MgCl+                                 0.02823         1482.      0.6744       -1.7204
+   H2(aq)                                0.01196         21.19      1.6762       -1.6979
+   HS-                                  0.007535         218.9      0.6388       -2.3176
+   K+                                   0.005723         196.6      0.5985       -2.4653
+   NaSO4-                              0.0003173         33.19      0.6744       -3.6696
+   SO4--                               0.0002770         23.38      0.1128       -4.5052
+   KCl                                 0.0001246         8.159      1.0000       -3.9046
+   MgSO4                               5.682e-05         6.010      1.0000       -4.2455
+   CaSO4                               4.484e-05         5.364      1.0000       -4.3483
+   MgOH+                               4.226e-05         1.534      0.6744       -4.5452
+   H2S(aq)                             3.295e-05        0.9867      1.0000       -4.4821
+   OH-                                 2.587e-05        0.3865      0.6388       -4.7819
+   NaOH                                1.424e-05        0.5006      1.0000       -4.8464
+   CaOH+                               3.342e-06        0.1677      0.6744       -5.6471
+   NaHCO3                              2.434e-06        0.1797      1.0000       -5.6137
+   HCO3-                               1.973e-06        0.1058      0.7060       -5.8561
+   KSO4-                               1.149e-06        0.1365      0.6744       -6.1107
+   CaCO3                               1.007e-06       0.08859      1.0000       -5.9968
+   MgCO3                               7.973e-07       0.05907      1.0000       -6.0984
+   CO3--                               6.592e-07       0.03476      0.1355       -7.0490
+   S--                                 6.460e-07       0.01820      0.1586       -6.9895
+   NaCO3-                              5.397e-07       0.03936      0.6744       -6.4390
+   MgHCO3+                             2.243e-07       0.01681      0.6744       -6.8204
+   CaHCO3+                             2.012e-07       0.01787      0.7448       -6.8243
+   CH4(aq)                             1.460e-08     0.0002058      1.6762       -7.6113
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Halite                           -1.3354     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Antigorite                        0.0000 sat    Monohydrocalcite                 -1.5987     
+   Dolomite-ord                     -0.0000        Artinite                         -2.2570     
+   Chrysotile                       -0.1781        Gypsum                           -2.3039     
+   Calcite                          -0.5624        Anhydrite                        -2.3829     
+   Aragonite                        -0.7266        Mg2Cl(OH)3^4H2O                  -2.6262     
+   Magnesite                        -1.0482     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   25.71         25.73         1.001      1.4104
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                              0.0003281     0.0003257        0.9926     -3.4872
+   CH4(g)                              1.622e-05     1.620e-05        0.9983     -4.7906
+   CO2(g)                              7.489e-08     7.452e-08        0.9951     -7.1277
+   S2(g)                               5.074e-22     5.074e-22         1.000*   -21.2947
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.53   8.787e+05
+   CH4(aq)                           1.461e-08    1.461e-08   0.0002058
+   Ca++                                0.09513      0.09401       3309.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.006746   -5.645e-05    -0.04997
+   H2(aq)                              0.01197      0.01197       21.19
+   HCO3-                              0.002257    7.842e-06      0.4202
+   HS-                                0.007572     0.007572       219.9
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06376       1361.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             0.0006975    0.0006975       58.84
+   SiO2(aq)                          0.0002338    5.948e-09   0.0003139
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09401       3309.
+   Carbon                             0.002257    7.856e-06     0.08288
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06376       1361.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.948e-09   0.0001467
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   698             Xi = 0.3000
+          Time = 1.20234e+11 secs  (1.3916e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.145
+          Ionic strength      =    2.320564 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384829 molal
+          Dissolved solids    =      121287 mg/kg sol'n
+          Hardness            =    13838.54 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13838.11 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.152 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        41.6 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.3986   -6.6671
+   2 e-  + 2 H+  = H2(aq)                                -0.5834   -9.7574
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4757   -7.9566
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       6.162e-08          --            --       2.279e-18
+   microbe-SRB                                        0.008270          --            --       2.228e-24
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     7.916e-05         39.90        -24.72   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -14.41   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002240     -2.650         0.1307         0.05518
+   Dolomite                             0.001124     -2.949         0.2073         0.07237
+                                                              _____________   _____________
+   (total)                                                          0.3692           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06209         4121.      0.6743       -1.3781
+   NaCl                                  0.04933         2533.      1.0000       -1.3069
+   Mg++                                  0.03524         752.7      0.2928       -1.9863
+   Ca++                                  0.03187         1122.      0.2048       -2.1854
+   MgCl+                                 0.02810         1475.      0.6743       -1.7225
+   H2(aq)                               0.009173         16.25      1.6760       -1.8132
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.7      0.5985       -2.4652
+   KCl                                 0.0001246         8.161      1.0000       -3.9046
+   MgOH+                               4.217e-05         1.531      0.6743       -4.5462
+   H2S(aq)                             3.590e-05         1.075      1.0000       -4.4449
+   OH-                                 2.593e-05        0.3875      0.6387       -4.7809
+   NaOH                                1.428e-05        0.5018      1.0000       -4.8453
+   CaOH+                               3.352e-06        0.1681      0.6743       -5.6459
+   NaHCO3                              2.434e-06        0.1796      1.0000       -5.6138
+   HCO3-                               1.973e-06        0.1058      0.7060       -5.8562
+   CaCO3                               1.010e-06       0.08882      1.0000       -5.9957
+   MgCO3                               7.953e-07       0.05892      1.0000       -6.0995
+   S--                                 7.071e-07       0.01992      0.1586       -6.9503
+   CO3--                               6.605e-07       0.03483      0.1355       -7.0481
+   NaCO3-                              5.409e-07       0.03945      0.6743       -6.4380
+   MgHCO3+                             2.232e-07       0.01673      0.6743       -6.8225
+   CaHCO3+                             2.013e-07       0.01788      0.7448       -6.8242
+   CH4(aq)                             6.249e-08     0.0008810      1.6760       -6.9799
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0493     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5975     
+   Chrysotile                       -0.1781        Artinite                         -2.2581     
+   Calcite                          -0.5613        Mg2Cl(OH)3^4H2O                  -2.6272     
+   Aragonite                        -0.7255     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   19.71         19.73         1.001      1.2950
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                              0.0003575     0.0003549        0.9926     -3.4499
+   CH4(g)                              6.942e-05     6.931e-05        0.9983     -4.1592
+   CO2(g)                              7.470e-08     7.433e-08        0.9951     -7.1288
+   S2(g)                               2.421e-28     2.421e-28         1.000*   -27.6161
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           6.253e-08    6.253e-08   0.0008810
+   Ca++                                0.09513      0.09401       3309.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007443   -5.357e-05    -0.04742
+   H2(aq)                             0.009177     0.009177       16.25
+   HCO3-                              0.002257    7.843e-06      0.4203
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06341       1354.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             2.524e-13    2.524e-13   2.129e-08
+   SiO2(aq)                          0.0002338    5.961e-09   0.0003146
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09401       3309.
+   Carbon                             0.002257    7.906e-06     0.08340
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06341       1354.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.961e-09   0.0001470
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   713             Xi = 0.4000
+          Time = 1.60313e+11 secs  (1.85547e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.145
+          Ionic strength      =    2.320564 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384829 molal
+          Dissolved solids    =      121287 mg/kg sol'n
+          Hardness            =    13838.54 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13838.11 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.152 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        41.6 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4035   -6.7480
+   2 e-  + 2 H+  = H2(aq)                                -0.5834   -9.7573
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4788   -8.0087
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       2.765e-07          --            --       1.025e-17
+   microbe-SRB                                        0.008270          --            --       8.528e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14     0.0003559         39.90        -24.08   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -13.99   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002241     -2.650         0.1307         0.05518
+   Dolomite                             0.001124     -2.949         0.2073         0.07236
+                                                              _____________   _____________
+   (total)                                                          0.3692           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06209         4121.      0.6743       -1.3781
+   NaCl                                  0.04933         2533.      1.0000       -1.3069
+   Mg++                                  0.03524         752.7      0.2928       -1.9863
+   Ca++                                  0.03187         1122.      0.2048       -2.1854
+   MgCl+                                 0.02810         1475.      0.6743       -1.7225
+   H2(aq)                               0.009172         16.25      1.6760       -1.8133
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.7      0.5985       -2.4652
+   KCl                                 0.0001246         8.161      1.0000       -3.9046
+   MgOH+                               4.217e-05         1.531      0.6743       -4.5462
+   H2S(aq)                             3.590e-05         1.075      1.0000       -4.4449
+   OH-                                 2.593e-05        0.3875      0.6387       -4.7809
+   NaOH                                1.428e-05        0.5018      1.0000       -4.8453
+   CaOH+                               3.352e-06        0.1681      0.6743       -5.6459
+   NaHCO3                              2.434e-06        0.1796      1.0000       -5.6138
+   HCO3-                               1.973e-06        0.1058      0.7060       -5.8562
+   CaCO3                               1.010e-06       0.08882      1.0000       -5.9957
+   MgCO3                               7.953e-07       0.05892      1.0000       -6.0995
+   S--                                 7.071e-07       0.01992      0.1586       -6.9503
+   CO3--                               6.605e-07       0.03483      0.1355       -7.0481
+   NaCO3-                              5.409e-07       0.03945      0.6743       -6.4380
+   CH4(aq)                             2.773e-07      0.003909      1.6760       -6.3328
+   MgHCO3+                             2.232e-07       0.01673      0.6743       -6.8225
+   CaHCO3+                             2.013e-07       0.01788      0.7448       -6.8242
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0493     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5975     
+   Chrysotile                       -0.1781        Artinite                         -2.2581     
+   Calcite                          -0.5613        Mg2Cl(OH)3^4H2O                  -2.6272     
+   Aragonite                        -0.7255     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   19.71         19.72         1.001      1.2950
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                              0.0003575     0.0003549        0.9926     -3.4499
+   CH4(g)                              0.0003081     0.0003075        0.9983     -3.5121
+   CO2(g)                              7.470e-08     7.433e-08        0.9951     -7.1288
+   S2(g)                               1.497e-28     1.497e-28         1.000*   -27.8246
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           2.774e-07    2.774e-07    0.003909
+   Ca++                                0.09513      0.09401       3309.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007443   -5.357e-05    -0.04742
+   H2(aq)                             0.009176     0.009176       16.25
+   HCO3-                              0.002256    7.843e-06      0.4203
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06341       1354.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.984e-13    1.984e-13   1.674e-08
+   SiO2(aq)                          0.0002338    5.961e-09   0.0003146
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09401       3309.
+   Carbon                             0.002257    8.121e-06     0.08567
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06341       1354.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.961e-09   0.0001470
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   728             Xi = 0.5000
+          Time = 2.00391e+11 secs  (2.31934e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.145
+          Ionic strength      =    2.320563 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384829 molal
+          Dissolved solids    =      121287 mg/kg sol'n
+          Hardness            =    13838.54 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13838.11 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.152 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        41.6 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4083   -6.8294
+   2 e-  + 2 H+  = H2(aq)                                -0.5834   -9.7573
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4806   -8.0388
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       1.242e-06          --            --       4.605e-17
+   microbe-SRB                                        0.008270          --            --       4.902e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14      0.001600         39.90        -23.42   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -13.75   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002241     -2.649         0.1307         0.05521
+   Dolomite                             0.001124     -2.949         0.2072         0.07233
+                                                              _____________   _____________
+   (total)                                                          0.3691           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06209         4121.      0.6743       -1.3781
+   NaCl                                  0.04933         2533.      1.0000       -1.3069
+   Mg++                                  0.03524         752.7      0.2928       -1.9863
+   Ca++                                  0.03187         1122.      0.2048       -2.1854
+   MgCl+                                 0.02810         1475.      0.6743       -1.7225
+   H2(aq)                               0.009168         16.24      1.6760       -1.8135
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.7      0.5985       -2.4652
+   KCl                                 0.0001246         8.161      1.0000       -3.9046
+   MgOH+                               4.216e-05         1.531      0.6743       -4.5462
+   H2S(aq)                             3.590e-05         1.075      1.0000       -4.4449
+   OH-                                 2.593e-05        0.3875      0.6387       -4.7809
+   NaOH                                1.428e-05        0.5018      1.0000       -4.8453
+   CaOH+                               3.352e-06        0.1681      0.6743       -5.6459
+   NaHCO3                              2.434e-06        0.1796      1.0000       -5.6138
+   HCO3-                               1.973e-06        0.1058      0.7060       -5.8562
+   CH4(aq)                             1.243e-06       0.01752      1.6760       -5.6813
+   CaCO3                               1.010e-06       0.08882      1.0000       -5.9957
+   MgCO3                               7.952e-07       0.05892      1.0000       -6.0995
+   S--                                 7.071e-07       0.01992      0.1586       -6.9503
+   CO3--                               6.605e-07       0.03483      0.1355       -7.0481
+   NaCO3-                              5.409e-07       0.03945      0.6743       -6.4380
+   MgHCO3+                             2.232e-07       0.01673      0.6743       -6.8225
+   CaHCO3+                             2.013e-07       0.01788      0.7448       -6.8242
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0493     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5975     
+   Chrysotile                       -0.1781        Artinite                         -2.2581     
+   Calcite                          -0.5613        Mg2Cl(OH)3^4H2O                  -2.6272     
+   Aragonite                        -0.7255     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   19.70         19.72         1.001      1.2948
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   CH4(g)                               0.001381      0.001378        0.9983     -2.8607
+   H2S(g)                              0.0003575     0.0003549        0.9926     -3.4499
+   CO2(g)                              7.470e-08     7.433e-08        0.9951     -7.1288
+   S2(g)                               1.135e-28     1.135e-28         1.000*   -27.9449
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           1.243e-06    1.243e-06     0.01752
+   Ca++                                0.09513      0.09401       3309.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007444   -5.357e-05    -0.04742
+   H2(aq)                             0.009172     0.009172       16.24
+   HCO3-                              0.002255    7.843e-06      0.4203
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06341       1354.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.728e-13    1.728e-13   1.458e-08
+   SiO2(aq)                          0.0002338    5.961e-09   0.0003146
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09401       3309.
+   Carbon                             0.002257    9.087e-06     0.09586
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06341       1354.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.961e-09   0.0001470
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   743             Xi = 0.6000
+          Time = 2.40469e+11 secs  (2.7832e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.145
+          Ionic strength      =    2.320562 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384829 molal
+          Dissolved solids    =      121287 mg/kg sol'n
+          Hardness            =    13838.54 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13838.11 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.152 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        41.6 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4132   -6.9110
+   2 e-  + 2 H+  = H2(aq)                                -0.5834   -9.7569
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4819   -8.0600
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       5.584e-06          --            --       2.070e-16
+   microbe-SRB                                        0.008270          --            --       3.317e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14      0.007191         39.90        -22.77   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -13.58   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002246     -2.649         0.1310         0.05531
+   Dolomite                             0.001122     -2.950         0.2068         0.07219
+                                                              _____________   _____________
+   (total)                                                          0.3690           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06209         4121.      0.6743       -1.3781
+   NaCl                                  0.04933         2533.      1.0000       -1.3069
+   Mg++                                  0.03524         752.7      0.2928       -1.9863
+   Ca++                                  0.03187         1122.      0.2048       -2.1854
+   MgCl+                                 0.02810         1475.      0.6743       -1.7225
+   H2(aq)                               0.009151         16.21      1.6760       -1.8143
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.7      0.5985       -2.4652
+   KCl                                 0.0001246         8.160      1.0000       -3.9046
+   MgOH+                               4.216e-05         1.531      0.6743       -4.5462
+   H2S(aq)                             3.590e-05         1.075      1.0000       -4.4449
+   OH-                                 2.593e-05        0.3875      0.6387       -4.7809
+   NaOH                                1.428e-05        0.5019      1.0000       -4.8453
+   CH4(aq)                             5.582e-06       0.07869      1.6760       -5.0289
+   CaOH+                               3.352e-06        0.1681      0.6743       -5.6458
+   NaHCO3                              2.434e-06        0.1796      1.0000       -5.6138
+   HCO3-                               1.973e-06        0.1058      0.7060       -5.8562
+   CaCO3                               1.010e-06       0.08882      1.0000       -5.9957
+   MgCO3                               7.952e-07       0.05892      1.0000       -6.0995
+   S--                                 7.071e-07       0.01992      0.1586       -6.9502
+   CO3--                               6.605e-07       0.03483      0.1355       -7.0481
+   NaCO3-                              5.409e-07       0.03945      0.6743       -6.4380
+   MgHCO3+                             2.232e-07       0.01673      0.6743       -6.8225
+   CaHCO3+                             2.013e-07       0.01788      0.7448       -6.8242
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0493     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5975     
+   Chrysotile                       -0.1781        Artinite                         -2.2582     
+   Calcite                          -0.5613        Mg2Cl(OH)3^4H2O                  -2.6272     
+   Aragonite                        -0.7255     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   19.66         19.68         1.001      1.2940
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   CH4(g)                               0.006201      0.006190        0.9983     -2.2083
+   H2S(g)                              0.0003575     0.0003548        0.9926     -3.4500
+   CO2(g)                              7.470e-08     7.433e-08        0.9951     -7.1288
+   S2(g)                               9.339e-29     9.339e-29         1.000*   -28.0297
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           5.585e-06    5.585e-06     0.07869
+   Ca++                                0.09513      0.09401       3309.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007449   -5.357e-05    -0.04742
+   H2(aq)                             0.009155     0.009155       16.21
+   HCO3-                              0.002251    7.843e-06      0.4203
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06341       1354.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.567e-13    1.567e-13   1.322e-08
+   SiO2(aq)                          0.0002338    5.961e-09   0.0003146
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09401       3309.
+   Carbon                             0.002257    1.343e-05      0.1417
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06341       1354.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.961e-09   0.0001470
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   759             Xi = 0.7000
+          Time = 2.80547e+11 secs  (3.24707e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.145
+          Ionic strength      =    2.320557 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384828 molal
+          Dissolved solids    =      121287 mg/kg sol'n
+          Hardness            =    13838.53 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13838.10 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.151 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        41.6 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4181   -6.9925
+   2 e-  + 2 H+  = H2(aq)                                -0.5833   -9.7550
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4829   -8.0764
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       2.508e-05          --            --       9.290e-16
+   microbe-SRB                                        0.008270          --            --       2.453e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14       0.03227         39.90        -22.10   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -13.43   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002265     -2.645         0.1321         0.05579
+   Dolomite                             0.001112     -2.954         0.2050         0.07156
+                                                              _____________   _____________
+   (total)                                                          0.3683           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06210         4122.      0.6743       -1.3780
+   NaCl                                  0.04933         2533.      1.0000       -1.3069
+   Mg++                                  0.03524         752.5      0.2928       -1.9864
+   Ca++                                  0.03187         1123.      0.2048       -2.1853
+   MgCl+                                 0.02809         1475.      0.6743       -1.7225
+   H2(aq)                               0.009073         16.07      1.6760       -1.8180
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.7      0.5985       -2.4652
+   KCl                                 0.0001246         8.160      1.0000       -3.9046
+   MgOH+                               4.216e-05         1.531      0.6743       -4.5462
+   H2S(aq)                             3.590e-05         1.075      1.0000       -4.4449
+   OH-                                 2.593e-05        0.3875      0.6387       -4.7809
+   CH4(aq)                             2.507e-05        0.3534      1.6760       -4.3766
+   NaOH                                1.428e-05        0.5019      1.0000       -4.8453
+   CaOH+                               3.352e-06        0.1682      0.6743       -5.6458
+   NaHCO3                              2.433e-06        0.1796      1.0000       -5.6138
+   HCO3-                               1.972e-06        0.1058      0.7060       -5.8562
+   CaCO3                               1.010e-06       0.08883      1.0000       -5.9957
+   MgCO3                               7.951e-07       0.05891      1.0000       -6.0996
+   S--                                 7.071e-07       0.01992      0.1586       -6.9502
+   CO3--                               6.606e-07       0.03483      0.1355       -7.0481
+   NaCO3-                              5.409e-07       0.03945      0.6743       -6.4380
+   MgHCO3+                             2.231e-07       0.01673      0.6743       -6.8226
+   CaHCO3+                             2.013e-07       0.01788      0.7448       -6.8242
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0494     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5975     
+   Chrysotile                       -0.1781        Artinite                         -2.2582     
+   Calcite                          -0.5612        Mg2Cl(OH)3^4H2O                  -2.6272     
+   Aragonite                        -0.7255     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   19.50         19.51         1.001      1.2903
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   CH4(g)                                0.02785       0.02780        0.9983     -1.5560
+   H2S(g)                              0.0003575     0.0003548        0.9926     -3.4500
+   CO2(g)                              7.469e-08     7.432e-08        0.9951     -7.1289
+   S2(g)                               8.029e-29     8.029e-29         1.000*   -28.0953
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           2.508e-05    2.508e-05      0.3534
+   Ca++                                0.09513      0.09402       3310.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007468   -5.357e-05    -0.04742
+   H2(aq)                             0.009077     0.009077       16.07
+   HCO3-                              0.002231    7.843e-06      0.4203
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06340       1353.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.453e-13    1.453e-13   1.226e-08
+   SiO2(aq)                          0.0002338    5.962e-09   0.0003146
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09402       3310.
+   Carbon                             0.002257    3.292e-05      0.3473
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06340       1353.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.962e-09   0.0001471
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   776             Xi = 0.8000
+          Time = 3.20625e+11 secs  (3.71094e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.145
+          Ionic strength      =    2.320536 molal
+          Activity of water   =    0.925375
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384824 molal
+          Dissolved solids    =      121288 mg/kg sol'n
+          Hardness            =    13838.50 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13838.07 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.151 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        41.7 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4230   -7.0741
+   2 e-  + 2 H+  = H2(aq)                                -0.5828   -9.7467
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4837   -8.0899
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       0.0001123          --            --       4.151e-15
+   microbe-SRB                                        0.008270          --            --       1.918e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14        0.1442         39.90        -21.38   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -13.25   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002353     -2.628         0.1372         0.05794
+   Dolomite                             0.001068     -2.971         0.1970         0.06876
+                                                              _____________   _____________
+   (total)                                                          0.3654           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06213         4123.      0.6743       -1.3778
+   NaCl                                  0.04933         2533.      1.0000       -1.3069
+   Mg++                                  0.03521         752.0      0.2928       -1.9867
+   Ca++                                  0.03189         1123.      0.2048       -2.1851
+   MgCl+                                 0.02807         1474.      0.6743       -1.7229
+   H2(aq)                               0.008724         15.45      1.6760       -1.8350
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.7      0.5985       -2.4652
+   KCl                                 0.0001246         8.160      1.0000       -3.9046
+   CH4(aq)                             0.0001122         1.582      1.6760       -3.7256
+   MgOH+                               4.215e-05         1.530      0.6743       -4.5464
+   H2S(aq)                             3.589e-05         1.075      1.0000       -4.4451
+   OH-                                 2.594e-05        0.3876      0.6387       -4.7807
+   NaOH                                1.429e-05        0.5021      1.0000       -4.8451
+   CaOH+                               3.355e-06        0.1683      0.6743       -5.6454
+   NaHCO3                              2.433e-06        0.1796      1.0000       -5.6139
+   HCO3-                               1.972e-06        0.1057      0.7060       -5.8563
+   CaCO3                               1.011e-06       0.08889      1.0000       -5.9954
+   MgCO3                               7.947e-07       0.05888      1.0000       -6.0998
+   S--                                 7.074e-07       0.01993      0.1586       -6.9501
+   CO3--                               6.606e-07       0.03484      0.1355       -7.0481
+   NaCO3-                              5.409e-07       0.03945      0.6743       -6.4380
+   MgHCO3+                             2.229e-07       0.01671      0.6743       -6.8230
+   CaHCO3+                             2.013e-07       0.01788      0.7448       -6.8241
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0496     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5972     
+   Chrysotile                       -0.1781        Artinite                         -2.2585     
+   Calcite                          -0.5610        Mg2Cl(OH)3^4H2O                  -2.6274     
+   Aragonite                        -0.7252     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   18.75         18.76         1.001      1.2733
+   CH4(g)                                 0.1247        0.1245        0.9983     -0.9050
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                              0.0003573     0.0003547        0.9926     -3.4501
+   CO2(g)                              7.464e-08     7.428e-08        0.9951     -7.1291
+   S2(g)                               7.094e-29     7.094e-29         1.000*   -28.1491
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           0.0001123    0.0001123       1.582
+   Ca++                                0.09513      0.09406       3311.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007555   -5.359e-05    -0.04744
+   H2(aq)                             0.008728     0.008728       15.45
+   HCO3-                              0.002144    7.842e-06      0.4203
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06336       1352.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.366e-13    1.366e-13   1.153e-08
+   SiO2(aq)                          0.0002338    5.963e-09   0.0003147
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09406       3311.
+   Carbon                             0.002257    0.0001201       1.267
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.835e+04
+   Magnesium                           0.06711      0.06336       1352.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.963e-09   0.0001471
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   799             Xi = 0.9000
+          Time = 3.60703e+11 secs  (4.17481e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.146
+          Ionic strength      =    2.320439 molal
+          Activity of water   =    0.925377
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1386 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384808 molal
+          Dissolved solids    =      121292 mg/kg sol'n
+          Hardness            =    13838.34 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13837.91 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.148 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        42.2 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4278   -7.1557
+   2 e-  + 2 H+  = H2(aq)                                -0.5803   -9.7051
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4844   -8.1019
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                       0.0004977          --            --       1.828e-14
+   microbe-SRB                                        0.008270          --            --       1.561e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14        0.6351         39.90        -20.40   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -12.83   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.002738     -2.563         0.1597         0.06744
+   Dolomite                            0.0008755     -3.058         0.1614         0.05635
+                                                              _____________   _____________
+   (total)                                                          0.3523           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.994e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06225         4132.      0.6743       -1.3770
+   NaCl                                  0.04932         2533.      1.0000       -1.3069
+   Mg++                                  0.03511         749.7      0.2928       -1.9880
+   Ca++                                  0.03195         1125.      0.2048       -2.1842
+   MgCl+                                 0.02799         1470.      0.6743       -1.7242
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   H2(aq)                               0.007183         12.72      1.6760       -1.9194
+   K+                                   0.005724         196.6      0.5985       -2.4652
+   CH4(aq)                             0.0004975         7.013      1.6760       -3.0790
+   KCl                                 0.0001246         8.160      1.0000       -3.9046
+   MgOH+                               4.208e-05         1.528      0.6743       -4.5470
+   H2S(aq)                             3.583e-05         1.073      1.0000       -4.4457
+   OH-                                 2.598e-05        0.3882      0.6387       -4.7801
+   NaOH                                1.431e-05        0.5028      1.0000       -4.8445
+   CaOH+                               3.367e-06        0.1689      0.6743       -5.6438
+   NaHCO3                              2.430e-06        0.1794      1.0000       -5.6143
+   HCO3-                               1.970e-06        0.1056      0.7060       -5.8567
+   CaCO3                               1.013e-06       0.08911      1.0000       -5.9943
+   MgCO3                               7.926e-07       0.05872      1.0000       -6.1009
+   S--                                 7.085e-07       0.01996      0.1586       -6.9494
+   CO3--                               6.610e-07       0.03485      0.1355       -7.0478
+   NaCO3-                              5.412e-07       0.03947      0.6743       -6.4378
+   MgHCO3+                             2.220e-07       0.01664      0.6743       -6.8248
+   CaHCO3+                             2.015e-07       0.01790      0.7448       -6.8236
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0507     
+   Antigorite                        0.0000 sat    Halite                           -1.3353     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5961     
+   Chrysotile                       -0.1781        Artinite                         -2.2596     
+   Calcite                          -0.5599        Mg2Cl(OH)3^4H2O                  -2.6281     
+   Aragonite                        -0.7241     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   H2(g)                                   15.43         15.45         1.001      1.1888
+   CH4(g)                                 0.5526        0.5517        0.9983     -0.2583
+   Steam                                 0.03637       0.03469        0.9537     -1.4599
+   H2S(g)                              0.0003568     0.0003542        0.9926     -3.4508
+   CO2(g)                              7.445e-08     7.409e-08        0.9951     -7.1302
+   S2(g)                               6.374e-29     6.374e-29         1.000*   -28.1956
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.54        55.54   8.787e+05
+   CH4(aq)                           0.0004977    0.0004977       7.013
+   Ca++                                0.09513      0.09426       3318.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.007941   -5.366e-05    -0.04750
+   H2(aq)                             0.007187     0.007187       12.72
+   HCO3-                              0.001759    7.838e-06      0.4200
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06317       1348.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.297e-13    1.297e-13   1.094e-08
+   SiO2(aq)                          0.0002338    5.971e-09   0.0003151
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09426       3318.
+   Carbon                             0.002257    0.0005056       5.333
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.834e+04
+   Magnesium                           0.06711      0.06317       1348.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    5.971e-09   0.0001473
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.9
+
+
+          Step #   915             Xi = 1.0000
+          Time = 4.00782e+11 secs  (4.63867e+06 days)
+
+          Temperature =  28.2 C    Pressure =  1.013 bar
+          pH =  9.149
+          Ionic strength      =    2.320024 molal
+          Activity of water   =    0.925385
+          Solvent mass        =      1.0005 kg
+          Solution mass       =      1.1387 kg
+          Mineral mass        =      11.154 kg
+          Fluid density       =    1.082    g/cm3
+            compressibility   =   3.841e-05 /bar
+            expansivity       =   0.0002592 /C
+            viscosity         =    0.011    poise
+          Chlorinity          =    2.384737 molal
+          Dissolved solids    =      121309 mg/kg sol'n
+          Hardness            =    13837.67 mg/kg sol'n as CaCO3
+            carbonate         =        0.43 mg/kg sol'n as CaCO3
+            non-carbonate     =    13837.24 mg/kg sol'n as CaCO3
+          Carbonate alkalinity=        0.43 mg/kg sol'n as CaCO3
+          Water type          =    Na-Cl
+          Bulk volume         =    5.26e+03 cm3
+          Fluid volume        =    1.05e+03 cm3
+          Mineral volume      =       0.135 cm3
+          Inert volume        =    4.21e+03 cm3
+          Porosity            =        20.0 %
+          Permeability        =    9.88e-11 cm2
+          Total biomass       =        44.3 mg/kg
+
+  Nernst redox couples                                 Eh (volts)     pe
+ ----------------------------------------------------------------------------
+   8 e-  + 9 H+  + HCO3-  = 3 H2O  + CH4(aq)             -0.4328   -7.2388
+   2 e-  + 2 H+  = H2(aq)                                -0.5470   -9.1488
+   8 e-  + 9 H+  + SO4--  = 4 H2O  + HS-                 -0.4852   -8.1145
+
+                                         moles          moles         grams          cm3      rxn rate
+  Reactants                            remaining       reacted       reacted       reacted   (molal/sec)
+ ---------------------------------------------------------------------------------------------------------
+   microbe-MET                                        0.002158          --            --       7.768e-14
+   microbe-SRB                                        0.008270          --            --       1.309e-25
+
+                                       rate const.       biomass                   affinity      forward
+  Microbial reactions                 (mol/mg sec)*      (mg/kg)         log K     (log Q/K)    direction
+ ----------------------------------------------------------------------------------------------------------
+   microbe-MET                         2.880e-14         2.720         39.90        -15.28   left-to-right
+     (HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O)
+   microbe-SRB                         4.270e-14         41.56         45.65        -8.274   left-to-right
+     (4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O)
+
+   *Units in absence of promoting or inhibiting species.
+
+  Minerals in system                    moles      log moles      grams        volume (cm3)
+ -------------------------------------------------------------------------------------------
+   Antigorite                          1.375e-05     -4.862        0.03119         0.02406
+   Brucite                              0.004398     -2.357         0.2565          0.1083
+   Dolomite                            4.561e-05     -4.341       0.008410        0.002935
+                                                              _____________   _____________
+   (total)                                                          0.2961           4209. 
+
+  Aqueous species                      molality    mg/kg sol'n    act. coef.     log act.
+ ------------------------------------------------------------------------------------------
+   Cl-                                     2.245     6.993e+04      0.5985        0.1283
+   Na+                                     2.023     4.087e+04      0.6743        0.1349
+   CaCl+                                 0.06280         4168.      0.6743       -1.3732
+   NaCl                                  0.04932         2533.      1.0000       -1.3070
+   Mg++                                  0.03464         739.9      0.2928       -1.9938
+   Ca++                                  0.03224         1135.      0.2048       -2.1804
+   MgCl+                                 0.02762         1450.      0.6743       -1.7300
+   HS-                                  0.008229         239.1      0.6387       -2.2793
+   K+                                   0.005724         196.6      0.5985       -2.4653
+   CH4(aq)                              0.002156         30.40      1.6758       -2.4420
+   H2(aq)                              0.0005470        0.9689      1.6758       -3.0378
+   KCl                                 0.0001245         8.159      1.0000       -3.9047
+   MgOH+                               4.181e-05         1.518      0.6743       -4.5499
+   H2S(aq)                             3.560e-05         1.066      1.0000       -4.4486
+   OH-                                 2.615e-05        0.3908      0.6387       -4.7772
+   NaOH                                1.440e-05        0.5061      1.0000       -4.8416
+   CaOH+                               3.420e-06        0.1715      0.6743       -5.6372
+   NaHCO3                              2.420e-06        0.1786      1.0000       -5.6163
+   HCO3-                               1.961e-06        0.1052      0.7060       -5.8587
+   CaCO3                               1.024e-06       0.09010      1.0000       -5.9895
+   MgCO3                               7.840e-07       0.05808      1.0000       -6.1057
+   S--                                 7.131e-07       0.02009      0.1586       -6.9465
+   CO3--                               6.624e-07       0.03493      0.1355       -7.0469
+   NaCO3-                              5.424e-07       0.03956      0.6743       -6.4368
+   MgHCO3+                             2.181e-07       0.01635      0.6743       -6.8324
+   CaHCO3+                             2.024e-07       0.01798      0.7448       -6.8217
+    (only species > 1e-8 molal listed)
+
+  Mineral saturation states         log Q/K                                         log Q/K
+ -----------------------------------------------------------------------------------------------
+   Dolomite                          0.0000 sat    Magnesite                        -1.0555     
+   Antigorite                        0.0000 sat    Halite                           -1.3354     
+   Brucite                           0.0000 sat    Dolomite-dis                     -1.5225     
+   Dolomite-ord                     -0.0000        Monohydrocalcite                 -1.5913     
+   Chrysotile                       -0.1781        Artinite                         -2.2643     
+   Calcite                          -0.5551        Mg2Cl(OH)3^4H2O                  -2.6310     
+   Aragonite                        -0.7193     
+    (only minerals with log Q/K > -3 listed)
+
+                                        partial
+  Gases                              press. (bar)     fugacity     fug. coef.    log fug.
+ -----------------------------------------------------------------------------------------
+   CH4(g)                                  2.395         2.391        0.9983      0.3786
+   H2(g)                                   1.175         1.176         1.001      0.0705
+   Steam                                 0.03637       0.03469        0.9537     -1.4598
+   H2S(g)                              0.0003544     0.0003518        0.9926     -3.4537
+   CO2(g)                              7.364e-08     7.328e-08        0.9951     -7.1350
+   S2(g)                               5.748e-29     5.748e-29         1.000*   -28.2405
+    *no data, gas taken to be ideal
+
+                                                       In fluid                 Sorbed
+  Original basis                    total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   H2O                                   55.55        55.54   8.787e+05
+   CH4(aq)                            0.002158     0.002158       30.40
+   Ca++                                0.09513      0.09509       3347.
+   Cl-                                   2.386        2.386   7.429e+04
+   H+                                -0.009600   -5.395e-05    -0.04775
+   H2(aq)                            0.0005473    0.0005473      0.9689
+   HCO3-                             9.904e-05    7.821e-06      0.4191
+   HS-                                0.008270     0.008270       240.2
+   K+                                 0.005851     0.005851       200.9
+   Mg++                                0.06711      0.06234       1331.
+   Na+                                   2.074        2.074   4.187e+04
+   SO4--                             1.240e-13    1.240e-13   1.046e-08
+   SiO2(aq)                          0.0002338    6.006e-09   0.0003169
+
+                                                        In fluid                  Sorbed
+  Elemental composition             total moles     moles       mg/kg        moles       mg/kg
+ -------------------------------------------------------------------------------------------------
+   Calcium                             0.09513      0.09509       3347.
+   Carbon                             0.002257     0.002165       22.84
+   Chlorine                              2.386        2.386   7.429e+04
+   Hydrogen                              111.1        111.1   9.834e+04
+   Magnesium                           0.06711      0.06234       1331.
+   Oxygen                                55.55        55.54   7.804e+05
+   Potassium                          0.005851     0.005851       200.9
+   Silicon                           0.0002338    6.006e-09   0.0001481
+   Sodium                                2.074        2.074   4.187e+04
+   Sulfur                             0.008270     0.008270       232.8
+

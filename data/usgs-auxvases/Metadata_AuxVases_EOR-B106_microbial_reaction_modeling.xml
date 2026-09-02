@@ -1,0 +1,2122 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>Joao S. Gallotti</origin>
+        <pubdate>20260529</pubdate>
+        <title>Data and model archive for simulations of microbial sulfate reduction and methanogenesis in porous media during underground hydrogen storage</title>
+        <geoform>tabular digital data</geoform>
+        <pubinfo>
+          <pubplace>Reston, VA</pubplace>
+          <publish>U.S. Geological Survey</publish>
+        </pubinfo>
+        <othercit>Gallotti, J.S., 2026, Data and model archive for simulations of microbial sulfate reduction and methanogenesis in porous media during underground hydrogen storage: U.S. Geological Survey data release, https://doi.org/10.5066/P13GJC6Y</othercit>
+        <onlink>https://doi.org/10.5066/P13GJC6Y</onlink>
+        <lworkcit>
+          <citeinfo>
+            <origin>Joao S. Gallotti</origin>
+            <pubdate>20260228</pubdate>
+            <title>Computational simulations of microbial sulfate reduction and methanogenesis during underground hydrogen storage in porous media</title>
+            <geoform>publication</geoform>
+            <pubinfo>
+              <pubplace>International Journal of Hydrogen Energy</pubplace>
+              <publish>Elsevier</publish>
+            </pubinfo>
+            <othercit>Gallotti, J.S., Hupp, B.N., Berger, P.M., Wiens, A.M., Jones, M.M., Brennan, S.T., Buursink, M.L., (submitted) Computational simulations of microbial sulfate reduction and methanogenesis during underground hydrogen storage in porous media: submitted to International Journal of Hydrogen Energy</othercit>
+          </citeinfo>
+        </lworkcit>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>This data release and model archive contains geochemical and microbial reaction modeling input files, selected output files, and an accompanying data dictionary. The files were used to simulate hydrogen consumption during underground hydrogen storage (UHS). Batch-reaction simulations were developed using the React program in Geochemist’s Workbench (GWB) and are based on estimated formation-water chemistry from the Mississippian Aux Vases Formation in the Illinois Basin. The models represent coupled geochemical and microbial processes in a closed porous system, including microbial sulfate reduction and hydrogenotrophic methanogenesis, reaction kinetics, biomass growth, and feedbacks with pH and temperature, and were run over short- and long-term timescales.</abstract>
+      <purpose>The simulations were developed to evaluate the potential impacts of microbial sulfate reduction and hydrogenotrophic methanogenesis on hydrogen stability during underground hydrogen storage in a depleted hydrocarbon reservoir. Estimated water chemistry data from Mississippian Aux Vases Formation of the Illinois Basin (Demir and Seyler, 1999) was used as initial input.</purpose>
+      <supplinf>One or more files contain data available in comma separated value (.csv) file format. The user must have software capable of opening and viewing a .csv file. It is recommended that data users consult the manuscript associated with this data release (crossref) for a detailed description of the methods, model input and assumptions. The simulations were developed using Geochemist’s Workbench (GWB) Professional, which is commercially available and requires a paid license for use. While the input files provided in this data release are complete, reproduction of the simulations requires access to a licensed copy of the software.
+Disclaimer: Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</supplinf>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <sngdate>
+          <caldate>2025</caldate>
+        </sngdate>
+      </timeinfo>
+      <current>ground condition</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>None planned</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-93.5596</westbc>
+        <eastbc>-84.1553</eastbc>
+        <northbc>42.5000</northbc>
+        <southbc>36.2088</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>ISO 19115 Topic Category</themekt>
+        <themekey>environment</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Metadata Identifier</themekt>
+        <themekey>USGS:698b487ab66b011dc17eb873</themekey>
+      </theme>
+      <place>
+        <placekt>Geographic Names Information System</placekt>
+        <placekey>Illinois</placekey>
+        <placekey>IL</placekey>
+      </place>
+      <place>
+        <placekt>Free Keywords</placekt>
+        <placekey>computational simulation</placekey>
+        <placekey>microbial sulfate reduction</placekey>
+        <placekey>methanogenesis</placekey>
+        <placekey>underground hydrogen storage</placekey>
+        <placekey>reaction modeling</placekey>
+        <placekey>geochemical modeling</placekey>
+        <placekey>microbial reaction modeling</placekey>
+        <placekey>hydrogen storage</placekey>
+        <placekey>hydrogen</placekey>
+      </place>
+    </keywords>
+    <accconst>None.  Please see 'Distribution Info' for details.</accconst>
+    <useconst>None.  Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntperp>
+          <cntper>Joao S. Gallotti</cntper>
+          <cntorg>USGS - Northeast Region</cntorg>
+        </cntperp>
+        <cntpos>Physical Scientist</cntpos>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>12201 Sunrise Valley Drive, Mail Stop 954</address>
+          <city>Reston</city>
+          <state>VA</state>
+          <postal>20192</postal>
+          <country>United States</country>
+        </cntaddr>
+        <cntvoice>703-648-6492</cntvoice>
+        <cntemail>sgallotti@usgs.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <datacred>Peter M. Berger (GFZ Helmholtz Centre for Geosciences, Potsdam, Germany) and Brittany N. Hupp (George Mason University, Fairfax, VA, USA) assisted with model development and implementation.</datacred>
+    <native>Microsoft Windows 11, Geochemist's Workbench v.17</native>
+    <crossref>
+      <citeinfo>
+        <origin>Ilham Demir</origin>
+        <origin>Beverly Seyler</origin>
+        <pubdate>1999</pubdate>
+        <title>Chemical composition and geologic history of saline waters in Aux Vases and Cypress Formations, Illinois Basin</title>
+        <geoform>publication</geoform>
+        <serinfo>
+          <sername>Aquatic Geochemistry</sername>
+          <issue>vol. 5</issue>
+        </serinfo>
+        <pubinfo>
+          <pubplace>n/a</pubplace>
+          <publish>Springer Nature</publish>
+        </pubinfo>
+        <othercit>pp. 281–311</othercit>
+        <onlink>https://doi.org/10.1023/A:1009609619083</onlink>
+      </citeinfo>
+    </crossref>
+    <crossref>
+      <citeinfo>
+        <origin>Craig M. Bethke</origin>
+        <origin>Brian Farrell</origin>
+        <origin>Melika Sharifi</origin>
+        <pubdate>2023</pubdate>
+        <title>GWB Reaction Modeling Guide</title>
+        <edition>Release 17</edition>
+        <geoform>publication</geoform>
+        <pubinfo>
+          <pubplace>Champaign, IL</pubplace>
+          <publish>Aqueous Solutions, LLC</publish>
+        </pubinfo>
+        <othercit>Data sources, as cited by LLNL:
+
+Baes, C.F., JR., and Mesmer, R.E. 1976. The Hydrolysis of Cations.
+Wiley-Interscience, New York.
+
+Codata Task Group on Key Values for Thermodynamics. 1978. Recommended
+key values for thermodynamics, 1977. J. Chem. Thermo. 10, 903-
+906.
+
+Helgeson, H.C. 1969. Thermodynamics of hydrothermal systems at
+elevated temperatures and pressures.  Amer. J. Sci. 267, 729-804.
+
+Helgeson, H.C., and Kirkham, D.H. 1974a. Theoretical prediction
+of the thermodynamic behavior of aqueous electrolytes at
+high pressures and temperatures. I. Summary of the
+thermodynamic/electrostatic properties of the solvent.  Amer.
+J. Sci. 274, 1089-1198.
+
+Helgeson, H.C., and Kirkham, D.H. 1974b. Theoretical prediction
+of the thermodynamic behavior of aqueous electrolytes at
+high pressures and temperatures. II. Debye-huckel parameters
+for activity coefficients and partial molal properties. Amer.
+J. Sci. 274, 1199-1261.
+
+Helgeson, H.C., and Kirkham, D.H. 1976. Theoretical prediction
+of the thermodynamic behavior of aqueous electrolytes at
+high pressures and temperatures. III. Equation of state for
+aqueous species at infinite dilution. Amer. J. Sci. 276,
+97-240.
+
+Helgeson, H.C., Delaney, J.M., Nesbitt, H.W., and Bird, D.K. 1978.
+Summary and critique of the thermodynamic properties of rock-
+forming minerals.  Amer. J. Sci. 278-A, 1-229.
+
+Helgeson, H.C., Kirkham, D.H., and Flowers, G.C. 1981. Theoretical
+prediction of the thermodynamic behavior of aqueous electrolytes at
+high pressures and temperatures. IV. Calculation of activity
+coefficients, osmotic coefficients, and apparent molal and
+standard and relative partial molal properties to 600 C and 5 kb.
+Amer. J. Sci. 281, 1249-1516.
+
+Robie, R.A., B.S. Hemingway, and J.R. Fisher, 1978, Thermodynamic
+properties of minerals and related substances at 298.15 K and
+1 bar pressure and at higher temperatures,
+Geological Survey Bulletin 1452, U.S. Govt. Printing Office,
+Washington, D.C.
+
+Tsonopoulos, C., 1974, An empirical correlation of second virial
+coefficients. AIChE Journal 20, 263â€“272.</othercit>
+        <onlink>https://www.gwb.com/pdf/GWB/GWBrxnmodeling.pdf</onlink>
+      </citeinfo>
+    </crossref>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>For microbial reaction modeling input, kinetic and thermodynamic parameters were sourced from the literature. The output data was generated based on input parameters and sensitivity analyses were performed to evaluate how varying input influenced the results and interpretations. For complete discussion of results, model assumptions and limitations, as well as the full reference list, please see the manuscript associated with this data release (crossref).</attraccr>
+    </attracc>
+    <logic>No formal logical accuracy tests were conducted.</logic>
+    <complete>Dataset is considered complete for the information presented, as described in the abstract. Users are advised to read the rest of the metadata record carefully for additional details.</complete>
+    <posacc>
+      <horizpa>
+        <horizpar>Not applicable</horizpar>
+      </horizpa>
+      <vertacc>
+        <vertaccr>Not applicable</vertaccr>
+      </vertacc>
+    </posacc>
+    <lineage>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Ilham Demir</origin>
+            <origin>Beverly Seyler</origin>
+            <pubdate>1999</pubdate>
+            <title>Chemical composition and geologic history of saline waters in Aux Vases and Cypress Formations, Illinois Basin</title>
+            <geoform>publication</geoform>
+            <serinfo>
+              <sername>Aquatic Geochemistry</sername>
+              <issue>vol. 5</issue>
+            </serinfo>
+            <pubinfo>
+              <pubplace>n/a</pubplace>
+              <publish>Springer Nature</publish>
+            </pubinfo>
+            <othercit>pp. 281–311</othercit>
+            <onlink>https://doi.org/10.1023/A:1009609619083</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>Digital and/or Hardcopy</typesrc>
+        <srctime>
+          <timeinfo>
+            <sngdate>
+              <caldate>1999</caldate>
+            </sngdate>
+          </timeinfo>
+          <srccurr>publication date</srccurr>
+        </srctime>
+        <srccitea>Demir and Seyler, 1999</srccitea>
+        <srccontr>Estimated water chemistry for a Mississippian Aux Vases reservoir in the Illinois Basin</srccontr>
+      </srcinfo>
+      <procstep>
+        <procdesc>The batch reaction simulations performed in this study used the React program of the Geochemist’s Workbench (GWB) version 17.0 as the modeling tool. Water chemistry from a single well (EOR-B106) in the Mississippian Aux Vases Formation in the Illinois Basin was used to model microbial reactions triggered by hydrogen in a closed system under reservoir conditions. For complete reference list and method description, please see the manuscript associated with this data release (crossref).</procdesc>
+        <procdate>2025</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>Thermodynamic and kinetic data for microbial sulfate reduction and hydrogenotrohpic methanogenesis were sourced from the literature. Parameters were originally acquired from laboratory experiments or modeling experiments replicating real world conditions. Simulations were performed for long term (12,700 years) and short term (365 days) time frames. Furthermore, the influence of pH and temperature on reaction rate and hydrogen loss were assessed by varying these parameters independently. For complete reference list and method description, please see the manuscript associated with this data release (crossref).</procdesc>
+        <procdate>2025</procdate>
+      </procstep>
+      <procstep>
+        <procdesc>To evaluate the sensitivity of model output to input data uncertainties, a series of simulations were conducted. The parameters tested include initial biomass concentration and rate constant for sulfate reduction and hydrogenotrophic methanogenesis, initial sulfate and bicarbonate concentrations, and initial salinity expressed as total dissolved solids (TDS). These parameters were independently varied above and below the baseline values used in this model. The time frame for these simulations was arbitrarily set to run for 50 years.</procdesc>
+        <procdate>2025</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>data_dictionary.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>Attribute</attrlabl>
+        <attrdef>Attribute name</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>run_ID</edomv>
+            <edomvd>ID number of each individual simulation</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Time</edomv>
+            <edomvd>Time frame selected for the simulation (365 days or 12700 years)</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>CH4_aq</edomv>
+            <edomvd>Aqueous methane activity in millimole per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>H2_aq</edomv>
+            <edomvd>Aqueous hydrogen activity in millimole per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>HCO3</edomv>
+            <edomvd>Bicarbonate activity in millimole per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>HS</edomv>
+            <edomvd>Hydrogen sulfide activity in millimole per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>SO4</edomv>
+            <edomvd>Sulfate activity in millimole per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>pH</edomv>
+            <edomvd>Initial pH of the system</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Temp</edomv>
+            <edomvd>Temperature of the system in Celsius</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>CH4_g</edomv>
+            <edomvd>Methane (gas) fugacity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>CO2_g</edomv>
+            <edomvd>Carbon dioxide (gas) fugacity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>H2_g</edomv>
+            <edomvd>Hydrogen (gas) fugacity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>H2S_g</edomv>
+            <edomvd>Hydrogen sulfide (gas) fugacity</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Biomass_MET</edomv>
+            <edomvd>Biomass of methanogens in the system in milligram per kilogram of water</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Biomass_SRB</edomv>
+            <edomvd>Biomass of sulfate reducers in the system in milligram per kilogram of water</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Rxn_rt_MET</edomv>
+            <edomvd>Reaction rate of methanogenesis in molal per second</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Rxn_rt_SRB</edomv>
+            <edomvd>Reaction rate of sulfate reduction in molal per second</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Rate_constant_MET</edomv>
+            <edomvd>Rate constant for methanogenesis in mol/mg/s</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Rate_constant_SRB</edomv>
+            <edomvd>Rate constant for sulfate reduction in mol/mg/s</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>TDS_initial</edomv>
+            <edomvd>Initial salinity expressed as total dissolved solids (TDS) in milligram per kilogram water</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Units</attrlabl>
+        <attrdef>Parameter units</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>unitless</edomv>
+            <edomvd>No units</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>days or years</edomv>
+            <edomvd>Time frame of simulations</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>mmol/kg</edomv>
+            <edomvd>Millimole per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Celsius</edomv>
+            <edomvd>Unit of temperature</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>fugacity</edomv>
+            <edomvd>Effective pressure that accounts for non-ideal behavior (gas–gas interactions, high pressure, real fluids)</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>mg/kg</edomv>
+            <edomvd>Milligram per kilogram</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>molal/s</edomv>
+            <edomvd>Molal per second</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Description</attrlabl>
+        <attrdef>Description of attribute</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>ID number of each individual simulation</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Time frame selected for the simulation (365 days or 12700 years)</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Aqueous methane activity in millimole per kilogram</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Aqueous hydrogen activity in millimole per kilogram</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Bicarbonate activity in millimole per kilogram</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Hydrogen sulfide activity in millimole per kilogram</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Sulfate activity in millimole per kilogram</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Initial pH of the system</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Temperature of the system in Celsius</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Methane fugacity</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Carbon dioxide fugacity</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Hydrogen fugacity</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Hydrogen sulfide fugacity</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Biomass of methanogens in the system in milligram per kilogram of water</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Biomass of sulfate reducers in the system in milligram per kilogram of water</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Reaction rate of methanogenesis in molal per second</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <edom>
+            <edomv>Reaction rate of sulfate reduction in molal per second</edomv>
+            <edomvd>NA</edomvd>
+            <edomvds>Producer defined</edomvds>
+          </edom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>input_script_microbial-reactions_EOR-B106_365days.txt</enttypl>
+        <enttypd>GWB React input script (*.txt) used in the geochemical simulations.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>input_script_microbial-reactions_EOR-B106_12700years.txt</enttypl>
+        <enttypd>GWB React input script (*.txt) used in the geochemical simulations.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>input_scripts_sensitivity.txt</enttypl>
+        <enttypd>GWB React input script (*.txt) used in the geochemical simulations.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>output_microbial-reactions_EOR-B106_365days.txt</enttypl>
+        <enttypd>GWB React output (*.txt) for the short term (365 days) geochemical simulations.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>output_microbial-reactions_EOR-B106_12700years.txt</enttypl>
+        <enttypd>GWB React output (*.txt) for the long term (12700 years) geochemical simulations.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>output_pHvsTemp_AuxVases_EOR-B106_365days.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>143</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>365.0</rdommax>
+            <attrunit>days</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6.8e-07</rdommin>
+            <rdommax>8.62e-07</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>36.19128593</rdommin>
+            <rdommax>38.28005328</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.978068545</rdommin>
+            <rdommax>2.008548926</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.81e-08</rdommin>
+            <rdommax>2.97e-08</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.249016349</rdommin>
+            <rdommax>7.360717626</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>5.0</rdommin>
+            <rdommax>10.0</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>20.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>9.75e-07</rdommin>
+            <rdommax>1e-06</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>3e-09</rdommin>
+            <rdommax>0.092755956</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>88.6891839</rdommin>
+            <rdommax>91.00002931</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.91e-13</rdommin>
+            <rdommax>6.39e-10</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.01e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rt_MET</attrlabl>
+        <attrdef>Reaction rate of methanogenesis in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.88e-20</rdommin>
+            <rdommax>1e-06</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rt_SRB</attrlabl>
+        <attrdef>Reaction rate of sulfate reduction in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>4.22e-20</rdommin>
+            <rdommax>1.01e-06</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>output_pHvsTemp_AuxVases_EOR-B106_12700years.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>143</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>12700.0</rdommax>
+            <attrunit>years</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6.8e-07</rdommin>
+            <rdommax>1.915479732</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>3.07e-60</rdommin>
+            <rdommax>38.28005328</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.071970954</rdommin>
+            <rdommax>2.008548926</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.81e-08</rdommin>
+            <rdommax>7.358748057</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.38e-14</rdommin>
+            <rdommax>7.360717626</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>5.0</rdommin>
+            <rdommax>10.0</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>20.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>9.75e-07</rdommin>
+            <rdommax>2.56982312</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.93e-09</rdommin>
+            <rdommax>0.092755956</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.47e-60</rdommin>
+            <rdommax>91.00002931</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.91e-13</rdommin>
+            <rdommax>0.158430758</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>2.739342343</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>42.03420734</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rt_MET</attrlabl>
+        <attrdef>Reaction rate of methanogenesis in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>5.31e-71</rdommin>
+            <rdommax>7.87e-14</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rt_SRB</attrlabl>
+        <attrdef>Reaction rate of sulfate reduction in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>3.34e-82</rdommin>
+            <rdommax>1.44e-12</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>sensitivity_analysis_biomass.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>5</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>years</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.91e-07</rdommin>
+            <rdommax>4.9e-06</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>37.10102758</rdommin>
+            <rdommax>37.10107176</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.9813</rdommin>
+            <rdommax>1.9813</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.81e-08</rdommin>
+            <rdommax>6.97e-06</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.2607965</rdommin>
+            <rdommax>7.2608034</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6.1009</rdommin>
+            <rdommax>6.1009</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>28.2</rdommin>
+            <rdommax>28.2</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>6.19e-06</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0243</rdommin>
+            <rdommax>0.0243</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>90.999895</rdommin>
+            <rdommax>91.000004</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.62e-10</rdommin>
+            <rdommax>6.5e-08</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-08</rdommin>
+            <rdommax>0.000106</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-08</rdommin>
+            <rdommax>0.00014</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rate_MET</attrlabl>
+        <attrdef>Reaction rate of methanogenesis in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.88e-22</rdommin>
+            <rdommax>3.05e-18</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rate_SRB</attrlabl>
+        <attrdef>Reaction rate of sulfate reduction in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>4.22e-22</rdommin>
+            <rdommax>5.89e-18</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>sensitivity_analysis_rate-constant.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>6</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>years</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.91e-07</rdommin>
+            <rdommax>0.000217</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>8.05953</rdommin>
+            <rdommax>37.10107</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.98128</rdommin>
+            <rdommax>1.9819</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.81e-08</rdommin>
+            <rdommax>7.26</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>7.2608</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6.10086</rdommin>
+            <rdommax>9.14501</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>28.2</rdommin>
+            <rdommax>28.2</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>0.000274</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>0.0243</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>19.7243</rdommin>
+            <rdommax>91.0</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.62e-10</rdommin>
+            <rdommax>0.00631</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>0.000314</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>41.6</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rate_MET</attrlabl>
+        <attrdef>Reaction rate of methanogenesis in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.8799999999999995e-23</rdommin>
+            <rdommax>9.04e-16</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rxn_rate_SRB</attrlabl>
+        <attrdef>Reaction rate of sulfate reduction in molal per second</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>4.2199999999999997e-23</rdommin>
+            <rdommax>1.43e-10</rdommax>
+            <attrunit>molal/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rate_constant_MET</attrlabl>
+        <attrdef>Rate constant used for methanogenesis</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.88e-17</rdommin>
+            <rdommax>2.88e-12</rdommax>
+            <attrunit>mol/mg/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Rate_constant_SRB</attrlabl>
+        <attrdef>Rate constant used for sulfate reduction</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>4.27e-17</rdommin>
+            <rdommax>4.27e-12</rdommax>
+            <attrunit>mol/mg/s</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>sensitivity_analysis_HCO3.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>5</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>years</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.94e-07</rdommin>
+            <rdommax>8.43e-07</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>37.23822</rdommin>
+            <rdommax>37.62409</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.01969</rdommin>
+            <rdommax>196.93273</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.79e-08</rdommin>
+            <rdommax>9.74e-08</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.21564</rdommin>
+            <rdommax>7.21731</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>5.36245</rdommin>
+            <rdommax>6.1683</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>28.2</rdommin>
+            <rdommax>28.2</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>9.91e-07</rdommin>
+            <rdommax>1.05e-06</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.000219</rdommin>
+            <rdommax>3.92</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>90.2</rdommin>
+            <rdommax>91.0</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.53e-10</rdommin>
+            <rdommax>1.06e-09</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.06e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.4e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>sensitivity_analysis_SO4.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>5</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>years</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7.93e-07</rdommin>
+            <rdommax>8.4e-07</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>37.23523</rdommin>
+            <rdommax>37.52392</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.96726</rdommin>
+            <rdommax>1.9702</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.79e-08</rdommin>
+            <rdommax>9.81e-08</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.07218</rdommin>
+            <rdommax>722.01795</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6.10084</rdommin>
+            <rdommax>6.11259</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>28.2</rdommin>
+            <rdommax>28.2</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>9.87e-07</rdommin>
+            <rdommax>1.05e-06</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.02417</rdommin>
+            <rdommax>0.02534</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>89.8277</rdommin>
+            <rdommax>91.0</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.6e-10</rdommin>
+            <rdommax>9.16e-10</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.06e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.4e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <detailed>
+      <enttyp>
+        <enttypl>sensitivity_analysis_salinity.csv</enttypl>
+        <enttypd>Comma Separated Value (CSV) file containing data.</enttypd>
+        <enttypds>Producer Defined</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>run_ID</attrlabl>
+        <attrdef>ID number of each individual simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1</rdommin>
+            <rdommax>5</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Time</attrlabl>
+        <attrdef>Time frame selected for the simulation</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>50.0</rdommax>
+            <attrunit>years</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_aq</attrlabl>
+        <attrdef>Aqueous methane activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>5.79e-07</rdommin>
+            <rdommax>1.31e-06</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_aq</attrlabl>
+        <attrdef>Aqueous hydrogen activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>27.18318</rdommin>
+            <rdommax>59.47443</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HCO3</attrlabl>
+        <attrdef>Bicarbonate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.52357</rdommin>
+            <rdommax>4.4238</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>HS</attrlabl>
+        <attrdef>Hydrogen sulfide activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.51e-08</rdommin>
+            <rdommax>1.04e-07</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SO4</attrlabl>
+        <attrdef>Sulfate activity in millimole per kilogram</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1.91872</rdommin>
+            <rdommax>16.21187</rdommax>
+            <attrunit>mmol/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>pH</attrlabl>
+        <attrdef>Initial pH of the system</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>6.1</rdommin>
+            <rdommax>6.10372</rdommax>
+            <attrunit>unitless</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Temp</attrlabl>
+        <attrdef>Temperature of the system in Celsius</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>28.2</rdommin>
+            <rdommax>28.2</rdommax>
+            <attrunit>Celsius</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CH4_g</attrlabl>
+        <attrdef>Methane (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.06e-06</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>CO2_g</attrlabl>
+        <attrdef>Carbon dioxide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0.0077</rdommin>
+            <rdommax>0.04301</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2_g</attrlabl>
+        <attrdef>Hydrogen (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>91.0</rdommin>
+            <rdommax>91.0</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>H2S_g</attrlabl>
+        <attrdef>Hydrogen sulfide (gas) fugacity</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>2.53e-10</rdommin>
+            <rdommax>9.37e-10</rdommax>
+            <attrunit>fugacity</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_MET</attrlabl>
+        <attrdef>Biomass of methanogens in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.06e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>Biomass_SRB</attrlabl>
+        <attrdef>Biomass of sulfate reducers in the system in milligram per kilogram of water</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>1e-06</rdommin>
+            <rdommax>1.4e-06</rdommax>
+            <attrunit>mg/kg</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>TDS_initial</attrlabl>
+        <attrdef>Initial salinity expressed as total dissolved solids (TDS) in milligram per liter</attrdef>
+        <attrdefs>Producer Defined</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>31936</rdommin>
+            <rdommax>319360</rdommax>
+            <attrunit>mg/L</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+  </eainfo>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey - ScienceBase</cntorg>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>mailing address</addrtype>
+          <address>Denver Federal Center</address>
+          <address>Building 810</address>
+          <address>Mail Stop 302</address>
+          <city>Denver</city>
+          <state>CO</state>
+          <postal>80225</postal>
+          <country>United States</country>
+        </cntaddr>
+        <cntvoice>1-888-275-8747</cntvoice>
+        <cntemail>sciencebase@usgs.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.</distliab>
+    <stdorder>
+      <digform>
+        <digtinfo>
+          <formname>Digital Data</formname>
+        </digtinfo>
+        <digtopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>https://doi.org/10.5066/P13GJC6Y</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+        </digtopt>
+      </digform>
+      <fees>None</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20260529</metd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper>Joao S. Gallotti</cntper>
+          <cntorg>USGS - Northeast Region</cntorg>
+        </cntperp>
+        <cntpos>Physical Scientist</cntpos>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>12201 Sunrise Valley Drive, Mail Stop 954</address>
+          <city>Reston</city>
+          <state>VA</state>
+          <postal>20192</postal>
+          <country>United States</country>
+        </cntaddr>
+        <cntvoice>703-648-6492</cntvoice>
+        <cntemail>sgallotti@usgs.gov</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>

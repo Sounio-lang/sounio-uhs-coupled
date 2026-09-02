@@ -1,0 +1,168 @@
+Disclaimer: Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.
+
+------------------------------------ SENSITIVITY ANALYSIS SCRIPTS -------------------------------------
+Script for BIOMASS CONCENTRATIONS
+Biomass concentrations tested (mg/kg): 1.00E-08, 1.00E-07, 1.00E-06, 1.00E-05, 1.00E-04
+React script, saved Fri Jun  6 2025 by sgallotti
+data = thermo.tdat verify
+conductivity = conductivity-USGS.dat
+time start = 0 day, end = 50 yr
+porosity = .2
+temperature = 28.2 C
+decouple ALL
+H2O          = 1 free kg
+pH           = 6.1
+Cl-          = 76000 mg/l
+balance on Cl-
+SO4--        = 750 mg/l
+HCO3-        = 130 mg/l
+Na+          = 45010 mg/l
+Ca++         = 3600 mg/l
+Mg++         = 1540 mg/l
+K+           = 216 mg/l
+SiO2(aq)     = 6.2 mg/l as Si
+HS-          = 1e-6 mg/l
+swap CH4(g) for CH4(aq)
+CH4(g)       = 1e-6 fugacity
+swap H2(g) for H2(aq)
+H2(g)        = 91 fugacity
+TDS = 127744
+kinetic microbe-SRB rxn = "4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O" biomass = [variable] rate_con = 4.27e-14 KA = 3.9e-5 KD = 1.1e-6 mpower(H2(aq)) = 1 mpower(SO4--) = 1 mpowerD(H2(aq)) = 1 mpowerA(SO4--) = 1 ATP_energy = -46.75 ATP_number = 1 growth_yield = 5000 order1 = .1666666666667 order2 = 0
+kinetic microbe-MET rxn = "HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O" biomass = 1e-8 rate_con = 2.88e-14 KA = 0 KD = 4.7e-6 mpower(H2(aq)) = 1 mpower(HCO3-) = 1 mpowerD(H2(aq)) = 1 mpowerA(HCO3-) = 1 ATP_energy = -45 ATP_number = .25 growth_yield = 1250 order1 = .5 order2 = 0
+explain_step
+audit
+ suffix _biomass[value]_noDecay_50years
+go
+
+------------------------------------------------------------------------------------------------------------------
+Script for RATE CONSTANTS
+Rate constants tested for methanogenesis (mol/mg/s): 2.88E-16, 2.88E-15, 2.88E-14, 2.88E-13, 2.88E-12
+Rate constants tested for sulfate reduction (mol/mg/s): 4.27E-16, 4.27E-15, 4.27E-14, 4.27E-13, 4.27E-12
+React script, saved Tue Apr 15 2025 by sgallotti
+data = thermo.tdat verify
+conductivity = conductivity-USGS.dat
+time start = 0 day, end = 50 yr
+porosity = .2
+temperature = 28.2 C
+decouple ALL
+H2O          = 1 free kg
+pH           = 6.1
+Cl-          = 76000 mg/l
+balance on Cl-
+SO4--        = 750 mg/l
+HCO3-        = 130 mg/l
+Na+          = 45010 mg/l
+Ca++         = 3600 mg/l
+Mg++         = 1540 mg/l
+K+           = 216 mg/l
+SiO2(aq)     = 6.2 mg/l as Si
+HS-          = 1e-6 mg/l
+swap CH4(g) for CH4(aq)
+CH4(g)       = 1e-6 fugacity
+swap H2(g) for H2(aq)
+H2(g)        = 91 fugacity
+TDS = 127744
+kinetic microbe-SRB rxn = "4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O" biomass = 1e-6 rate_con = [variable] KA = 3.9e-5 KD = 1.1e-6 mpower(H2(aq)) = 1 mpower(SO4--) = 1 mpowerD(H2(aq)) = 1 mpowerA(SO4--) = 1 ATP_energy = -46.75 ATP_number = 1 growth_yield = 5000 order1 = .1666666666667 order2 = 0
+kinetic microbe-MET rxn = "HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O" biomass = 1e-6 rate_con = [variable] KA = 0 KD = 4.7e-6 mpower(H2(aq)) = 1 mpower(HCO3-) = 1 mpowerD(H2(aq)) = 1 mpowerA(HCO3-) = 1 ATP_energy = -45 ATP_number = .25 growth_yield = 1250 order1 = .5 order2 = 0
+explain_step
+audit
+suffix _MET-SRB_50k-yrs_rateConstant_[variable]_NoDecay
+go
+
+------------------------------------------------------------------------------------------------------------------
+Script for HCO3 CONCENTRATIONS
+HCO3 concentrations tested (mmol/kg): 1.3, 13, 130, 1300, 13000
+React script, saved Tue Jul 29 2025 by sgallotti
+data = thermo.tdat verify
+conductivity = conductivity-USGS.dat
+time start = 0 day, end = 50 yr
+porosity = .2
+temperature = 28.2 C
+decouple ALL
+H2O          = 1 free kg
+pH           = 6.1
+Cl-          = 76000 mg/l
+balance on Cl-
+SO4--        = 750 mg/l
+HCO3-        = [variable] mg/l
+Na+          = 45010 mg/l
+Ca++         = 3600 mg/l
+Mg++         = 1540 mg/l
+K+           = 216 mg/l
+SiO2(aq)     = 6.2 mg/l as Si
+HS-          = 1e-6 mg/l
+swap CH4(g) for CH4(aq)
+CH4(g)       = 1e-6 fugacity
+swap H2(g) for H2(aq)
+H2(g)        = 91 fugacity
+kinetic microbe-SRB rxn = "4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O" biomass = 1e-6 rate_con = 4.27e-14 KA = 3.9e-5 KD = 1.1e-6 mpower(H2(aq)) = 1 mpower(SO4--) = 1 mpowerD(H2(aq)) = 1 mpowerA(SO4--) = 1 ATP_energy = -46.75 ATP_number = 1 growth_yield = 5000 order1 = .1666666666667 order2 = 0
+kinetic microbe-MET rxn = "HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O" biomass = 1e-6 rate_con = 2.88e-14 KA = 0 KD = 4.7e-6 mpower(H2(aq)) = 1 mpower(HCO3-) = 1 mpowerD(H2(aq)) = 1 mpowerA(HCO3-) = 1 ATP_energy = -45 ATP_number = .25 growth_yield = 1250 order1 = .5 order2 = 0
+explain_step
+audit
+suffix _noDecay_50years_HCO3
+go
+
+------------------------------------------------------------------------------------------------------------------
+Script for SO4 CONCENTRATIONS
+SO4 concentrations tested (mmol/kg): 7.5, 75, 750, 7500, 75000
+React script, saved Tue Jul 29 2025 by sgallotti
+data = thermo.tdat verify
+conductivity = conductivity-USGS.dat
+time start = 0 day, end = 50 yr
+porosity = .2
+temperature = 28.2 C
+decouple ALL
+H2O          = 1 free kg
+pH           = 6.1
+Cl-          = 76000 mg/l
+balance on Cl-
+SO4--        = [variable] mg/l
+HCO3-        = 130 mg/l
+Na+          = 45010 mg/l
+Ca++         = 3600 mg/l
+Mg++         = 1540 mg/l
+K+           = 216 mg/l
+SiO2(aq)     = 6.2 mg/l as Si
+HS-          = 1e-6 mg/l
+swap CH4(g) for CH4(aq)
+CH4(g)       = 1e-6 fugacity
+swap H2(g) for H2(aq)
+H2(g)        = 91 fugacity
+kinetic microbe-SRB rxn = "4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O" biomass = 1e-6 rate_con = 4.27e-14 KA = 3.9e-5 KD = 1.1e-6 mpower(H2(aq)) = 1 mpower(SO4--) = 1 mpowerD(H2(aq)) = 1 mpowerA(SO4--) = 1 ATP_energy = -46.75 ATP_number = 1 growth_yield = 5000 order1 = .1666666666667 order2 = 0
+kinetic microbe-MET rxn = "HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O" biomass = 1e-6 rate_con = 2.88e-14 KA = 0 KD = 4.7e-6 mpower(H2(aq)) = 1 mpower(HCO3-) = 1 mpowerD(H2(aq)) = 1 mpowerA(HCO3-) = 1 ATP_energy = -45 ATP_number = .25 growth_yield = 1250 order1 = .5 order2 = 0
+explain_step
+audit
+suffix _noDecay_50years_SO4
+go
+
+------------------------------------------------------------------------------------------------------------------
+Script for SALINITY (TDS)
+React script, saved Tue Aug  5 2025 by sgallotti
+data = thermo.tdat verify
+conductivity = conductivity-USGS.dat
+time start = 0 day, end = 50 yr
+porosity = .2
+temperature = 28.2 C
+decouple ALL
+H2O          = 1 free kg
+pH           = 6.1
+Cl-          = 19000 mg/l, 38000 mg/l, 76000 mg/l, 152000 mg/l, 190000 mg/l
+balance on Cl-
+SO4--        = 187.5 mg/l, 375 mg/l, 750 mg/l, 1500 mg/l, 1875 mg/l
+HCO3-        = 32.5 mg/l, 65 mg/l, 130 mg/l, 260 mg/l, 325 mg/l
+Na+          = 11252.5 mg/l, 22505 mg/l, 45010 mg/l, 90020 mg/l, 112525 mg/l
+Ca++         = 900 mg/l, 1800 mg/l, 3600 mg/l, 7200 mg/l, 9000 mg/l
+Mg++         = 385 mg/l, 770 mg/l, 1540 mg/l, 3080 mg/l, 3850 mg/l
+K+           = 54 mg/l, 108 mg/l, 216 mg/l, 432 mg/l, 540 mg/l
+SiO2(aq)     = 1.5 mg/l as Si, 3.1 mg/l as Si, 6.2 mg/l as Si, 12.4 mg/l as Si, 15.5 mg/l as Si
+HS-          = 1e-6 mg/l
+swap CH4(g) for CH4(aq)
+CH4(g)       = 1e-6 fugacity
+swap H2(g) for H2(aq)
+H2(g)        = 91 fugacity
+kinetic microbe-SRB rxn = "4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O" biomass = 1e-6 rate_con = 4.27e-14 KA = 3.9e-5 KD = 1.1e-6 mpower(H2(aq)) = 1 mpower(SO4--) = 1 mpowerD(H2(aq)) = 1 mpowerA(SO4--) = 1 ATP_energy = -46.75 ATP_number = 1 growth_yield = 5000 order1 = .1666666666667 order2 = 0
+kinetic microbe-MET rxn = "HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O" biomass = 1e-6 rate_con = 2.88e-14 KA = 0 KD = 4.7e-6 mpower(H2(aq)) = 1 mpower(HCO3-) = 1 mpowerD(H2(aq)) = 1 mpowerA(HCO3-) = 1 ATP_energy = -45 ATP_number = .25 growth_yield = 1250 order1 = .5 order2 = 0
+explain_step
+audit
+suffix _noDecay_50years_TDS_[variable]
+go

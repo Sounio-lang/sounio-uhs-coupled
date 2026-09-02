@@ -1,0 +1,21 @@
+Attribute,Units,Description
+run_ID,unitless,ID number of each individual simulation
+Time,days or years,Time frame selected for the simulation (365 days or 12700 years)
+CH4_aq,mmol/kg,Aqueous methane activity in millimole per kilogram
+H2_aq,mmol/kg,Aqueous hydrogen activity in millimole per kilogram
+HCO3,mmol/kg,Bicarbonate activity in millimole per kilogram
+HS,mmol/kg,Hydrogen sulfide activity in millimole per kilogram
+SO4,mmol/kg,Sulfate activity in millimole per kilogram
+pH,unitless,Initial pH of the system
+Temp,Celsius,Temperature of the system in Celsius
+CH4_g,fugacity,Methane (gas) fugacity
+CO2_g,fugacity,Carbon dioxide (gas) fugacity
+H2_g,fugacity,Hydrogen (gas) fugacity
+H2S_g,fugacity,Hydrogen sulfide (gas) fugacity
+Biomass_MET,mg/kg,Biomass of methanogens in the system in milligram per kilogram of water
+Biomass_SRB,mg/kg,Biomass of sulfate reducers in the system in milligram per kilogram of water
+Rxn_rt_MET,molal/s,Reaction rate of methanogenesis in molal per second
+Rxn_rt_SRB,molal/s,Reaction rate of sulfate reduction in molal per second
+Rate_constant_MET,mol/mg/s,Rate constant for methanogenesis in mole per milligram per second
+Rate_constant_SRB,mol/mg/s,Rate constant for sulfate reduction in mole per milligram per second
+TDS_initial,mg/kg,Initial salinity expressed as total dissolved solids (TDS) in milligram per kilogram water

@@ -1,0 +1,32 @@
+Disclaimer: Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data for other purposes, nor on all computer systems, nor shall the act of distribution constitute any such warranty.
+
+React script, saved Fri Mar 21 2025 by sgallotti
+data = thermo.tdat verify
+conductivity = conductivity-USGS.dat
+time start = 0 day, end = 12700 yr
+porosity = .2
+temperature = 28.2 C
+decouple ALL
+H2O          = 1 free kg
+pH           = 6.1
+Cl-          = 76000 mg/l
+balance on Cl-
+SO4--        = 750 mg/l
+HCO3-        = 130 mg/l
+Na+          = 45010 mg/l
+Ca++         = 3600 mg/l
+Mg++         = 1540 mg/l
+K+           = 216 mg/l
+SiO2(aq)     = 6.2 mg/l as Si
+HS-          = 1e-6 mg/l
+swap CH4(g) for CH4(aq)
+CH4(g)       = 1e-6 fugacity
+swap H2(g) for H2(aq)
+H2(g)        = 91 fugacity
+TDS = 127744
+kinetic microbe-SRB rxn = "4 H2(aq)  + H+  + SO4--  -> HS-  + 4 H2O" biomass = 1e-6 rate_con = 4.27e-14 KA = 3.9e-5 KD = 1.1e-6 mpower(H2(aq)) = 1 mpower(SO4--) = 1 mpowerD(H2(aq)) = 1 mpowerA(SO4--) = 1 ATP_energy = -46.75 ATP_number = 1 growth_yield = 5000 order1 = .1666666666667 order2 = 0
+kinetic microbe-MET rxn = "HCO3-  + 4 H2(aq)  + H+  -> CH4(aq)  + 3 H2O" biomass = 1e-6 rate_con = 2.88e-14 KA = 0 KD = 4.7e-6 mpower(H2(aq)) = 1 mpower(HCO3-) = 1 mpowerD(H2(aq)) = 1 mpowerA(HCO3-) = 1 ATP_energy = -45 ATP_number = .25 growth_yield = 1250 order1 = .5 order2 = 0
+explain_step
+audit
+suffix _varH2Fug_MET-SRB_12.7k-yrs
+go

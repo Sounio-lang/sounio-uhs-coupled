@@ -207,3 +207,58 @@ independence assumption stated explicitly at every combination site.
 are used throughout. Forward references are not allowed, so module layout is
 dictated by call order. Cost to this study: stylistic only. Recorded for
 completeness because it shapes every file.
+
+---
+
+## G8 — A compiler change is not verifiable through `bin/souc`
+
+**Status: OPEN. Affects how every language-side claim in this study is checked.**
+
+`bin/souc` resolves the engine with a fallback:
+
+```sh
+[[ -x "$LEAN_SINGLE" ]] || LEAN_SINGLE="$ROOT_DIR/bin/souc-linux-x86_64"
+```
+
+`bin/souc-linux-x86_64` is the **committed seed binary**. So when a change is made
+to `self-hosted/compiler/lean_single.sio` and `make build` is run, the tree now
+holds two different compilers:
+
+| | md5 (measured on the reaction-literal branch) |
+|---|---|
+| committed seed, used by `bin/souc` | `c7d5e8388494f6b753111943182df7ba` |
+| freshly built `gen3.elf` | `21bfdf12bf923220f6c98ba88d42bd0c` |
+
+**`./bin/souc check` exercises the seed, not what was just built.** A new
+front-end feature is therefore invisible to it, and to the test harness, which
+invokes the same wrapper.
+
+This was found the hard way. The reaction-literal feature (`docs/CHEMICAL_SYNTAX.md`,
+item 1) was measured through `bin/souc` and pronounced inert: three compile-fail
+fixtures compiled cleanly, and so did deliberately malformed syntax. Run against
+`gen3.elf` directly, the same fixtures give:
+
+```
+error[E188]: reaction `sulfate_reduction_perturbed` does not balance for element H
+error[E189]: reaction `iron_oxidation_unbalanced` does not balance in charge
+error[E190]: unknown element symbol `Xx` in reaction `bogus_element`
+```
+
+The feature was correct the whole time; the measurement was pointed at the wrong
+binary.
+
+**Why this belongs in this file.** It is the same failure this project has
+documented four times in CI gates — a claim resting on a proxy that no longer
+measures what it names — occurring in the verification path itself, and it caught
+us. `✓ FIXED POINT OK` says the bootstrap chain converged. It does **not** say
+that any subsequent test exercised the compiler that was just built.
+
+**Practical consequence.** Any language-side result in this study must state which
+binary produced it. Verification of a `lean_single` change runs `gen3.elf`
+directly, or refreshes the seed first. A green test suite after a compiler change,
+obtained through `bin/souc`, is not evidence.
+
+**What would close it.** `bin/souc` preferring a freshly built `gen3.elf` over the
+seed when one is present and newer, or the harness taking an explicit engine
+binary and refusing to guess. Neither is done here — this study does not modify
+the wrapper other projects depend on.

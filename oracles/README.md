@@ -237,7 +237,7 @@ Dissolved H₂, 40 °C, f(H₂) = 91 bar:
 **The resolution is not constant — it varies by 29 % across these four regimes**,
 rising monotonically with salinity. A single measurement, reused, would have
 misstated the instrument at three of the four points. This is why it is measured
-每 regime rather than once.
+in each regime rather than once.
 
 ### The first attempt measured the formatter, not the oracle
 

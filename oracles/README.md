@@ -149,3 +149,63 @@ percentage for a reservoir: that requires the gas-to-water ratio of the site, an
 Lehen's salinity is not reported at all (see `CORRECTIONS.md` C6). Nor is this a
 kinetic result — it is equilibrium. The Palandri–Kharaka rate law is not yet wired
 in, so nothing here speaks to how fast.
+
+---
+
+## Oracle 2 — Chabab correlation, and where it disagrees with IPhreeqc
+
+`oracles/chabab_solubility.cpp` evaluates Chabab et al.'s Model 2 (Duan-type /
+Pitzer) for H₂ solubility in NaCl brine. It is an **independent** check, not a
+replica: PHREEQC combines a Henry's law constant with a Debye–Hückel activity
+model, while this is a virial correlation fitted directly to H₂–brine solubility
+measurements. Agreement corroborates both; disagreement is a finding either way.
+
+Coefficients are Table 4 of the accepted manuscript, read from the PDF and
+verified (see `data/README.md`). The fugacity coefficient cancels out of the
+published equation once fugacity rather than partial pressure is imposed, so no
+φ model is invented.
+
+The program **refuses to extrapolate** outside the fitted range by default:
+
+```sh
+./chabab_solubility --temp-k 400 --pressure-bar 91 --nacl-molal 1 --fugacity-bar 91
+#   FAIL: T = 400 K is outside the fitted range 298-373 K; pass
+#         --allow-extrapolation to proceed and label the result
+```
+
+The range is the *measured* range, not an authors' statement — the paper gives no
+validity envelope, and that is recorded rather than glossed.
+
+### Dissolved H₂ at 40 °C, f(H₂) = 91 bar (mol/kg water)
+
+| m_NaCl | IPhreeqc (decoupled) | Chabab | difference |
+|---|---|---|---|
+| 0 | 6.78160e-02 | 6.31345e-02 | **+7.42 %** |
+| 1 | 5.38580e-02 | 5.10648e-02 | **+5.47 %** |
+| 2 | 4.27810e-02 | 4.20922e-02 | **+1.64 %** |
+| 3 | 3.39830e-02 | 3.53597e-02 | **−3.89 %** |
+
+**The disagreement is systematic, not scatter.** It runs monotonically from
++7.4 % to −3.9 % and crosses zero near 2.2 molal, which means the two models
+differ in the *salting-out slope* rather than in a constant offset:
+
+| salting-out ratio m(0 molal) / m(3 molal) | |
+|---|---|
+| IPhreeqc | **1.9956** |
+| Chabab | **1.7855** |
+
+PHREEQC salts H₂ out about **12 % more strongly** than the correlation fitted to
+H₂–brine data. That direction is what one would expect: a Debye–Hückel/Davies
+activity model is not fitted to the salting-out of a neutral dissolved gas,
+whereas Chabab's virial terms are.
+
+**Why this matters here, concretely.** Lehen's salinity was never measured or
+reported (`CORRECTIONS.md` C6), so salinity enters the model as an uncertain
+parameter — and across the plausible range the two oracles disagree by up to
+7 % in a salinity-dependent way. That is a contribution to the uncertainty band
+which is now **measured**, not assumed, and it cannot be reduced by choosing one
+oracle: choosing is the assumption.
+
+At a single point the agreement (5.5 % at 1 molal, against Chabab's own reported
+AAD of 3.13 %) would have looked like corroboration and nothing more. Sweeping
+the parameter is what exposed the structure.

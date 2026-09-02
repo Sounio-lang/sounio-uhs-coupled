@@ -308,3 +308,68 @@ they reside in a commercial software database. Recorded as a gap.
 field sites (Lehen 40 °C = 313 K, Lobodice 25–45 °C = 298–318 K) sit inside the
 fitted temperature range. Salinity is the open question, not temperature — and
 for Lehen the salinity is not reported at all (see C6).
+
+---
+
+## `palandri-kharaka/` — mineral dissolution rate parameters
+
+USGS Open-File Report **2004-1068**, Palandri & Kharaka, "A compilation of rate
+parameters of water-mineral interaction kinetics for application to geochemical
+modeling". US Government work, **public domain**. Retrieved 2026-09-02,
+2 132 202 bytes, **70 pages** (note: `file` reports 35; the PDF toolkit reports
+70, and 70 is correct).
+
+Extracted from the PDF itself, not from a secondary summary.
+
+### Table 33 — Carbonate Mineral Dissolution Rate Parameters, verbatim
+
+| mineral | acid log k | acid E | acid n | neutral log k | neutral E | carbonate log k | carbonate E | carbonate n |
+|---|---|---|---|---|---|---|---|---|
+| **calcite** | **−0.30** | **14.4** | **1.000** | **−5.81** | **23.5** | **−3.48** | **35.4** | **1.000** |
+| dawsonite | — | — | — | −7.00 | 62.8 | — | — | — |
+| dolomite, sedimentary (disordered) | −3.19 | 36.1 | 0.500 | −7.53 | 52.2 | −5.11 | 34.8 | 0.500 |
+| dolomite, hydrothermal (ordered) | −3.76 | 56.7 | 0.500 | −8.60 | 95.3 | −5.37 | 45.7 | 0.500 |
+| magnesite | −6.38 | 14.4 | 1.000 | −9.34 | 23.5 | −5.22 | 62.8 | 1.000 |
+
+Footnotes, verbatim — these **are** the convention axioms:
+
+> a. Rate constant k computed from A and E, **25 °C, pH = 0, mole m⁻² s⁻¹**
+> b. Arrhenius activation energy E, **kJ mole⁻¹**
+> c. Reaction order n with respect to **H⁺**
+> d. Reaction order n with respect to **P(CO₂)**
+> e. Sedimentary (disordered) dolomite
+> f. Hydrothermal (ordered) dolomite
+
+### Three things a naive port would get wrong
+
+**1. The third mechanism is not the base mechanism.** For every other mineral
+class in this report the three columns are acid / neutral / **base**, and the
+third order is with respect to H⁺ (footnote c). For carbonates the third column
+is the **"Carbonate Mechanism"** and its order is with respect to **P(CO₂)** —
+footnote **d**, a different footnote. Applying the base-mechanism form with an H⁺
+order here would be wrong in both the variable and the sign of its effect.
+
+This matters directly for **H1a**: the calcite rate law carries an explicit
+CO₂-partial-pressure term with order 1.000, so CO₂ and calcite are coupled in the
+rate law itself, not only through the carbonate equilibria.
+
+**2. There are two dolomites and they differ by more than an order of
+magnitude.** Sedimentary (disordered) neutral log k = **−7.53**; hydrothermal
+(ordered) = **−8.60**. Which one applies to a given rock is a modelling choice
+with a ~12× consequence in the neutral mechanism, and it is not determined by the
+data. The Hellerschmied cores are 8 % calcite + **20 % dolomite**, so dolomite
+carries more of the carbonate mass than calcite does at that site and this choice
+is load-bearing. It is carried as a declared alternative, not silently fixed.
+
+**3. Magnesite's activation energies are not measured.** Page 48, verbatim:
+*"In the absence of data for the activation energy for magnesite dissolution, the
+activation energy of calcite is assigned to magnesite."* Hence magnesite's 14.4
+and 23.5 are **calcite's values**, not independent measurements — they must not
+be treated as an independent constraint anywhere.
+
+### What is still not extracted
+
+The rate-law equation number the table is regressed against (eqn. 11 in the
+report) and the chemical-affinity parameters *p* and *q* are referenced on
+page 48 but have not been read out yet; they are needed before the rate law is
+implemented, and are recorded as outstanding rather than assumed.

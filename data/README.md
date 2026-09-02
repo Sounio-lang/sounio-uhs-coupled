@@ -122,3 +122,100 @@ candidate case for the ontology convention check.
 Geochemist's Workbench is not available here, so **React cannot be run**. Parity
 in Phase 3 is claimed against the **archived output files** only. No claim of
 parity with GWB itself is made anywhere in this repository.
+
+---
+
+## `thaysen-strains/` — environmental growth envelopes
+
+DOI `10.17632/4dksb2x4zn.1` · **CC BY** · published 2021-05-11 · retrieved
+2026-09-02 · Thaysen & Strobel · one workbook, 192 652 bytes, size matched on
+download.
+
+Three sheets: `all info`, `R input microbes strobel comple`, `IRB + uncertain`.
+Extracted with `tools/xlsx_to_tsv.py`, a stdlib-only reader written rather than
+pulled in as a dependency, which refuses any workbook part carrying a DTD or
+entity declaration.
+
+**518 strains, counted rather than inherited** — 286 SRB, 144 methanogens (METH),
+88 homoacetogens (ACET):
+
+```sh
+python3 tools/xlsx_to_tsv.py data/thaysen-strains/*.xlsx --sheet "all info" > allinfo.tsv
+python3 tools/thaysen_envelopes.py allinfo.tsv
+```
+
+Columns give, per strain, optimum and lower/upper critical values for
+temperature, salinity and pH, plus pressure, references and a link. Salinity is
+declared **g/L** and pressure **MPa**; the **temperature unit is not declared in
+the header** and is carried as undeclared. The solute basis for salinity is also
+not declared — it is not stated whether "Salt" means NaCl-equivalent or total
+dissolved salts, which matters when it is compared against a formation water
+reported as TDS.
+
+### Six rows contradict their own bounds
+
+```sh
+python3 tools/thaysen_consistency.py allinfo.tsv     # exit 1
+```
+
+The rule needs no outside knowledge and imputes nothing: a strain's reported
+optimum must lie between that same strain's own lower and upper critical values.
+Of 706 such assertions, **6 fail**:
+
+| group | strain | field | low | OPT | up | reference |
+|---|---|---|---|---|---|---|
+| SRB | *Desulfonatronum buryatense* Su2 | Salt | 2 | **1** | 100 | Ryzhmanova et al. 2013 |
+| METH | *Methanofollis aquaemaris* | Salt | — | **52.6** | 5.84 | Imachi et al. 2009 |
+| METH | *Methanogenium tatii* | Salt | 0 | **44173** | 70 | Zabel et al. 1984 |
+| METH | *Methanosarcina spelaei* | pH | 4.1 | **66** | 9.9 | Ganzert et al. 2014 |
+| METH | *Methanobacterium aarhusense* | pH | `7,5-8` | **9** | **5** | Ma et al. 2005 |
+| METH | *Methanotorris igneus* | Salt | — | **78** | 54 | Takai et al. 2004b |
+
+Two of these are also physically impossible on their face (pH 66; 44 173 g/L,
+some 120× halite saturation). The other four are not — they are only detectable
+against the row's own bounds, which is why that is the rule used. The
+*M. aarhusense* row is worse than an outlier: its upper bound (5) is **below** its
+lower bound (`7,5-8`, itself a comma-decimal range in a numeric field).
+
+**These values are excluded and named. None is repaired.** An optimum that is
+needed must come from the primary reference the row itself cites, and would enter
+as a separate, separately-sourced datum. Silently clipping them to the bound
+would have widened three group envelopes with fabricated numbers.
+
+### A third of optima are not numbers
+
+**369 optimum cells are non-numeric** — ranges such as `40-45`, or comma
+decimals. The extractor refuses to parse these into a single value rather than
+guessing a midpoint. Any statistic over optima therefore covers a subset, and the
+count of what was skipped is reported alongside it.
+
+### Pressure is not obtainable for two of three groups
+
+The mission asks for envelopes in T, salinity, pH **and pressure**. Measured
+coverage: pressure is reported by **3 SRB strains** (optimum) and **2** (tolerance),
+and by **no methanogen and no homoacetogen at all**. A pressure envelope per group
+cannot be built from this source. Reported as a gap, not filled from elsewhere.
+
+### Envelopes as computed
+
+Group envelope = the union of its strains' reported tolerance ranges, which is
+the quantity the ontology's subsumption-derived envelope must reproduce in test
+O1. Computed **before** exclusions, so the two defective salinity/pH maxima above
+still inflate the METH row; the post-exclusion table is regenerated when the
+envelopes are consumed.
+
+| group | field | n reported | n missing | envelope low | envelope high |
+|---|---|---|---|---|---|
+| ACET | Temp | 56 | 32 | −2.5 | 72 |
+| ACET | Salt (g/L) | 16 | 72 | 0 | 250 |
+| ACET | pH | 60 | 28 | 3.6 | 10.7 |
+| METH | Temp | 128 | 16 | 0 | 122 |
+| METH | Salt (g/L) | 103 | 41 | 0 | 200 |
+| METH | pH | 112 | 32 | 4.1 | 10.2 |
+| SRB | Temp | 220 | 66 | −2 | 113 |
+| SRB | Salt (g/L) | 165 | 121 | 0 | 250 |
+| SRB | pH | 184 | 102 | 1 | 11.5 |
+
+Missing counts are large — salinity is absent for 72 of 88 homoacetogens and 121
+of 286 sulfate reducers — so an envelope is the range of what *was reported*, not
+of the group.

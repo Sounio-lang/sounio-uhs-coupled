@@ -177,6 +177,29 @@ int main(int argc, char** argv) {
 
     std::ostringstream in;
     in << std::setprecision(17);
+    // Redox decoupling, when asked for, is done the way PHREEQC's own Amm.dat
+    // decouples ammonia from nitrogen: by making the species a SEPARATE ELEMENT
+    // with its own master species, so no electron appears in its reactions and
+    // it cannot drive pe. `Hdg` is dissolved hydrogen gas carrying exactly the
+    // Henry constants that phreeqc.dat gives H2(g) -- same solubility, no redox.
+    //
+    // The database itself is NOT modified: it stays pinned by hash, and this
+    // block is part of the run's own input, so it appears in the record.
+    if (decouple) {
+        in << "SOLUTION_MASTER_SPECIES\n"
+           << "    Hdg    Hdg    0.0    Hdg    2.016\n"
+           << "SOLUTION_SPECIES\n"
+           << "    Hdg = Hdg\n"
+           << "    -log_k 0.0\n"
+           << "PHASES\n"
+           << "    Hdg(g)\n"
+           << "    Hdg = Hdg\n"
+           << "    -log_k -3.105\n"
+           << "    -delta_h -4.184 kJ\n"
+           << "    -analytic -9.3114 4.6473e-3 -49.335 1.4341 1.2815e5\n"
+           << "END\n";
+    }
+
     // Charge balance is placed on Cl, not on pH. Balancing on pH lets the solver
     // move pH arbitrarily to absorb the Ca2+ released by calcite, which produces
     // a formally converged but physically meaningless state.
@@ -201,12 +224,13 @@ int main(int argc, char** argv) {
     // respect to the water couple, which is the physical situation at 40 degC in
     // the absence of a catalyst -- and is why microbial catalysis is the thing
     // that matters. Matches the archived USGS model, which sets "decouple ALL".
-    if (decouple && h2_molal > 0.0)
-        in << "    H(0)       " << h2_molal << "\n";
     in << "EQUILIBRIUM_PHASES 1\n"
        << "    Calcite    0.0  10.0\n";
-    if (!decouple && h2_fug > 0.0)
-        in << "    H2(g)      " << std::log10(h2_fug) << "  10.0\n";
+    if (h2_fug > 0.0) {
+        // same imposed fugacity either way; only the coupling differs
+        if (decouple) in << "    Hdg(g)     " << std::log10(h2_fug) << "  10.0\n";
+        else          in << "    H2(g)      " << std::log10(h2_fug) << "  10.0\n";
+    }
     if (have_co2 && co2_fug > 0.0)
         in << "    CO2(g)     " << std::log10(co2_fug) << "  10.0\n";
     in << "SELECTED_OUTPUT\n"
@@ -214,7 +238,7 @@ int main(int argc, char** argv) {
        << "    -temperature true\n"
        << "    -pH        true\n"
        << "    -ionic_strength true\n"
-       << "    -totals    Ca C H(0)\n"
+       << (decouple ? "    -totals    Ca C Hdg\n" : "    -totals    Ca C H(0)\n")
        << "    -equilibrium_phases Calcite\n"
        << "    -saturation_indices Calcite\n"
        << "END\n";

@@ -98,3 +98,54 @@ abiotic H₂-loss number from this harness is quotable, and none is quoted.
 | parity against the Sounio model | not started; the Sounio model does not exist yet |
 | oracle resolution in regime, over 10 perturbed states | not started |
 | step bisection | not started |
+
+---
+
+## Redox decoupling: achieved, and the 400× was entirely the convention
+
+The earlier attempt — fixing `H(0)` as a molality — did **not** decouple: 0.05 molal
+in returned 7.3073e-07 out, so pe re-equilibrated and the H₂ reacted away. That is
+now fixed.
+
+**How.** The species is made a **separate element**, which is exactly how PHREEQC's
+own `Amm.dat` decouples ammonia from nitrogen redox (`Amm  AmmH+  0  AmmH  17.031`).
+`Hdg` is dissolved hydrogen gas carrying **the Henry constants `phreeqc.dat` gives
+`H2(g)`** — `log_k -3.105`, `delta_h -4.184 kJ`, and the same `-analytic` row — so
+its solubility is identical, but no electron appears in its reaction and it cannot
+drive pe.
+
+**The pinned database is not modified.** The definition is part of the run's own
+input, emitted before `SOLUTION`, so it appears in the record and the hash gate
+still holds.
+
+### Measured, 40 °C, 1 molal NaCl, f(H₂) = 91
+
+| formulation | pH | Ca (mol/kgw) | H₂ in solution (mol/kgw) | calcite dissolved (mol) |
+|---|---|---|---|---|
+| redox coupled | 13.7866 | 2.3922 | 9.9300e-05 | 2.5000 |
+| **redox decoupled** | **9.6474** | **3.7824e-04** | **5.3858e-02** | **3.7824e-04** |
+| decoupled, no H₂ at all | 9.64715 | 3.7830e-04 | 0 | 3.7830e-04 |
+
+Two things follow, and they are the point of the exercise.
+
+**1. Decoupled H₂ dissolves and stays.** 5.3858e-02 mol/kgw remains in solution,
+against 9.93e-05 in the coupled case where it had reacted away. That residual is
+Henry's law, and it is the abiotic loss mechanism.
+
+**2. With H₂ inert, calcite dissolution is unchanged.** 3.7824e-04 mol with H₂
+against 3.7830e-04 without — a difference of 6e-9 mol, **0.016 %**, and pH moves
+from 9.64715 to 9.6474.
+
+**So the factor of ~400 reported earlier was entirely an artefact of the redox
+convention, not a property of the rock.** Under the physically appropriate
+treatment for 40 °C without a catalyst, hydrogen does not measurably attack
+calcite in this system. That is consistent with the direction of the calibrated-
+model literature, which reports overall hydrogen loss to brine dissolution as far
+below 1 % molar.
+
+**What this does and does not license.** It licenses reporting equilibrium calcite
+dissolution under decoupled H₂. It does **not** yet license an abiotic H₂-loss
+percentage for a reservoir: that requires the gas-to-water ratio of the site, and
+Lehen's salinity is not reported at all (see `CORRECTIONS.md` C6). Nor is this a
+kinetic result — it is equilibrium. The Palandri–Kharaka rate law is not yet wired
+in, so nothing here speaks to how fast.

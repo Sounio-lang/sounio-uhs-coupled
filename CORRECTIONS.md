@@ -345,3 +345,43 @@ document. The same run also caught a search summariser fabricating twice, once
 inventing a Creative Commons licence for a paywalled Wiley article and once
 attributing a paper to a DOI belonging to an unrelated study. Neither reached
 this repository.
+
+---
+
+## C12 — The Lobodice source itself says the site is not directly applicable
+
+Reading the secondary in full turned up a stronger statement than the confounder
+recorded in `PREREGISTRATION.md`. Tremosa, Jakobsen & Le Gallo (2023), *Front.
+Energy Res.* 11:1145978 (CC BY), opens its Lobodice discussion with:
+
+> *"Field observations from town gas storage sites are **not directly applicable
+> to pure hydrogen storage, due to the large presence of co-injected carbon
+> sources**. The most emblematic case is that of the town gas storage of Lobodice
+> (Czech Republic), documented in two scientific articles (Smigan et al., 1990;
+> Buzek et al., 1994). In Lobodice, town gas containing 54% H2 was stored in a
+> sandstone reservoir at a depth of 500 m (pressure of 4 MPa and temperature of
+> 25°C–45°C). After 7 months of storage, 10%–20% of the gas volume was lost and
+> the composition of the gas changed, with the formation of methane and decreases
+> in hydrogen, carbon dioxide and carbon monoxide."*
+
+The pre-registration recorded co-injected CO₂ and CO as a confounder that weakens
+what Lobodice constrains. **The source goes further**: it states the class of site
+is not directly applicable to pure-H₂ storage at all.
+
+**Consequence for F2.** F2 requires the coupled band to encompass the Lobodice
+54 % → 37 % drop. That criterion is frozen and is not being altered. But the
+verdict on it will be reported **with this statement attached**, because a
+validation point whose own source says it is not directly applicable cannot carry
+the same weight as Sun Storage. Concretely: the F2 verdict is reported twice —
+against both field points as pre-registered, and against Sun Storage alone — and
+both are stated. Reporting only the combined verdict would hide that one of the
+two points is contested by the literature it comes from.
+
+This also sharpens **F3**. If the abiotic band alone encompasses both points, the
+coupling is superfluous; but if Lobodice is not a clean pure-H₂ test, then F3
+effectively turns on Sun Storage, and the study has **one** clean field
+constraint, not two. That is a materially weaker validation base than the mission
+assumed, and it is recorded now rather than discovered at the end.
+
+Reservoir parameters confirmed from the same passage: 500 m depth, 4 MPa,
+25–45 °C, sandstone, 7 months, 10–20 % of gas volume lost.

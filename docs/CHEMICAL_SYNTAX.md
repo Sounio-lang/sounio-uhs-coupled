@@ -41,7 +41,7 @@ be a typed term with its balance checked at compile time.
 
 ## Three proposals, in order of what the current compiler can carry
 
-### 1. Reaction literals, balance checked at compile time — **buildable now**
+### 1. Reaction literals, balance checked at compile time — **built**
 
 ```sio
 reaction sulfate_reduction {
@@ -56,26 +56,48 @@ reaction methanogenesis {
 The checker verifies, per reaction:
 
 - **mass balance**, element by element;
-- **charge balance**, left against right.
+- **charge balance**, left against right;
+- **every element symbol is a real element symbol** — an unrecognised symbol is
+  an error, never a silent zero. Without this a typo in a species name would let
+  a reaction appear to balance.
 
 Charge is written the way chemists and both reference engines write it —
 trailing `+`/`-`, repeated for multiplicity (`SO4--`, `Ca++`) — so a reaction can
 be transcribed from a paper or a GWB script without re-encoding. Phase is part of
 the species, not decoration: `H2(aq)` and `H2(g)` are different species, which the
-redox result above makes non-negotiable.
+redox result above makes non-negotiable. A parenthesised group that is *not* a
+phase is a multiplier group, so `CaMg(CO3)2` counts C 2 and O 6.
 
-Proposed diagnostics:
+Implemented diagnostics, quoted as the compiler actually emits them — these are
+the verbatim outputs of the three tests in `tests/compile-fail/reaction_*.sio` in
+the Sounio repository.
+
+The negative control is sulfate reduction, which balances exactly, with one
+coefficient perturbed from `4 H2O` to `3 H2O`:
 
 ```
-error[E185]: reaction `sulfate_reduction` does not balance for element H
-  --> model.sio:2
-   |
- 2 |     4 H2(aq) + H+ + SO4-- -> HS- + 4 H2O
-   |     ^ left 9, right 9
-   = note: charge balances: left -1, right -1
+error[E188]: reaction `sulfate_reduction_perturbed` does not balance for element H at <main>:1 (bundle line 1)
+  = note: element H: left 9, right 7
+error[E188]: reaction `sulfate_reduction_perturbed` does not balance for element O at <main>:1 (bundle line 1)
+  = note: element O: left 4, right 3
+```
 
-error[E186]: reaction `bad_rxn` does not balance in charge
-   = note: left -2, right -1
+Dropping one water removes 2 H and 1 O, and the diagnostic says exactly that: it
+names every element that fails and reports both counts. Sulfur still balances and
+is not reported. A checker that said only "does not balance" would leave the
+author to find the missing atom themselves, which is most of the work.
+
+Charge, isolated from mass — iron is conserved, so no `E188` fires:
+
+```
+error[E189]: reaction `iron_oxidation_unbalanced` does not balance in charge at <main>:1 (bundle line 1)
+  = note: charge left 2, right 3
+```
+
+An unrecognised element symbol:
+
+```
+error[E190]: unknown element symbol `Xx` in reaction `bogus_element` at <main>:2 (bundle line 2)
 ```
 
 **What this deliberately does not claim.** It checks conservation, nothing more.
@@ -84,11 +106,19 @@ elementary, that its direction is right, or that its rate law is sound. A
 balanced reaction can still be wrong chemistry. Claiming otherwise would be the
 same category of error this document exists to prevent.
 
-**Why it is buildable now.** `unit` is already a soft keyword registered in
-Pass 0a of the production engine and skipped in the main pass, with
-`tc_linear_violation` emitting the diagnostic. `reaction` follows that precedent
-exactly. Formula parsing and integer balance arithmetic need nothing the language
-does not have.
+**Status: built.** `unit` was already a soft keyword registered in Pass 0a of the
+production engine and skipped in the main pass, with `tc_linear_violation`
+emitting the diagnostic. `reaction` follows that precedent exactly: registered in
+Pass 0a of `self-hosted/compiler/lean_single.sio`, where the balance is checked,
+and skipped by the main compile pass. Formula parsing and integer balance
+arithmetic needed nothing the language did not already have.
+
+That `reaction` is a *soft* keyword is a compatibility guarantee, not a detail.
+It introduces a declaration only in the position `reaction NAME {` and stays an
+ordinary identifier everywhere else, so `fn reaction(...)`, `let reaction = 7`
+and `reaction + 1` all still compile. This is pinned by
+`tests/run-pass/reaction_soft_keyword_shadowing.sio`, so the feature is not a
+breaking change for programs that already use the word.
 
 ### 2. Species identity from the ontology, not from the formula — **fits what exists**
 
@@ -145,7 +175,8 @@ would have gone into a report with nothing to flag it.
 
 ## What this is not
 
-A wish list. Item 1 is being implemented as a proof of concept; item 2 rests on
+A wish list. Item 1 is implemented, with the diagnostics quoted above taken
+from its tests; item 2 rests on
 machinery that already exists and is verified; item 3 names precisely which
 extension it needs and why the current profile cannot carry it. Where an item is
 blocked, it says so and says what it would cost.

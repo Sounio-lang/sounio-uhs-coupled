@@ -219,3 +219,92 @@ envelopes are consumed.
 Missing counts are large — salinity is absent for 72 of 88 homoacetogens and 121
 of 286 sulfate reducers — so an envelope is the range of what *was reported*, not
 of the group.
+
+---
+
+## `chabab-h2-solubility/` — H₂ solubility in NaCl brine (coefficients only, no redistribution)
+
+**No file from this source is committed.** The accessible copies are author
+manuscripts deposited on HAL under the HAL depositor authorisation, which is
+**not** a Creative Commons licence, so the PDFs are not redistributed here. What
+is recorded is the coefficient set — facts, freely usable — together with the
+retrieval URL and the file hash, so anyone can fetch the same bytes and check.
+
+| | |
+|---|---|
+| target paper | Chabab, Kerkache, Bouchkira, Poulain, Baudouin, Moine, Ducousso, Hoang, Galliero, Cézac — *Int. J. Hydrogen Energy* **50**:648–658, doi `10.1016/j.ijhydene.2023.10.290` (online Nov 2023, print Jan 2024) |
+| copy read | accepted manuscript, `https://univ-pau.hal.science/hal-04623907/document`, 33 pp., sha256 `6e1d87124013fda00ef362932bcf10c071eab1b442e87606793ac518e896a979` |
+| precursor | doi `10.1016/j.ijhydene.2020.08.192`, `https://hal.science/hal-02984804/document`, 35 pp., sha256 `7f10fc019712e8c1b58874c722834dba4c1a4654af395f1909c77ebf19a166d7` |
+| version of record | paywalled (ScienceDirect HTTP 403) — coefficients below are **accepted-manuscript values, pre-copyedit**, pending a VoR check |
+
+### Verified against the source, not taken on report
+
+Two automated extractions of this source disagreed — one returned the table, the
+other reported the deposit unreachable behind a bot challenge. Both were set
+aside and the file was fetched directly: **HTTP 200, `application/pdf`, 33
+pages**. Table 4 was then read from the PDF itself. Every coefficient below was
+confirmed that way.
+
+**Model 2 (Duan-type / Pitzer).** Equation 8:
+
+```
+ln(y_H2 · P / m_H2) = mu0_H2/RT - ln(phi_H2)
+                      + sum 2*lambda_H2-c * m_c
+                      + sum 2*lambda_H2-a * m_a
+                      + sum sum zeta_H2-c-a * m_c * m_a
+```
+
+with **P in bar, m in mol/kg water, T in K, R = 83.14 bar cm³ mol⁻¹ K⁻¹**.
+
+Equation 11 gives the T,P dependence of each parameter:
+
+```
+Par(T,P) = C1 + C2*T + C3/T + C4*T^2 + C5*P + C6*P/T^2
+           + C7/P + C8*T/P + C9*T^2/P + C10*T^3/P
+```
+
+| | μ°_H2/RT | λ_H2−c |
+|---|---|---|
+| C1 | 41.8266086 | −7.74829265312071 |
+| C2 | −8.24713967 × 10⁻² | 0.0226221702021589 |
+| C3 | −4.60318630 × 10³ | 923.092396500207 |
+| C4 | 6.03537635 × 10⁻⁵ | −2.21140172559128 × 10⁻⁵ |
+| C5 | 4.12979459 × 10⁻⁴ | 7.40868321886585 × 10⁻⁵ |
+| C6 | 1.82081207 × 10¹ | −12.3509724808910 |
+| C7 | 3.73478602 × 10¹ | −47.3816790140829 |
+| C8 | −3.87633253 × 10⁻¹ | 0.469165009435218 |
+| C9 | 1.34370747 × 10⁻³ | −0.0015626314758 |
+| C10 | −1.55621990 × 10⁻⁶ | 1.75015662317748 × 10⁻⁶ |
+
+**λ_H2−a = 0 exactly** and **ζ_H2−c−a = −0.009470244669, constant** — their C2–C10
+cells are blank in the table, i.e. no T or P dependence, not zero-filled.
+
+Water content in the H₂-rich phase, equation 10
+`phi_H2O = exp(A1 + A2*P + A3*P^2 + A4*P*T + A5*P/T + A6*P^2/T)`:
+
+| A1 | A2 | A3 | A4 | A5 | A6 |
+|---|---|---|---|---|---|
+| −0.0183687889210319 | 0.0258865530837438 | −1.97530641525822 × 10⁻⁵ | −3.10454712930491 × 10⁻⁵ | −5.61575502087305 | 0.00673250140185062 |
+
+These parameters were **readjusted in this work** — `λ_H2−c` and `ζ_H2−c−a`
+against new measurements plus Braun 1900 and Crozier & Yamamoto 1974, and A1–A6
+against H₂–H₂O dew-curve data from Gillespie & Wilson 1980, because the model
+they build on had kept CH₄–H₂O coefficients.
+
+### Validity range is inferred, not stated — flagged
+
+**The 2023 paper states no explicit numerical validity envelope.** Its
+measurements span **T 298–373 K, P ≤ 200 bar, m_NaCl 0–4 mol/kg water**, and the
+200 bar ceiling is an autoclave limit rather than a physical one. Any envelope
+quoted from this source is therefore **an inference from the fitting range, not
+an authors' statement**, and is labelled so wherever it is used. The 2020
+precursor does state ranges explicitly (323.15–373.15 K, 10–230 bar,
+0–5 mol/kg water for brine).
+
+**Not obtained:** the e-NRTL model's τ and α parameters are never tabulated —
+they reside in a commercial software database. Recorded as a gap.
+
+**Relevant to site coverage:** the correlation is fitted at ≥ 298 K, and both
+field sites (Lehen 40 °C = 313 K, Lobodice 25–45 °C = 298–318 K) sit inside the
+fitted temperature range. Salinity is the open question, not temperature — and
+for Lehen the salinity is not reported at all (see C6).

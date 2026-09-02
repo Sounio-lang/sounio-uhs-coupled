@@ -263,3 +263,85 @@ so. The 2020 paper does state ranges explicitly.
 
 The e-NRTL model's τ and α parameters are **not tabulated anywhere** — they live
 in a commercial software database. Recorded as a gap.
+
+---
+
+## C10 — "Yarrabee formation" does not exist, and the Al-Yaseri paper is not what the brief describes
+
+**Believed:** Fatah & Al-Yaseri 2024 plus Monash/CSIRO work on the "Yarrabee
+formation" would supply an abiotic limestone–H₂ time series.
+
+Three separate errors in that premise:
+
+**1. There is no Yarrabee formation.** The only formal Australian unit of that
+name is the **Yarrabee Tuff**, an upper Permian volcanic ash marker bed in the
+Bowen Basin, Queensland — not a limestone, not a carbonate, not a storage target.
+No matching record was found for a Yarrabee-formation H₂ storage dataset. Any
+protocol text referring to it should be struck.
+
+**2. Author order and institution.** The paper is **Al-Yaseri, Fatah**, Alsaif,
+Sakthivel, Amao, Al-Qasim, Yousef (2024), *Energy & Fuels* 38(11):9923–9932,
+doi `10.1021/acs.energyfuels.4c00742` — and the group is **KFUPM / Saudi Aramco,
+not Australian**.
+
+**3. It is not a time series.** Conditions per the abstract: limestone, 1500 psi,
+75 °C, 6–13 months, reaction cells with SEM/GC/ICP-OES. Verbatim: *"suggesting
+that abiotic reactions in carbonate rocks are unlikely to occur during the first
+stages of UHS."* That is a **two-endpoint null result**. It can bound a
+dissolution rate; it cannot calibrate one. Full text is closed (ACS HTTP 403,
+`oa_status: closed`), so conditions, mineralogy, sterile controls and the data
+statement are **not verified**.
+
+Note the temperature: 75 °C, i.e. **above** the ~70 °C threshold where Ghaedi
+reports geochemical interactions become negligible. A null result there is
+consistent with Ghaedi and says little about our sites at 25–45 °C.
+
+**The real Monash/CSIRO paper, for the record.** Dodangoda, Haque, Zeng, Yang &
+Ranjith (2025), *Renewable Energy* **251**:123357, doi
+`10.1016/j.renene.2025.123357`, Monash + CSIRO Manufacturing, **CC BY 4.0**.
+Abstract-level: 2.8 MPa/28 °C and 12 MPa/70 °C, up to 180 days, ~1 % calcite
+dissolution, up to 25 % H₂ loss within 10 days, up to 63 % porosity increase.
+Elsevier's bot filter returned 403 to automated retrieval, so the Methods and the
+data-availability statement were **not read**.
+
+**Two cautions before anyone treats it as an abiotic control**: the only control
+described is an **N₂ gas-type control, not a sterility control**, so it should not
+be classified as abiotic-controlled without reading the Methods; and Crossref
+shows no linked dataset, DataCite no deposit. The related Dodangoda & Ranjith
+(2024) *Gas Sci. Eng.* paper is CC BY but is **PHREEQC modelling only and includes
+methanogenesis terms** — it is not an abiotic measurement. The thesis that likely
+holds raw series is embargoed until 2027-01-12.
+
+**Conclusion unchanged from C8:** no confirmed, openly accessible, numerical
+abiotic carbonate–H₂ time series was found. Hellerschmied's CC BY abiotic
+controls remain the substitute, with the total-pressure caveat.
+
+---
+
+## C11 — Two automated extractions of the same source contradicted each other
+
+Worth recording as a method note, because it nearly put an unverified table into
+this repository.
+
+The Chabab solubility coefficients were reported twice by the same automated
+extraction. The first run returned full coefficient tables read from the HAL
+deposit (`HTTP 200, 33 pp.`). The second run reported the same deposit
+**unreachable behind an anti-bot proof-of-work challenge** and the coefficients
+**not obtained**.
+
+Both were set aside and the file was fetched directly:
+
+```sh
+curl -sL -o chabab.pdf https://univ-pau.hal.science/hal-04623907/document
+#   200  1082113  application/pdf   -> PDF document, version 1.4, 33 pages
+```
+
+Accessible. Table 4 was then read from the PDF itself and every coefficient
+confirmed. The first run was right; the second was wrong.
+
+**The rule this enforces:** an extraction is a lead, not a source. No number
+enters this repository on the strength of a report about a document — only on the
+document. The same run also caught a search summariser fabricating twice, once
+inventing a Creative Commons licence for a paywalled Wiley article and once
+attributing a paper to a DOI belonging to an unrelated study. Neither reached
+this repository.

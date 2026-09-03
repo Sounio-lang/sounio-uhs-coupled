@@ -3,10 +3,33 @@
 A pre-registered attempt to **falsify** a hypothesis about what controls
 hydrogen loss in underground hydrogen storage — not to confirm it.
 
-**Status: Phase 0 complete. No scientific result exists yet.** `RESULTS.md` does
-not appear in this tree until Phase 2 produces something to put in it. This
-README, `PREREGISTRATION.md`, `FEATURES.md` and `LANGUAGE_GAPS.md` are the whole
-of the current content, and that is deliberate.
+**Status: Phases 0-4 complete. All three pre-registered criteria have
+verdicts.** They are recorded in `PHASE4_GATE.md`, which is written as a running
+log rather than a summary: it contains a wrong answer, the defect that produced
+it, and the correction, in that order. `RESULTS.md` does not exist yet — the
+final write-up is still to come, and until it does the log is the record.
+
+| criterion | verdict | where |
+|---|---|---|
+| **F1** — remove calcite; under a factor 2 and H1a dies | **passes at a CO2-poor feed** (4.3x at ordinary gas saturation, approaching 13x), **but is inert at a stoichiometric or CO2-rich feed** (1.00 to 1.13) | `sio/coupled_gasphase.sio` |
+| **F2** — band must encompass both field points, nothing tuned | **not evaluable as pre-registered.** Lobodice's reported data fail four independent consistency checks (`CORRECTIONS.md` C13). **Satisfied against Sun Storage alone**, which falls inside the model's reachable range with nothing tuned | `sio/coupled_finite.sio`, `sio/lobodice_massbalance.sio` |
+| **F3** — if the abiotic band alone encompasses both points, the coupling is superfluous | **does not fire.** Dissolution accounts for 1.88 % against ~16 % observed, and the site's own sterile controls lose 5-10x less than the biotic ones | `sio/f3_abiotic_band.sio` |
+
+**H1a survives, in a sharper and more falsifiable form than it was
+pre-registered in.** The mechanism is not kinetic — the CO2 half-saturation term
+is worth 0.055 % — but stoichiometric: the ratio of biotic H2 loss with calcite
+to without approaches `y_H2 / (4 * y_CO2)`, the excess of stored hydrogen over
+the CO2 stored with it. That is 13.0 for the 52:1 field gas and 1.0 for the 4:1
+mesocosm feed, so the hypothesis is **true only for a CO2-poor feed** and this
+study says where it is false.
+
+**Two things are open, and both are data gaps rather than modelling ones.** No
+microbial kinetic parameter set appropriate to a 285-day reservoir observation
+exists in these sources — the available one is ~10 orders of magnitude too slow,
+and the fast one is stated in units that cannot be converted without inventing a
+mass per cell. And three of the four abiotic channels in F3 have no measured
+rate, which is why that module refuses to emit a total band rather than
+silently treating them as zero.
 
 The engine is [Sounio](https://github.com/sounio-lang/sounio), a self-hosted
 systems and scientific language. Harnesses are C++. Python appears only as an
@@ -45,7 +68,8 @@ work:
 | `data/` | manifest: origin, DOI, licence, sha256, convention axioms per file |
 | `abiotic/` `microbial/` `coupled/` | the models |
 | `oracles/` | IPhreeqc parity harness; archived USGS outputs |
-| `PHASE4_GATE.md` | Phase 4 hard-stop report: the mesocosm/field ratio does not exist in the source; the testable dual-Monod reading gives 1.000552, not ~30x |
+| `PHASE4_GATE.md` | the running log of Phase 4 and the three verdicts — including a retracted result and the defect that caused it |
+| `CORRECTIONS.md` | 13 corrections to the brief's premises and to the sources, each with the measurement that exposed it |
 | `sio/` | the Sounio engine sources -- validation and gate probes live here too, not in a separate `probes/` directory, because imports resolve same-directory first and the self-hosted stdlib fallback does not see this repo |
 | `tools/` | data → `.sio` code generation (marshalling only, no numerics) |
 

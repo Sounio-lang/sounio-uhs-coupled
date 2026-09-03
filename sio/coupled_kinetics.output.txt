@@ -1,0 +1,149 @@
+Raw stdout of sio/coupled_kinetics.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf coupled_kinetics.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 35359f48fb (this repo, HEAD at capture time)
+date:     2026-09-03T15:05:09Z
+
+COUPLED KINETICS -- F1, mass-balance version of H1a
+with calcite: DIC held at the equilibrium ceiling (buffered,
+mineral assumed in excess). without calcite: DIC is the same
+charge balance with no calcium term, fixed at t=0, depleting
+thereafter -- reusing microbial_kinetics.sio's own mechanism.
+T = 40 C. NaCl background = 0 (Lehen salinity unreported, C6).
+SO4_total = 0.008269 molal, reused from the Aux Vases archive.
+
+== sanity: DIC ceilings at the two conditions ==
+   mesocosm with-calcite DIC  3712971131087e-14
+   mesocosm no-calcite   DIC  2382160868617e-14
+   field    with-calcite DIC  1004986057364e-14
+   field    no-calcite   DIC  3556375171758e-15
+
+== F1 at the Aux Vases geological horizon, for continuity ==
+   (12700 yr, dt = 1e7 s -- same integrator settings already
+   verified against the archived USGS trajectory)
+
+   MESOCOSM condition (P_CO2  1000000000000e-12
+atm)      with calcite    H2 consumed  2983248054862e-15
+      without calcite H2 consumed  2983248054862e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite branch  0
+      [diag] final DIC,    no-calcite branch  2382159892980e-14
+      [diag] initial DIC,  no-calcite branch  2382160868617e-14
+
+   FIELD condition (P_CO2  1482000000000e-13
+atm)      with calcite    H2 consumed  5751792158850e-15
+      without calcite H2 consumed  5751792158850e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite branch  0
+      [diag] final DIC,    no-calcite branch  3556364136641e-15
+      [diag] initial DIC,  no-calcite branch  3556375171758e-15
+
+== F1 at an OPERATIONAL storage horizon ==
+   285 days -- the Sun Storage field-validation duration this
+   study targets. dt = 3600 s (1 h): does the mass-balance
+   ceiling even bite on a timescale storage actually runs at?
+
+   MESOCOSM condition (P_CO2  1000000000000e-12
+atm)      with calcite    H2 consumed  6999048223538e-24
+      without calcite H2 consumed  6999048223538e-24
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite branch  2981199993000e-15
+      [diag] final DIC,    no-calcite branch  2382160868546e-14
+      [diag] initial DIC,  no-calcite branch  2382160868617e-14
+
+   FIELD condition (P_CO2  1482000000000e-13
+atm)      with calcite    H2 consumed  7001940033771e-24
+      without calcite H2 consumed  7001940033771e-24
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite branch  5749393252998e-15
+      [diag] final DIC,    no-calcite branch  3556375171049e-15
+      [diag] initial DIC,  no-calcite branch  3556375171758e-15
+
+
+###############################################################
+# TARGETED SWEEP: the three conditions PHASE4_GATE.md left open #
+###############################################################
+
+== SWEEP 1: salinity, Tremosa et al. 2023's own viability bounds ==
+   mesocosm condition (P_CO2 1.0 atm), 12700 yr, cold-start biomass
+   NaCl = 0.40 M (SRB/acetogen upper bound)      with calcite    H2 consumed  2983248054862e-15
+      without calcite H2 consumed  2983248054862e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  0
+      [diag] final DIC,    no-calcite  2386019715111e-14
+      [diag] initial DIC,  no-calcite  2386020690748e-14
+
+   NaCl = 0.77 M (methanogen upper bound)         with calcite    H2 consumed  2983248054862e-15
+      without calcite H2 consumed  2983248054862e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  0
+      [diag] final DIC,    no-calcite  2386647717249e-14
+      [diag] initial DIC,  no-calcite  2386648692885e-14
+
+   field condition (P_CO2 0.148 atm), 12700 yr, cold-start biomass
+   NaCl = 0.40 M (SRB/acetogen upper bound)      with calcite    H2 consumed  5751792158850e-15
+      without calcite H2 consumed  5751792158850e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  0
+      [diag] final DIC,    no-calcite  3571419799857e-15
+      [diag] initial DIC,  no-calcite  3571430834974e-15
+
+   NaCl = 0.77 M (methanogen upper bound)         with calcite    H2 consumed  5751792158850e-15
+      without calcite H2 consumed  5751792158850e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  0
+      [diag] final DIC,    no-calcite  3573837779193e-15
+      [diag] initial DIC,  no-calcite  3573848814310e-15
+
+== SWEEP 2: Lobodice's actual injected composition ==
+   54% H2, 22% CH4, 12% CO2, 9% CO, 2.5% N2, 4 MPa, 25-45 C
+   (Tremosa et al. 2023 sec 2.2). T taken at 40 C, mid-range.
+   12700 yr horizon, cold-start biomass, NaCl = 0 (unreported)
+   Lobodice composition      with calcite    H2 consumed  1610954003393e-14
+      without calcite H2 consumed  1610954003393e-14
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  0
+      [diag] final DIC,    no-calcite  1140562821942e-13
+      [diag] initial DIC,  no-calcite  1140562955394e-13
+
+   7-month horizon (the field's own storage duration), cold-start biomass
+   Lobodice composition      with calcite    H2 consumed  5234294588856e-24
+      without calcite H2 consumed  5234294588856e-24
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  1609847999476e-14
+      [diag] final DIC,    no-calcite  1140562955389e-13
+      [diag] initial DIC,  no-calcite  1140562955394e-13
+
+== SWEEP 3: established (not cold-start) biomass ==
+   1e-4 mg/kg -- the Aux Vases archive's own upper sensitivity
+   bound, 100x the cold start used elsewhere in this study.
+   mesocosm condition, 285 d (operational horizon)
+   biomass_init = 1e-4 mg/kg      with calcite    H2 consumed  6999048222535e-22
+      without calcite H2 consumed  6999048222535e-22
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  2981199300095e-15
+      [diag] final DIC,    no-calcite  2382160861533e-14
+      [diag] initial DIC,  no-calcite  2382160868617e-14
+
+   field condition, 285 d
+   biomass_init = 1e-4 mg/kg      with calcite    H2 consumed  7001940033277e-22
+      without calcite H2 consumed  7001940033277e-22
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  5749392559806e-15
+      [diag] final DIC,    no-calcite  3556375100868e-15
+      [diag] initial DIC,  no-calcite  3556375171758e-15
+
+   mesocosm condition, 12700 yr (for completeness)
+   biomass_init = 1e-4 mg/kg      with calcite    H2 consumed  2983259271509e-15
+      without calcite H2 consumed  2983259271509e-15
+      ratio  1000000000000e-12
+      [diag] final H2(aq), no-calcite  0
+      [diag] final DIC,    no-calcite  2382120747078e-14
+      [diag] initial DIC,  no-calcite  2382160868617e-14
+

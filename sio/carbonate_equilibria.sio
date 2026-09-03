@@ -68,6 +68,20 @@ var KSP_A5: f64 = 0.0
 var KSP_A6: f64 = 0.0
 var KSP_LOGK25: f64 = 0.0 - 8.48
 
+// ── ion pairs, from the same pinned database ───────────────────────────────
+// Ca+2 + CO3-2 + H+ = CaHCO3+   log_k 10.91,  -gamma 6 0
+var P1_A1: f64 = 0.0 - 6.009
+var P1_A2: f64 = 3.377e-2
+var P1_A3: f64 = 2044.0
+// Ca+2 + CO3-2 = CaCO3 (aq)     log_k 3.224, uncharged, NO -gamma line
+var P2_A1: f64 = 0.0 - 1228.732
+var P2_A2: f64 = 0.0 - 0.29944
+var P2_A3: f64 = 35512.75
+var P2_A4: f64 = 485.818
+// Ca+2 + H2O = CaOH+ + H+       log_k -12.78, no analytic and no -gamma:
+// temperature-independent here, and Davies for its activity coefficient.
+var P3_LOGK: f64 = 0.0 - 12.78
+
 var LN10: f64 = 2.302585092994046
 
 fn log10_of(x: f64) -> f64 with Mut, Div, Panic {
@@ -94,8 +108,14 @@ fn log_k(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
         a1 = KC_A1  a2 = KC_A2  a3 = KC_A3  a4 = KC_A4  a5 = KC_A5  a6 = KC_A6
     } else if which == 3 {
         a1 = KW_A1  a2 = KW_A2  a3 = KW_A3  a4 = KW_A4  a5 = KW_A5  a6 = KW_A6
-    } else {
+    } else if which == 4 {
         a1 = KSP_A1 a2 = KSP_A2 a3 = KSP_A3 a4 = KSP_A4 a5 = KSP_A5 a6 = KSP_A6
+    } else if which == 5 {
+        a1 = P1_A1  a2 = P1_A2  a3 = P1_A3
+    } else if which == 6 {
+        a1 = P2_A1  a2 = P2_A2  a3 = P2_A3  a4 = P2_A4
+    } else {
+        return P3_LOGK
     }
     a1 + a2 * t_k + a3 / t_k + a4 * log10_of(t_k) + a5 / (t_k * t_k) + a6 * t_k * t_k
 }
@@ -276,6 +296,92 @@ fn gamma_wateq(tc: f64, pa_atm: f64, z: f64, a: f64, b: f64, mu: f64) -> f64 wit
 // pH here is -log10(a_H), which is what the oracle reports, so the two are
 // comparable without a further convention.
 
+var SP_M_CA: f64 = 0.0        // free Ca2+
+var SP_M_CAHCO3: f64 = 0.0
+var SP_M_CACO3: f64 = 0.0
+var SP_M_CAOH: f64 = 0.0
+var SP_M_TOTAL_CA: f64 = 0.0  // what the oracle's `Ca` column reports
+var SP_CHARGE: f64 = 0.0
+var SP_MU: f64 = 0.0
+
+// Full speciation at a given pH and ionic strength, pairs included.
+// PHREEQC reports TOTAL calcium, so the comparison is only like-for-like once
+// the pairs are summed -- part of the residual this is testing was free Ca2+
+// being compared against a total.
+fn speciate(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic {
+    let tc = t_k - 273.15
+    let g_h    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0,   mu)
+    let g_oh   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0,   mu)
+    let g_hco3 = gamma_wateq(tc, 1.0, 1.0, 5.4, 0.0,   mu)
+    let g_co3  = gamma_wateq(tc, 1.0, 2.0, 5.4, 0.0,   mu)
+    let g_ca   = gamma_wateq(tc, 1.0, 2.0, 5.0, 0.165, mu)
+    let g_cahco3 = gamma_wateq(tc, 1.0, 1.0, 6.0, 0.0, mu)
+    let g_caoh   = gamma_davies(tc, 1.0, mu)
+    // CaCO3(aq) is uncharged with no -gamma line: PHREEQC gflag 0 with dhb = 0,
+    // i.e. activity coefficient exactly 1.
+    let g_caco3  = 1.0
+
+    let a_h    = exp((0.0 - ph) * LN10)
+    let a_oh   = exp(log_k(3, t_k) * LN10) / a_h
+    let a_co2  = exp(log_k(0, t_k) * LN10) * p_co2_atm
+    let a_hco3 = a_co2 * exp((0.0 - p_k1(t_k)) * LN10) / a_h
+    let a_co3  = a_hco3 * exp((0.0 - p_k2(t_k)) * LN10) / a_h
+    if a_co3 <= 0.0 { SP_M_TOTAL_CA = 0.0  SP_CHARGE = 0.0  SP_MU = mu  return }
+    let a_ca   = exp(log_k(4, t_k) * LN10) / a_co3
+
+    let a_cahco3 = a_ca * a_co3 * a_h * exp(log_k(5, t_k) * LN10)
+    let a_caco3  = a_ca * a_co3 * exp(log_k(6, t_k) * LN10)
+    let a_caoh   = a_ca * exp(log_k(7, t_k) * LN10) / a_h
+
+    let m_h      = a_h / g_h
+    let m_oh     = a_oh / g_oh
+    let m_hco3   = a_hco3 / g_hco3
+    let m_co3    = a_co3 / g_co3
+    let m_ca     = a_ca / g_ca
+    let m_cahco3 = a_cahco3 / g_cahco3
+    let m_caco3  = a_caco3 / g_caco3
+    let m_caoh   = a_caoh / g_caoh
+
+    SP_M_CA = m_ca
+    SP_M_CAHCO3 = m_cahco3
+    SP_M_CACO3 = m_caco3
+    SP_M_CAOH = m_caoh
+    SP_M_TOTAL_CA = m_ca + m_cahco3 + m_caco3 + m_caoh
+    SP_CHARGE = 2.0 * m_ca + m_h + m_cahco3 + m_caoh - m_hco3 - 2.0 * m_co3 - m_oh
+    SP_MU = 0.5 * (4.0 * m_ca + m_h + m_hco3 + 4.0 * m_co3 + m_oh
+                   + m_cahco3 + m_caoh)
+}
+
+fn solve_ph_pairs(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
+    var mu = 0.0
+    var ph = 7.0
+    var n: i64 = 0
+    while n < 200 {
+        var lo = 3.0
+        var hi = 13.0
+        speciate(t_k, p_co2_atm, lo, mu)
+        let f_lo = SP_CHARGE
+        var k: i64 = 0
+        while k < 60 {
+            let mid = 0.5 * (lo + hi)
+            speciate(t_k, p_co2_atm, mid, mu)
+            if (f_lo < 0.0 && SP_CHARGE < 0.0) || (f_lo > 0.0 && SP_CHARGE > 0.0) { lo = mid } else { hi = mid }
+            k = k + 1
+        }
+        ph = 0.5 * (lo + hi)
+        speciate(t_k, p_co2_atm, ph, mu)
+        let d = SP_MU - mu
+        var ad = d
+        if ad < 0.0 { ad = 0.0 - ad }
+        mu = SP_MU
+        n = n + 1
+        if ad < 1.0e-15 { n = 200 }
+    }
+    speciate(t_k, p_co2_atm, ph, mu)
+    MU_ITERS = n
+    ph
+}
+
 var MU_LAST: f64 = 0.0
 var MU_ITERS: i64 = 0
 
@@ -445,6 +551,16 @@ fn solve_ph(t_k: f64, p_co2_atm: f64, ph_lo: f64, ph_hi: f64, tol: f64) -> f64 w
     mid
 }
 
+// Davies. PHREEQC uses this for a charged species with no -gamma line
+// (gflag 1): log g = -A z^2 (sqrt(mu)/(1+sqrt(mu)) - 0.3 mu).
+fn gamma_davies(tc: f64, z: f64, mu: f64) -> f64 with Mut, Div, Panic {
+    if mu <= 0.0 { return 1.0 }
+    let sm = sqrtf(mu)
+    let aa = dh_a(tc, 1.0)
+    if aa < 0.0 { return 0.0 - 1.0 }
+    exp(((0.0 - aa) * z * z * (sm / (1.0 + sm) - 0.3 * mu)) * LN10_A)
+}
+
 // ── printing ───────────────────────────────────────────────────────────────
 fn digit(d: i64) with IO, Mut, Div, Panic {
     if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
@@ -543,6 +659,25 @@ fn main() -> i32 with IO, Mut, Div, Panic {
         print("   outer_iters ") pi64(MU_ITERS) println("")
         print("   Ca_activity ") emit("", ca_activity_model(313.15, qs[j], ph_a, MU_LAST))
         j = j + 1
+    }
+    println("")
+    println("== WITH ION PAIRS: CaHCO3+, CaCO3(aq), CaOH+ ==")
+    var w: i64 = 0
+    var ps2: [f64; 3] = [0.0; 3]
+    ps2[0] = 0.01
+    ps2[1] = 0.1
+    ps2[2] = 1.0
+    while w < 3 {
+        let ph_p = solve_ph_pairs(313.15, ps2[w])
+        print("P_CO2 ") emit("", ps2[w])
+        print("   pH ") emit("", ph_p)
+        print("   mu ") emit("", SP_MU)
+        print("   Ca_total ") emit("", SP_M_TOTAL_CA)
+        print("   free_Ca ") emit("", SP_M_CA)
+        print("   CaHCO3+ ") emit("", SP_M_CAHCO3)
+        print("   CaCO3aq ") emit("", SP_M_CACO3)
+        print("   CaOH+ ") emit("", SP_M_CAOH)
+        w = w + 1
     }
     println("== bracketing control: an interval with no sign change must refuse ==")
     emit("solve_ph(4.0..4.5)", solve_ph(313.15, 0.01, 4.0, 4.5, 1.0e-12))

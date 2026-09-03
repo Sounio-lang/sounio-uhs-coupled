@@ -270,3 +270,59 @@ oracle to 0.02 % — but it did **not** meet its own stated criterion, and that 
 a defect in the solver rather than a property of the chemistry. It is recorded
 here rather than papered over by loosening the tolerance to whatever it happened
 to reach.
+
+### Ion pairs: the third named hypothesis, and the third collapse
+
+The residual left after Debye–Hückel — 1.4 to 3.5 % in [Ca], still growing with
+P(CO₂) — was attributed to **ion pairing**, on the grounds that PHREEQC speciates
+CaHCO₃⁺, CaCO₃⁰ and CaOH⁺ and this engine did not, and that more dissolved
+carbonate means more pairing. As before, the attribution was recorded before the
+test.
+
+There was a second, sharper reason to expect it: **PHREEQC's `Ca` column is
+*total* calcium.** Comparing it against free Ca²⁺, as the previous section did,
+is not like-for-like, and the pairs are exactly the difference.
+
+Constants from the same pinned database: CaHCO₃⁺ (log K 10.91, `-gamma 6 0`),
+CaCO₃⁰ (log K 3.224, uncharged with **no `-gamma` line**, so PHREEQC's gflag 0
+with dhb = 0, i.e. γ ≡ 1), CaOH⁺ (log K −12.78, charged with no `-gamma` line, so
+**Davies**, gflag 1).
+
+#### The collapse
+
+| P(CO₂) | ideal | + activity | **+ ion pairs** | total gain |
+|---|---|---|---|---|
+| 0.01 | −13.594 % | −1.376 % | **+0.0098 %** | **1384×** |
+| 0.1 | −18.946 % | −2.015 % | **+0.0270 %** | **702×** |
+| 1.0 | −26.261 % | −3.453 % | **+0.2127 %** | **123×** |
+
+| P(CO₂) | ΔpH ideal | ΔpH + activity | **ΔpH + pairs** |
+|---|---|---|---|
+| 0.01 | −0.02962 | −0.00104 | **−0.000044** |
+| 0.1 | −0.04341 | −0.00223 | **−0.000191** |
+| 1.0 | −0.06412 | −0.00557 | **−0.001541** |
+
+Ionic strength agrees with the oracle to **0.007 %, 0.025 % and 0.206 %**.
+
+#### An internal check that was not planned for
+
+`CaCO₃⁰` comes out **identical at all three P(CO₂)**: 5.868226950764e-06 molal.
+It has to be. At calcite saturation `a_Ca · a_CO₃ = Ksp` is fixed, and
+`CaCO₃⁰ = K · a_Ca · a_CO₃ = K · Ksp`, which does not depend on P(CO₂) at all.
+The model reproduced that without being asked to, which is the kind of check
+worth more than one that was designed in.
+
+#### Where the residual now stands
+
+Three named hypotheses, three tests, three collapses — ideal → activity → pairs,
+each attributed in advance and each confirmed by supplying the term rather than
+by fitting anything.
+
+**The remainder still grows with P(CO₂)** — 0.0098 %, 0.027 %, 0.213 % — so one
+small term is still missing, and the sign has flipped: the engine now reads
+slightly high rather than low. At P(CO₂) = 1 atm the 0.213 % sits about **three
+orders of magnitude above the oracle's measured 2 ppm resolution**, so it is
+still real and not instrument. Naming the next candidate honestly: PHREEQC
+applies molar-volume pressure corrections (`-Vm`) to these species and carries a
+water activity that this engine holds at 1. Which of those it is has not been
+tested, and it is not claimed.

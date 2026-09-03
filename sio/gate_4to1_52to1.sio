@@ -1,0 +1,126 @@
+// PHASE 4 GATE — mesocosm 4:1 vs field 52:1 in H2:CO2.
+//
+// The protocol makes this a hard stop: if the coupled model does not explain the
+// mesocosm-vs-field difference from the H2:CO2 ratio, stop and report.
+//
+// TWO READINGS, AND THEY HAVE DIFFERENT ANSWERS.
+//
+// (a) "Reproduce the ~30x ratio in the rate." That figure is NOT IN THE SOURCE.
+//     Searching the article and all supplementary material for fold-changes and
+//     factors returns only "three times higher in energy density per unit
+//     volume" for CH4 against H2, which is unrelated. There is no measured field
+//     methanation rate to compare against either: the 0.26 mmol/l/h MER is
+//     explicitly "for the test reservoir operated at MESOCOSM productivity" --
+//     a projection, not a field measurement. Under the rule that no number is
+//     invented, interpolated or inherited, this reading cannot be tested and
+//     the figure is not carried.
+//
+// (b) "Does the H2:CO2 ratio explain a rate difference?" This IS testable, and
+//     it is the substantive question. That is what this probe computes.
+//
+// WHAT THE SOURCE ITSELF CLAIMS. The paper attributes the difference to
+// "several factors": FIRST the stoichiometry, SECOND "the difference in scale of
+// several orders of magnitude ... and unknown factors". It does not claim the
+// ratio explains the difference, and it names unknown factors explicitly.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{log_k, LN10}
+
+// Henry constants at 40 C from the pinned phreeqc.dat, as used in the abiotic
+// validation: H2 7.4530e-4, CO2 2.371e-2 mol kgw^-1 atm^-1.
+var KH_H2: f64 = 7.4530e-4
+var KH_CO2: f64 = 2.371e-2
+
+// Strobel et al. dual-Monod half-saturations, converted from mol/m3 to molal.
+// K_H2,w  = 0.02  mol/m3 = 2.0e-5 molal
+// K_CO2,w = 0.011 mol/m3 = 1.1e-5 molal
+// Both were taken from the literature rather than fitted, and the authors state
+// their influence is minimal.
+var K_H2: f64 = 2.0e-5
+var K_CO2: f64 = 1.1e-5
+
+fn monod(m: f64, k: f64) -> f64 with Mut, Div, Panic {
+    if m <= 0.0 { return 0.0 }
+    if k <= 0.0 { return 1.0 }
+    m / (k + m)
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+var PROD: f64 = 0.0
+
+fn case(label: string, p_total: f64, y_h2: f64, y_co2: f64) with IO, Mut, Div, Panic {
+    let p_h2 = y_h2 * p_total
+    let p_co2 = y_co2 * p_total
+    let m_h2 = KH_H2 * p_h2
+    let m_co2 = KH_CO2 * p_co2
+    let f_h2 = monod(m_h2, K_H2)
+    let f_co2 = monod(m_co2, K_CO2)
+    PROD = f_h2 * f_co2
+    println(label)
+    print("   P_total ") emit("", p_total)
+    print("   P_H2 ") emit("", p_h2)
+    print("   P_CO2 ") emit("", p_co2)
+    print("   H2(aq) molal ") emit("", m_h2)
+    print("   CO2(aq) molal ") emit("", m_co2)
+    print("   H2/K_H2 ") emit("", m_h2 / K_H2)
+    print("   CO2/K_CO2 ") emit("", m_co2 / K_CO2)
+    print("   Monod H2 ") emit("", f_h2)
+    print("   Monod CO2 ") emit("", f_co2)
+    print("   product ") emit("", PROD)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("PHASE 4 GATE: mesocosm 4:1 vs field 52:1, dual Monod")
+    println("Strobel K_H2 = 2.0e-5 molal, K_CO2 = 1.1e-5 molal")
+    println("")
+
+    // Mesocosm: 10% H2 / 2.5% CO2 in CH4 at about 40 bar (Methods).
+    case("MESOCOSM  10% H2, 2.5% CO2, 40 bar  (H2:CO2 = 4:1)", 40.0, 0.10, 0.025)
+    let p_meso = PROD
+
+    // Field: injected mixture 9.89% H2, 0.19% CO2 (Methods), pressures reaching
+    // 78.4 bar during injection.
+    case("FIELD     9.89% H2, 0.19% CO2, 78 bar  (H2:CO2 = 52:1)", 78.0, 0.0989, 0.0019)
+    let p_field = PROD
+
+    println("== the gate ==")
+    print("   mesocosm Monod product ") emit("", p_meso)
+    print("   field    Monod product ") emit("", p_field)
+    print("   field / mesocosm       ") emit("", p_field / p_meso)
+    println("")
+    println("   The dual-Monod predicts NO meaningful difference. Both substrates")
+    println("   sit two to three orders of magnitude above their half-saturation")
+    println("   constants in BOTH cases, so Monod kinetics are insensitive to")
+    println("   their ratio. If anything the field is marginally faster, because")
+    println("   at 78 bar it carries MORE dissolved H2 than the mesocosm at 40.")
+    println("")
+    println("== what it would take for the ratio to matter ==")
+    print("   field CO2(aq) / K_CO2 ") emit("", (KH_CO2 * 0.0019 * 78.0) / K_CO2)
+    println("   CO2 would have to fall by about that factor before the CO2 term")
+    println("   drops to one half. The stoichiometry cannot be the mechanism at")
+    println("   these dissolved concentrations.")
+    0
+}

@@ -45,8 +45,8 @@ work:
 | `data/` | manifest: origin, DOI, licence, sha256, convention axioms per file |
 | `abiotic/` `microbial/` `coupled/` | the models |
 | `oracles/` | IPhreeqc parity harness; archived USGS outputs |
-| `probes/` | versioned, each named with the section it produces |
-| `sio/` | the Sounio engine sources |
+| `PHASE4_GATE.md` | Phase 4 hard-stop report: the mesocosm/field ratio does not exist in the source; the testable dual-Monod reading gives 1.000552, not ~30x |
+| `sio/` | the Sounio engine sources -- validation and gate probes live here too, not in a separate `probes/` directory, because imports resolve same-directory first and the self-hosted stdlib fallback does not see this repo |
 | `tools/` | data → `.sio` code generation (marshalling only, no numerics) |
 
 ## Compiler provenance

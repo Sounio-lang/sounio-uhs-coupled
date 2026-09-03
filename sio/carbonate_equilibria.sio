@@ -409,6 +409,82 @@ pub fn solve_ph_pairs(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
     ph
 }
 
+// ── the no-calcite carbonate closure ──────────────────────────────────────
+//
+// The SAME charge balance as solve_ph_pairs above with every calcium term
+// removed:   H+ = HCO3- + 2 CO3-2 + OH-
+//
+// This is NOT a subtraction from the calcite closure -- it is a smaller system
+// with its own root, and it exists because the coupled model needs to know what
+// carbon a CO2 stream alone puts into solution when no mineral buffers it.
+// Structurally identical to solve_ph_pairs on purpose, so the two branches
+// differ only in the physics they contain and never in the method used.
+//
+// Lives here rather than in a caller because it is a carbonate equilibrium, and
+// because two coupled models now need the same one -- a second copy would be a
+// second thing to keep correct.
+
+pub var NC_DIC: f64 = 0.0
+pub var NC_HCO3: f64 = 0.0
+var NC_CHARGE: f64 = 0.0
+var NC_MU: f64 = 0.0
+
+fn speciate_nocalcite(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic {
+    let tc = t_k - 273.15
+    let g_h    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0, mu)
+    let g_oh   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0, mu)
+    let g_hco3 = gamma_wateq(tc, 1.0, 1.0, 5.4, 0.0, mu)
+    let g_co3  = gamma_wateq(tc, 1.0, 2.0, 5.4, 0.0, mu)
+
+    let a_h    = exp((0.0 - ph) * LN10)
+    let a_oh   = exp(log_k(3, t_k) * LN10) / a_h
+    let a_co2  = exp(log_k(0, t_k) * LN10) * p_co2_atm
+    let a_hco3 = a_co2 * exp((0.0 - p_k1(t_k)) * LN10) / a_h
+    let a_co3  = a_hco3 * exp((0.0 - p_k2(t_k)) * LN10) / a_h
+
+    let m_h    = a_h / g_h
+    let m_oh   = a_oh / g_oh
+    let m_hco3 = a_hco3 / g_hco3
+    let m_co3  = a_co3 / g_co3
+    // CO2(aq) is uncharged with no -gamma line: activity coefficient exactly 1,
+    // the same PHREEQC convention used for CaCO3(aq) above.
+    let m_co2  = a_co2
+
+    NC_CHARGE = m_h - m_hco3 - 2.0 * m_co3 - m_oh
+    NC_MU     = 0.5 * (m_h + m_hco3 + 4.0 * m_co3 + m_oh) + BACKGROUND_NACL
+    NC_DIC    = m_co2 + m_hco3 + m_co3
+    NC_HCO3   = m_hco3
+}
+
+pub fn solve_nocalcite(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
+    var mu = 0.0
+    var ph = 5.0
+    var n: i64 = 0
+    while n < 200 {
+        var lo = 2.0
+        var hi = 10.0
+        speciate_nocalcite(t_k, p_co2_atm, lo, mu)
+        let f_lo = NC_CHARGE
+        var k: i64 = 0
+        while k < 60 {
+            let mid = 0.5 * (lo + hi)
+            speciate_nocalcite(t_k, p_co2_atm, mid, mu)
+            if (f_lo < 0.0 && NC_CHARGE < 0.0) || (f_lo > 0.0 && NC_CHARGE > 0.0) { lo = mid } else { hi = mid }
+            k = k + 1
+        }
+        ph = 0.5 * (lo + hi)
+        speciate_nocalcite(t_k, p_co2_atm, ph, mu)
+        let d = NC_MU - mu
+        var ad = d
+        if ad < 0.0 { ad = 0.0 - ad }
+        mu = NC_MU
+        n = n + 1
+        if ad < 1.0e-15 { n = 200 }
+    }
+    speciate_nocalcite(t_k, p_co2_atm, ph, mu)
+    ph
+}
+
 var MU_LAST: f64 = 0.0
 var MU_ITERS: i64 = 0
 

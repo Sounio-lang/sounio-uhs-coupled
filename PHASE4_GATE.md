@@ -363,3 +363,138 @@ silico only, pre-registered as such) and any condition beyond what a real,
 cited source supports. Within that boundary, this sweep is not a spot-check
 that happened to miss the effect — it is the effect's own most favourable
 directions, checked, and it is not there.
+
+---
+
+## RETRACTION and correction, 2026-09-03: F1 was tested on a defective model
+
+**The two sections above reporting F1 = 1.000000 are retracted.** The verdict
+was produced by a model that could not express H1a's mechanism, and the reason
+is a defect in that model, not a property of the system. This section states
+the defect, the corrected test, and the new verdict.
+
+### The defect
+
+`sio/coupled_kinetics.sio` supplied H2 as a single Henry's-law snapshot of the
+**aqueous film alone** — 2.98e-3 molal (mesocosm) to 5.75e-3 molal (field) —
+while keeping the reference model's **sulfate** inventory of 8.269e-3 molal.
+Sulfate reduction consumes 4 H2 per SO4, so exhausting that pool needs
+3.31e-2 molal of H2:
+
+| | H2 supplied | H2 sulfate alone needs | shortfall |
+|---|---|---|---|
+| mesocosm | 2.981e-3 molal | 3.308e-2 | **11.1×** |
+| field | 5.749e-3 molal | 3.308e-2 | **5.8×** |
+
+Sulfate reduction therefore consumed every H2 molecule in the model before
+methanogenesis could touch carbon at all. The diagnostic that read "H2-limited"
+was true *inside* that model and meaningless outside it: the H2 budget was
+being spent on a reaction that has nothing to do with H1a, and carbon was
+never approached for a reason unrelated to whether carbon is scarce.
+
+**The oracle says so directly.** The archived input script declares
+`swap H2(g) for H2(aq)` with `H2(g) = 91 fugacity`, giving H2(aq) = 4.226e-2
+molal — **7 to 14 times more H2** than the coupled model contained. The
+previous model inverted its own oracle's limiting reagent. That is the defect,
+and it is mine.
+
+A second, smaller error is corrected at the same time: the previous module
+applied Henry's-law constants (which are per **atm**) to pressures stated in
+**bar** without converting, a 1.3 % error in every partial pressure.
+
+### The oracle's own trajectory identifies the limiting reagent
+
+From `data/usgs-auxvases/output_microbial-reactions_EOR-B106_12700years.txt`:
+
+| | start | end | change |
+|---|---|---|---|
+| H2(g) | 91.00 bar | 1.176 bar | ÷ 77 |
+| **CO2(g)** | **0.02433 bar** | **7.328e-08 bar** | **÷ 332 000** |
+
+CO2 collapses five and a half orders of magnitude and sits pinned at a floor
+from the ninth reporting step onward — while H2 is still at 19.7 bar. And the
+stoichiometry confirms it: 4 × (SO4 8.269e-3 + DIC 2.2565e-3) = 4.210e-2 molal
+of H2 exhausts both pools, against 4.226e-2 available. **Balanced to 0.4 %.**
+Carbon is a genuine limiting reagent in the reference model.
+
+### The Phase 4 gate also asked the wrong question
+
+Section 3 above tested whether the H2:CO2 ratio changes the **rate**, through
+the dual-Monod term, and measured 1.000552. **That measurement stands** — Monod
+is saturated at both compositions, and the kinetic channel is still closed.
+
+But the source's own sentence is about stoichiometry: *"the mesocosm experiments
+were conducted with a substrate gas mixture at optimal stoichiometry for
+hydrogenotrophic methanogenesis (mesocosms H2:CO2 = 4:1; field H2:CO2 = 52:1)."*
+Stoichiometry governs **how much** H2 can be converted before the co-injected
+CO2 runs out. That is *extent*, not rate. Testing the rate reading and
+concluding the stoichiometry "cannot be the mechanism" was a conclusion about
+the wrong quantity.
+
+### The corrected model
+
+`sio/coupled_gasphase.sio`. Underground hydrogen storage stores **gas**; the
+water is a connate film. So each species' inventory per kg of water is
+
+    n_i = y_i * P * V_gas / (R T)   [gas]  +  KH_i * y_i * P   [aqueous]
+
+with `V_gas` the gas volume per kg water — a **swept input**, since no source
+here reports one for these reservoirs. V_gas = 1 L/kg is what porosity 0.2 at
+50 % gas saturation implies, and it is reported inside the sweep rather than
+presented as the answer.
+
+The extent limit is exact and **no rate constant, surface area or
+half-saturation constant enters it**. Sulfate is reduced first, costing
+4 × SO4_total. Then: *without* calcite, methanogenesis stops when the finite
+gas + aqueous carbon inventory is gone; *with* calcite, carbon is resupplied by
+the mineral and methanogenesis runs until H2 is gone.
+
+### Result — F1 discriminates sharply, along exactly H1a's axis
+
+Computed by the Sounio engine, cross-checked against the closed form
+`y_H2 / (4·y_CO2)` that the ratio must approach as V_gas grows:
+
+| condition | H2:CO2 | V=0.1 | **V=1.0** | V=10 | V=100 | asymptote |
+|---|---|---|---|---|---|---|
+| mesocosm | 4:1 | *starved* | **1.000** | 1.000 | 1.000 | 1.000 |
+| **field** | **52:1** | 1.000 | **4.321** | 10.803 | 12.752 | **13.013** |
+| Lobodice | 4.5:1 | 1.000 | 1.000 | 1.058 | 1.118 | 1.125 |
+
+**F1 passes at the field condition.** The ratio is 4.32 at the reservoir-
+plausible gas volume and rises to 12.75 — far above the factor-of-2 bar F1
+sets. **H1a survives, as a mass-balance/extent claim.**
+
+At V_gas = 0.1 the mesocosm case reports *sulfate alone exhausts the H2* and
+refuses to emit a ratio, rather than printing the spurious 1.0 that the
+arithmetic would otherwise give — the same fail-closed discipline used
+elsewhere in this study.
+
+### What this says, and where H1a is still false
+
+The mesocosm feed sits **at** stoichiometry, so its co-injected CO2 covers the
+H2 it arrives with and calcite changes nothing: ratio 1.000 at every gas
+volume. The field feed carries **13 times more H2 than its own CO2 can
+convert**, so carbon runs out first and calcite is what relieves it. Lobodice,
+at 12 % CO2, is CO2-rich and calcite is again nearly irrelevant.
+
+So **H1a is not universally true, and this test says precisely where it is
+false**: at a stoichiometric or CO2-rich feed. It survives only for a CO2-poor
+feed — which is what the field trial actually was. That is a sharper and more
+falsifiable hypothesis than the one pre-registered, and it was reachable only
+by correcting the model rather than accepting its verdict.
+
+The asymptotic factor of 13 is what the reported gas compositions give. It is
+**not** offered as a reproduction of the "~30×" of section 1, which remains
+absent from the source and is still not carried.
+
+### What remains open, and is not claimed
+
+1. **This is the infinite-horizon bound.** Whether a real storage reaches it
+   within a given horizon is kinetic, and is the next increment. The finite-
+   horizon integration is not run here and no timescale is claimed.
+2. **Calcite is assumed in excess.** The mineral mass is not modelled.
+   `abiotic_kinetics.sio` already measured dissolution as fast relative to this
+   clock, which supports the assumption but does not establish the inventory.
+3. **F2 is untested.** Whether this model's band encompasses the 84.3 %
+   recovery at Sun Storage and the 54 %→37 % drop at Lobodice is a separate
+   criterion, and nothing here should be read as bearing on it.

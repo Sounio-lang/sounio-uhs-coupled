@@ -1,0 +1,226 @@
+// Coupled model with the GAS PHASE as the H2 reservoir -- and the correction of
+// a defect in this study's own previous coupled model.
+//
+// WHAT WAS WRONG, STATED FIRST. sio/coupled_kinetics.sio reported F1 = 1.000000
+// at every condition and concluded H1a falsified on the mass-balance channel.
+// That verdict is RETRACTED, and the reason is a defect in that model, not a
+// property of the system:
+//
+//   It supplied H2 as a single Henry's-law snapshot of the AQUEOUS FILM only --
+//   2.98e-3 to 5.75e-3 molal -- while keeping the reference model's SULFATE
+//   inventory of 8.269e-3 molal. Sulfate reduction needs 4 H2 per SO4, i.e.
+//   3.31e-2 molal of H2, which is 5.8 to 11.1 TIMES MORE H2 THAN THE MODEL
+//   CONTAINED. Sulfate reduction therefore consumed every H2 molecule before
+//   methanogenesis could touch carbon at all. "H2-limited" was real inside that
+//   model and meaningless outside it: the H2 budget was spent on a reaction
+//   that has nothing to do with H1a.
+//
+//   For comparison, the ORACLE this study validates against holds H2(aq) at
+//   4.226e-2 molal -- 7 to 14 times more -- because its input script declares
+//   `swap H2(g) for H2(aq)` with `H2(g) = 91 fugacity`. The reference model's
+//   H2 lives at 91 bar. The previous model inverted its own oracle's limiting
+//   reagent, and that is the defect.
+//
+// THE ORACLE'S OWN TRAJECTORY SHOWS WHICH REAGENT LIMITS. Over the archived
+// 12 700-year run (output_microbial-reactions_EOR-B106_12700years.txt):
+//
+//     H2(g)     91.00 -> 1.176 bar          divided by 77
+//     CO2(g)  0.02433 -> 7.328e-08 bar      divided by 332 000
+//
+// CO2 collapses five and a half orders of magnitude and is pinned at a floor
+// from the ninth reporting step onward, while H2 is still at 19.7 bar. Carbon
+// is the limiting reagent in the reference model, and the stoichiometry says so
+// directly: 4 x (SO4 8.269e-3 + DIC 2.2565e-3) = 4.210e-2 molal of H2 needed to
+// exhaust both, against 4.226e-2 available -- balanced to 0.4 %.
+//
+// WHY THE PHASE 4 GATE ALSO ASKED THE WRONG QUESTION. That gate tested whether
+// the H2:CO2 ratio changes the RATE, through the dual-Monod term, and got
+// 1.000552. That measurement stands: Monod is saturated at both compositions.
+// But the source's own sentence is about STOICHIOMETRY -- "the mesocosm
+// experiments were conducted with a substrate gas mixture at optimal
+// stoichiometry for hydrogenotrophic methanogenesis (mesocosms H2:CO2 = 4:1;
+// field H2:CO2 = 52:1)". Stoichiometry sets how much H2 can be converted before
+// the co-injected CO2 runs out. That is EXTENT, not rate, and extent is what
+// this module computes.
+//
+// THE MODEL. Underground hydrogen storage stores GAS; the water is a connate
+// film in the pores. So the inventory of each species, per kg of water, is
+//
+//     n_i = y_i * P * V_gas / (R T)        gas, mol per kg water
+//         + KH_i * y_i * P                 aqueous, molal
+//
+// with V_gas the gas volume per kg of water. V_gas IS A SWEPT INPUT, not a
+// datum: no source in this study reports one for these reservoirs. V_gas = 1
+// L/kg is the value implied by porosity 0.2 at 50 % gas saturation, which is
+// where a reservoir engineer would start, and it is reported alongside the rest
+// of the sweep rather than presented as the answer.
+//
+// THE EXTENT LIMIT, which is exact and needs no rate constant, no surface area
+// and no half-saturation constant:
+//
+//   sulfate is reduced first (it is the higher-energy acceptor, and the
+//   archive's own succession shows SRB completing before MET arrives), costing
+//   4 * SO4_total of H2. Whatever H2 remains is available to methanogenesis.
+//
+//   WITHOUT calcite  carbon is the finite gas + aqueous inventory, so
+//                    methanogenesis stops when it is gone:
+//                    H2 loss = 4*SO4 + 4*min(C_total, H2_left/4)
+//   WITH calcite     carbon is resupplied by the mineral (assumed in excess;
+//                    the mineral mass is NOT modelled, and abiotic_kinetics.sio
+//                    already measured dissolution as fast relative to this
+//                    clock), so methanogenesis runs until H2 is gone:
+//                    H2 loss = 4*SO4 + H2_left
+//
+// F1 is the ratio of those two. As V_gas grows, the fixed sulfate term stops
+// mattering and the ratio approaches y_H2 / (4 * y_CO2) exactly -- the
+// stoichiometric excess of stored H2 over the CO2 stored with it. That closed
+// form is printed next to the computed ratio as a self-check.
+//
+// This is the INFINITE-HORIZON bound. Whether a real storage reaches it inside
+// a given horizon is a kinetic question this module does not answer, and the
+// finite-horizon integration is the next increment, not a result claimed here.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{solve_nocalcite, NC_DIC, BACKGROUND_NACL}
+
+var R_L_ATM: f64 = 0.0820574        // L atm mol^-1 K^-1
+var BAR_TO_ATM: f64 = 0.986923
+var KH_H2: f64 = 7.4530e-4          // molal atm^-1, pinned phreeqc.dat
+
+// Total sulfate, reused from the Aux Vases archive. Kept rather than dropped:
+// sulfate reduction genuinely competes with methanogenesis for H2, and removing
+// it would silently delete that competition instead of modelling its absence.
+var SO4_TOTAL: f64 = 0.008269
+
+// results, exposed so the sweep can print without a return tuple
+var EX_H2: f64 = 0.0
+var EX_C: f64 = 0.0
+var EX_WITH: f64 = 0.0
+var EX_WITHOUT: f64 = 0.0
+var EX_RATIO: f64 = 0.0
+var EX_SULFATE_STARVED: bool = false
+
+fn extent_limit(t_k: f64, y_h2: f64, y_co2: f64, p_bar: f64, v_gas: f64) with Mut, Div, Panic {
+    let p_atm = p_bar * BAR_TO_ATM
+    let p_h2 = y_h2 * p_atm
+    let p_co2 = y_co2 * p_atm
+    let rt = R_L_ATM * t_k
+
+    // gas inventory plus the aqueous film, per kg of water
+    let n_h2 = p_h2 * v_gas / rt + KH_H2 * p_h2
+    let ph = solve_nocalcite(t_k, p_co2)
+    let n_c = p_co2 * v_gas / rt + NC_DIC
+
+    let so4_sink = 4.0 * SO4_TOTAL
+    let h2_left = n_h2 - so4_sink
+
+    EX_H2 = n_h2
+    EX_C = n_c
+    EX_SULFATE_STARVED = false
+
+    if h2_left <= 0.0 {
+        // sulfate alone exhausts the H2: methanogenesis never starts, and
+        // calcite cannot matter because no carbon is consumed either way.
+        EX_SULFATE_STARVED = true
+        EX_WITH = n_h2
+        EX_WITHOUT = n_h2
+        EX_RATIO = 1.0
+        return
+    }
+
+    var c_used = n_c
+    if h2_left / 4.0 < c_used { c_used = h2_left / 4.0 }
+
+    EX_WITH = so4_sink + h2_left
+    EX_WITHOUT = so4_sink + 4.0 * c_used
+    EX_RATIO = 1.0
+    if EX_WITHOUT > 0.0 { EX_RATIO = EX_WITH / EX_WITHOUT }
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn sweep_one(label: string, y_h2: f64, y_co2: f64, p_bar: f64) with IO, Mut, Div, Panic {
+    let t_k = 313.15
+    println(label)
+    print("   H2:CO2 in the gas          ") emit("", y_h2 / y_co2)
+    print("   asymptote y_H2/(4*y_CO2)   ") emit("", y_h2 / (4.0 * y_co2))
+    var v: f64 = 0.1
+    var n: i64 = 0
+    while n < 4 {
+        extent_limit(t_k, y_h2, y_co2, p_bar, v)
+        print("   V_gas = ") emit("", v)
+        print("      H2 total   ") emit("", EX_H2)
+        print("      C total    ") emit("", EX_C)
+        if EX_SULFATE_STARVED {
+            println("      sulfate alone exhausts the H2: no methanogenesis either way")
+        } else {
+            print("      with calcite    ") emit("", EX_WITH)
+            print("      without calcite ") emit("", EX_WITHOUT)
+            print("      F1 RATIO        ") emit("", EX_RATIO)
+        }
+        v = v * 10.0
+        n = n + 1
+    }
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("COUPLED MODEL, GAS PHASE AS THE H2 RESERVOIR")
+    println("F1 extent limit: cumulative biotic H2 loss, with calcite over without.")
+    println("Exact and stoichiometric -- no rate constant, no surface area, no")
+    println("half-saturation constant enters. Infinite-horizon bound.")
+    println("")
+    println("This RETRACTS the F1 = 1.000000 verdict of coupled_kinetics.sio,")
+    println("which supplied 7-14x less H2 than its own oracle and let sulfate")
+    println("reduction consume all of it before methanogenesis reached carbon.")
+    println("")
+    print("Sulfate sink, 4 x SO4_total (molal H2) ") emit("", 4.0 * SO4_TOTAL)
+    println("V_gas = 1.0 L/kg corresponds to porosity 0.2 at 50 % gas saturation.")
+    println("V_gas is a SWEPT INPUT: no source here reports one for these sites.")
+    println("")
+
+    println("== the reference model's own inventory, for orientation ==")
+    println("   H2(aq) 4.226e-2 molal at H2(g) = 91 bar fugacity")
+    print("   H2 needed to exhaust sulfate + carbon ") emit("", 4.0 * (0.008269 + 2.256521e-3))
+    println("   against 4.226e-2 available -- balanced to 0.4 %, so carbon is")
+    println("   a genuine limiting reagent there, as its CO2(g) collapse shows.")
+    println("")
+
+    sweep_one("== MESOCOSM  10 % H2 / 2.5 % CO2, 40 bar  (H2:CO2 = 4:1) ==", 0.10, 0.025, 40.0)
+    sweep_one("== FIELD  9.89 % H2 / 0.19 % CO2, 78 bar  (H2:CO2 = 52:1) ==", 0.0989, 0.0019, 78.0)
+    sweep_one("== LOBODICE  54 % H2 / 12 % CO2, 40 bar  (as injected) ==", 0.54, 0.12, 40.0)
+
+    println("== reading ==")
+    println("   The mesocosm feed is AT stoichiometry, so its co-injected CO2")
+    println("   covers the H2 it arrives with and calcite changes nothing: the")
+    println("   ratio is 1 at every gas volume. The field feed carries 13 times")
+    println("   more H2 than its own CO2 can convert, so carbon runs out first")
+    println("   and calcite is what relieves it. Lobodice, at 12 % CO2, is")
+    println("   CO2-rich and calcite is again nearly irrelevant.")
+    println("")
+    println("   So H1a is NOT universally true, and this test says where it is")
+    println("   false: at a stoichiometric or CO2-rich feed. It survives F1 only")
+    println("   for a CO2-POOR feed, which is what the field trial actually was.")
+    0
+}

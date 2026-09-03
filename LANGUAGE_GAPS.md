@@ -259,7 +259,9 @@ completeness because it shapes every file.
 **Status: HALF CLOSED. The harness half is done on `feat/w6-neg-f64-global`
 (`4e92710d20`), not yet merged; the wrapper half stays open by this study's own
 decision not to modify `bin/souc`. Affects how every language-side claim in this
-study is checked.**
+study is checked. See "A correction to this entry's premise" below: a lagging
+seed is a CI merge blocker, not the tolerated condition this entry first
+described.**
 
 `bin/souc` resolves the engine with a fallback:
 
@@ -366,10 +368,55 @@ build reports `engine=explicit md5=fe4d4915` and passes
 present the guard stays silent and reports `engine=madaros`. That last one is
 the test that mattered — the ordinary case must not start refusing.
 
-**Still open:** the first route. `bin/souc` is a wrapper other projects depend
-on, and this study does not modify it. Until that changes, a `lean_single`
-result obtained through `bin/souc` outside this harness still carries the
-original hazard, and must name its binary.
+### A correction to this entry's premise
+
+The entry above says the tree "now holds two different compilers" as though that
+were a tolerated condition. It is not. `scripts/ci/canonical_compiler_gate.sh`,
+in the Contracts job, **requires** `bin/souc-lean-single-x86_64` to BE the fixed
+point of `self-hosted/compiler/lean_single.sio`:
+
+```
+[canonical-compiler] FAIL: <seed> is NOT the fixed point of <src>.
+[canonical-compiler]   The committed lean_single ELF has drifted from current source.
+```
+
+So a lagging seed is a **merge blocker**, not a sanctioned state. Measured
+2026-09-03, both branches from this study are held by it:
+
+| branch | committed seed | fixed point of its source |
+|---|---|---|
+| `feat/w6-neg-f64-global` | `0f3aa2c9…` | `fe4d4915…` |
+| `feat/w4b-e072-allocation` | `0f3aa2c9…` | `c20a4490…` |
+
+That sharpens what this gap actually is. The hazard is not that the repository
+accepts two compilers — it forbids them. The hazard lives in the **window**
+between editing `lean_single.sio` and refreshing the seed, which is every moment
+of development on that file. CI closes the window at merge. Nothing closes it
+while you work, and `bin/souc` says nothing, which is how the reaction-literal
+feature was measured against the wrong binary and pronounced inert.
+
+The refresh is documented and executable — `scripts/dev/refresh_lean_seed.sh`,
+`docs/ops/LEAN_SINGLE_SEED_REFRESH.md` — and it is deliberately not casual. §3
+calls placement "a founder decision — consumes cluster", the driver's own header
+says *"Agents must not run --execute unprompted"*, and §2 is a HARD STOP against
+the obvious shortcut: an ELF that merely differs from the old seed is not a
+refresh; M1 settle, M2 self-reproduction and M3 determinism must be recorded, and
+`out/SETTLED.md5` must exist before anything is installed. *"Hand-derive without
+M1 = off-recipe. STOP. Do not cp. Do not commit."* — because shipping gen1
+(#1606) is worse than not refreshing at all.
+
+**Still open:** the first route, and it is the one that closes the window rather
+than the end state. The canonical gate already forbids a lagging seed at merge;
+what nothing does is tell you, while you work, that the binary answering
+`./bin/souc` is not the source you just edited. `bin/souc` preferring a freshly
+built `gen3.elf` would say it — but it is a wrapper other projects depend on, and
+this study does not modify it. Until that changes, a `lean_single` result
+obtained through `bin/souc` outside this harness still carries the original
+hazard, and must name its binary.
+
+Worth noting that the wrapper already does exactly this for the OTHER engine:
+Madaros resolves a local `artifacts/self-hosted/madaros` ahead of the committed
+ELF and reports which one it used. The asymmetry is the whole gap.
 
 ---
 

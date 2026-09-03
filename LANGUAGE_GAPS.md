@@ -549,7 +549,14 @@ neither related.
 
 ## G10 — No rate-law composition or catalyst-cycle representation
 
-**Status: OPEN (by decision) — anticipated, not yet model-forced.**
+**Status: CLOSED, not yet merged.** Implemented on `Sounio-lang/sounio`
+branch `lane/cursor-1/20260826` @ `21900a1dfe` (pushed to `origin`, not on
+`main`) — see "Update, 2026-09-03: implemented" below for what actually
+landed, what it corrected in this entry's own original assumptions, and
+what is still not done. The paragraph immediately below is the entry as
+originally written and is kept for the record, not silently edited.
+
+**Status, as originally written: OPEN (by decision) — anticipated, not yet model-forced.**
 
 Every other entry in this file is scoped to what a run of this study actually
 hit. This one is not: no phase here has yet needed a catalytic mechanism, so by
@@ -608,3 +615,88 @@ blocked on `feat/w5-reaction-literals` merging first.
 (`mm_rate()`, `monod()`/`microbial_rate()`), each hand-written outside any
 shared abstraction and reviewed as a class — the same fallback discipline
 already in force for G4 and G5.
+
+---
+
+### Update, 2026-09-03: implemented
+
+New file, `stdlib/chemistry/catalysis.sio` (709 lines), on
+`Sounio-lang/sounio` branch `lane/cursor-1/20260826` @ `21900a1dfe`. All
+three parts of the gap are addressed:
+
+1. **Rate-law composability.** `RateLaw` — a flat struct with an `i64 kind`
+   discriminator (Sounio has no traits/generics beyond prototype tier) —
+   covers 9 kinds: mass-action, MM irreversible/reversible, Hill, Langmuir–
+   Hinshelwood single/dual-site, competitive/noncompetitive-inhibited MM,
+   generalized dual-substrate Monod. `compute_rates_mechanistic`/
+   `simulate_mechanistic_crn` plug this into the same `MatNM` stoichiometry
+   machinery `compute_rates_general` already uses — `nu` still drives
+   species bookkeeping, only the per-reaction rate *formula* is now
+   pluggable. `compute_rates_general` itself is untouched, and is the
+   trusted baseline the new path is cross-checked against.
+2. **A catalyst/intermediate species-role tag.** `CatalyticSpecies { index,
+   role, initial_amount }`, plus `catalyst_conserved` — a checkable
+   invariant (net-zero stoichiometry across a minimal cycle) that used to be
+   assumed, not tested. **This entry's original assumption about how to get
+   here was wrong, discovered during implementation, not before**: it said
+   a role tag would be "cheapest once `feat/w5-reaction-literals` merges,
+   since roles would naturally attach to the existing species position in
+   that syntax." Reaction literals turn out to be **100% compile-time-only**
+   — species are folded into throwaway integer arrays for balance-checking
+   and then discarded; nothing survives to codegen or produces a runtime
+   value at all. A role tag cannot ride syntax that carries nothing to
+   runtime. `catalysis.sio` has zero dependency on that branch.
+3. **Turnover-number bookkeeping.** `turnover_number`/`turnover_frequency`
+   plus `simulate_catalytic_cycle`, which runs a mechanism and derives
+   TON/TOF from it directly.
+
+**Validation, by explicit instruction, never Python, never Rust — not even
+for validation.** Sounio-internal tests (conservation laws, algebraic
+identities — e.g. Hill at `S=Km` gives exactly `Vmax/2` for any `n`, checked
+both numerically in `.sio` and formally in Lean) plus three independent
+oracles, none of them translations of the Sounio code: `stdlib/chemistry/
+oracles/catalysis_oracle.cpp` (C++23, all 9 rate laws reimplemented
+independently, 22-case self-test), `stdlib/chemistry/oracles/
+catalysis_cycle.kk` (Koka, independent hand-rolled RK4 of the classic
+E+S⇌ES→E+P cycle, division-by-zero surfaced as a typed effect), `formal/
+lean4/SounioCatalysisKinetics.lean` (Lean4, Mathlib-free — this repo's own
+default — proves enzyme conservation and Hill half-saturation, zero
+`sorry`; a mandatory `xai/grok-4.5` math-review on that file caught a real
+docstring/theorem mismatch — an unused `0 < n` hypothesis — before it
+shipped).
+
+**The independent Koka oracle caught something concrete.** Run at
+`kinetics.sio::test_enzyme_crn`'s own parameters (`kf=1.2, kr=0.3, kcat=0.8,
+E0=0.05, S0=2.0`), it independently computed P≈0.154, not the ≈0.7 that
+test's own `check_near` expects. That expectation was never actually
+verified: `kinetics.sio` parse-fails outright under `bin/souc run`, and its
+external driver (`tests/stdlib/chemistry/test_kinetics_core.sio`) is
+`//@ check-only` — type-checked, never executed. `catalysis.sio`'s own
+equivalent test now checks the value both independent implementations
+agree on, ~0.154054667769, to full displayed precision.
+
+**Four real, previously-undocumented Sounio compiler bugs were found
+building this — this is the "what this model forced the language to need"
+this file's own header names, arriving after the fact rather than before
+it, which is exactly why this update exists as a correction and not just a
+status flip.** All four are fixed at their trigger point in
+`catalysis.sio` itself: `extern "C" fn pow(x,y)` silently returns `0.0`
+whenever `y` isn't a compile-time literal; sequential per-field mutation
+across *different* struct-array indices aliases every write to one slot;
+a function returning a struct or tuple that embeds a fixed-size array
+corrupts under native linking; a tuple-destructured binding corrupts on its
+second use in the same function. **One is not worked around**, and is a
+standing limitation stated plainly rather than hidden: a function taking a
+mutable array-reference parameter (`&![T;N]`) only links when called
+directly from `main()`, not from a wrapper function — so
+`simulate_catalytic_cycle`/its test is verified correct by isolated
+extraction (matches the Koka oracle exactly) but the full 10-function test
+suite cannot be linked as one binary. `test_catalysis_stdlib.sio` is
+`//@ check-only` for the same reason `test_kinetics_core.sio` already is.
+
+**Not done, stated plainly:** not merged to `main`; not applied back to
+this study's own models (the mineral-surface-catalyzed abiotic pathway
+named above as the trigger for IN PROGRESS is still untouched — this closes
+the *language* gap, not a *study* phase). If a future phase of this study
+actually needs a catalytic mechanism, the tool now exists to reach for
+rather than a further estimate to make.

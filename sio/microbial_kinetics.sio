@@ -1,0 +1,154 @@
+// Microbial time integration, against the archived USGS trajectory.
+//
+// ORACLE STATUS. GWB is not available; React was NOT run. Parity is against the
+// ARCHIVED OUTPUT FILES only (DOI 10.5066/P13GJC6Y, CC0-1.0).
+//
+// WHAT THE ANALYTIC WORK ALREADY ESTABLISHED, before this integrator existed.
+// The archived 12 700-year trajectory closes stoichiometrically on four
+// independent checks, each under 1 %:
+//
+//   total sulfate 0.008269 -> archived final HS- 0.008229          0.48 %
+//   SRB biomass = yield 5000 x total sulfate = 41.34 vs 41.56     -0.52 %
+//   CH4 = MET biomass / yield 1250 = 2.176e-3 vs 2.156e-3          0.93 %
+//   H2 consumed = 4 x (SRB + MET) = 0.041779 vs 0.041713           0.16 %
+//
+// and on timing, from mu = yield * k in the exponential phase:
+//   SRB doubling 103 yr, reaches 41.34 mg/kg in 2603 yr
+//   MET doubling 610 yr, reaches 2.720 mg/kg in 13041 yr
+// against a 12 700-year horizon -- so SRB completes early and MET only just
+// arrives at the end, which is what the archive shows.
+//
+// THE DETAIL THAT COSTS A FACTOR OF 2.5. The Monod term uses the FREE species
+// molality (SO4-- = 0.003276) while the mass balance uses the TOTAL pool, free
+// plus complexed (0.008269, the sum over NaSO4-, MgSO4, CaSO4, KSO4-, HSO4-).
+// Running the mass balance on free sulfate alone would predict a final SRB
+// biomass of 16.4 mg/kg instead of 41.6.
+//
+// This integrator exists to confirm the succession numerically -- the part the
+// analytic treatment approximates, since it assumes the donor Monod term stays
+// near 1 throughout. It does: H2 falls only to 5.470e-4 molal, against a MET
+// KD of 4.7e-6, so that term never drops below about 0.99.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use microbial::{microbial_rate}
+
+var YIELD_MET: f64 = 1250.0
+var YIELD_SRB: f64 = 5000.0
+// No decay coefficient is given by the archived scripts, so decay is zero here
+// rather than invented. The archive's monotonic biomass growth, stalling only
+// at substrate exhaustion, is consistent with that.
+var DECAY: f64 = 0.0
+
+// Free fraction of the sulfate pool at step 0: 0.003276 / 0.008269. Held
+// constant, which is a DECLARED simplification -- as pH rises the complexes
+// redistribute and this ratio moves. The effect on the endpoint is nil, since
+// the endpoint is set by the total pool, but it shifts the timing slightly.
+var SO4_FREE_FRAC: f64 = 0.3962
+
+var ST_XMET: f64 = 0.0
+var ST_XSRB: f64 = 0.0
+var ST_H2: f64 = 0.0
+var ST_SO4T: f64 = 0.0
+var ST_HCO3: f64 = 0.0
+var ST_CH4: f64 = 0.0
+var ST_HS: f64 = 0.0
+
+fn init_state() with Mut {
+    ST_XMET = 1.0e-6
+    ST_XSRB = 1.0e-6
+    ST_H2 = 0.04226
+    ST_SO4T = 0.008269
+    ST_HCO3 = 0.0005818
+    ST_CH4 = 9.005e-10
+    ST_HS = 0.0
+}
+
+// One explicit Euler step of dt seconds.
+fn step(dt: f64) with Mut, Div, Panic {
+    let so4_free = ST_SO4T * SO4_FREE_FRAC
+    let r_met = microbial_rate(0, ST_XMET, ST_H2, ST_HCO3, 1.0)
+    let r_srb = microbial_rate(1, ST_XSRB, ST_H2, so4_free, 1.0)
+    if r_met < 0.0 { return }
+    if r_srb < 0.0 { return }
+
+    var d_h2 = 0.0 - 4.0 * (r_met + r_srb) * dt
+    var d_so4 = 0.0 - r_srb * dt
+    var d_hco3 = 0.0 - r_met * dt
+
+    ST_H2 = ST_H2 + d_h2
+    ST_SO4T = ST_SO4T + d_so4
+    ST_HCO3 = ST_HCO3 + d_hco3
+    ST_CH4 = ST_CH4 + r_met * dt
+    ST_HS = ST_HS + r_srb * dt
+    ST_XMET = ST_XMET + (YIELD_MET * r_met - DECAY * ST_XMET) * dt
+    ST_XSRB = ST_XSRB + (YIELD_SRB * r_srb - DECAY * ST_XSRB) * dt
+
+    if ST_H2 < 0.0 { ST_H2 = 0.0 }
+    if ST_SO4T < 0.0 { ST_SO4T = 0.0 }
+    if ST_HCO3 < 0.0 { ST_HCO3 = 0.0 }
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+// Integrate to t_end with fixed dt, printing at the requested year marks.
+fn run(t_end_yr: f64, dt_s: f64) with IO, Mut, Div, Panic {
+    let yr = 3.1557600e7
+    init_state()
+    var t = 0.0
+    let t_end = t_end_yr * yr
+    var next_mark = 500.0
+    var guard: i64 = 0
+    while t < t_end && guard < 4000000 {
+        step(dt_s)
+        t = t + dt_s
+        if t >= next_mark * yr {
+            print("   yr ") pi64(next_mark as i64)
+            print("   X_SRB ") emit("", ST_XSRB)
+            print("            X_MET ") emit("", ST_XMET)
+            print("            H2 ") emit("", ST_H2)
+            print("            CH4 ") emit("", ST_CH4)
+            next_mark = next_mark * 2.0
+        }
+        guard = guard + 1
+    }
+    println("   -- final --")
+    print("   X_SRB ") emit("", ST_XSRB)
+    print("   X_MET ") emit("", ST_XMET)
+    print("   H2    ") emit("", ST_H2)
+    print("   CH4   ") emit("", ST_CH4)
+    print("   HS    ") emit("", ST_HS)
+    print("   SO4_total remaining ") emit("", ST_SO4T)
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("MICROBIAL TIME INTEGRATION vs the ARCHIVED USGS trajectory")
+    println("GWB not available; React not run; parity is against the archive.")
+    println("")
+    println("archived endpoints at 12700 yr:")
+    println("   X_SRB 41.56   X_MET 2.720   H2 5.470e-4   CH4 2.156e-3   HS 8.229e-3")
+    println("")
+    println("== integrated, dt = 1e7 s (~0.32 yr) ==")
+    run(12700.0, 1.0e7)
+    0
+}

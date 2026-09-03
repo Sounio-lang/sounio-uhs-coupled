@@ -888,3 +888,84 @@ pH 7 the temperature-and-pH viability is 68 %, 49 % and 58 %. Everything that
 follows depends on the salinity — and for Lehen no TDS, no salinity and no
 sodium measurement exists (`CORRECTIONS.md` C6). The single most consequential
 input for microbial viability at that site was never reported.
+
+## `microbial_kinetics.sio` — dynamic parity, half exact and half diagnostic
+
+**Oracle status.** GWB is not available; React was **not run**. Parity is against
+the archived output files only.
+
+### The archive reproduces analytically before any integrator runs
+
+Four independent stoichiometric checks over the 12 700-year trajectory, each
+under 1 %:
+
+| check | predicted | archived | difference |
+|---|---|---|---|
+| total sulfate → sulfide | 0.008269 | 0.008229 | **0.48 %** |
+| SRB biomass = yield 5000 × total sulfate | 41.34 | 41.56 | **−0.52 %** |
+| CH₄ = MET biomass / yield 1250 | 2.176e-03 | 2.156e-03 | **0.93 %** |
+| H₂ consumed = 4 × (SRB + MET) | 0.041779 | 0.041713 | **0.16 %** |
+
+And the timing, from μ = yield · k in the exponential phase: SRB doubles every
+**103 years** and reaches 41.34 mg/kg in **2603 years**; MET doubles every
+**610 years** and reaches 2.720 mg/kg in **13 041 years**, against a 12 700-year
+horizon. So SRB completes early and MET only just arrives at the end — which is
+what the archive shows, with MET biomass still 7.9e-05 at step 698 and 2.720 by
+step 915.
+
+### One detail is worth a factor of 2.5
+
+The Monod term uses the **free species** molality (SO₄²⁻ = 0.003276) while the
+mass balance uses the **total pool** — free plus NaSO₄⁻, MgSO₄, CaSO₄, KSO₄⁻ and
+HSO₄⁻, summing to 0.008269. Running the mass balance on free sulfate alone
+predicts a final SRB biomass of **16.4** instead of **41.6** mg/kg.
+
+### Integrated: the sulfate half is exact, the methane half is not
+
+Explicit Euler, dt = 1e7 s, to 12 700 years:
+
+| | integrated | archived | difference |
+|---|---|---|---|
+| X_SRB | **41.345** | 41.56 | **−0.52 %** |
+| HS⁻ | **8.269e-03** | 8.229e-03 | **+0.48 %** |
+| sulfate remaining | ~1e-316 | exhausted | agrees |
+| X_MET | 0.72729 | 2.720 | **−73 %** |
+| CH₄ | 5.8184e-04 | 2.156e-03 | **−73 %** |
+| H₂ remaining | 6.857e-03 | 5.470e-04 | over by 12.5× |
+
+**The sulfate-reduction half is reproduced to half a percent.** The
+methanogenesis half is short by a factor of 3.7 — and the reason is exact rather
+than mysterious.
+
+### Why, precisely
+
+The CH₄ this model produces, **5.8184e-04 molal, is the initial bicarbonate pool
+to four figures** (5.818e-04). Methanogenesis consumed every available HCO₃⁻ and
+stalled on mass balance.
+
+The archive reacted **2.176e-03 molal** — 3.7× more bicarbonate than the initial
+pool contains. It can, because there the carbonate system replenishes HCO₃⁻: from
+CO₂(aq), which starts at 8.281e-04 molal, and from the rising pH converting CO₂
+to HCO₃⁻ as sulfate reduction consumes protons, and from the dolomite and brucite
+equilibria that appear later in the run.
+
+**This module has no carbonate system coupled to it.** That is the missing term,
+named and not papered over, and it is the next increment.
+
+### The distinction this exposes, which matters for H1a
+
+`KA = 0` switches off the **kinetic** carbon limitation — the Monod term on
+bicarbonate is identically 1. It does **not** switch off the **mass-balance**
+limitation: if the pool is not replenished, methanogenesis stops when the carbon
+is gone regardless of what the Monod term says.
+
+So there are two separate ways CO₂ can limit methanogenesis, and the reference
+model has one of them switched off and the other supplied by the carbonate
+system. H1a is a claim about carbon *availability*, which is the mass-balance
+channel — and this run shows that channel is worth a factor of 3.7 in methane
+when the replenishment is removed.
+
+That is not evidence for H1a: the replenishment is real chemistry, and removing
+it is a defect of this increment rather than a scenario. It does show the channel
+H1a needs is a live one, distinct from the Monod term whose constant Strobel
+measured and whose effect was 1.9 %.

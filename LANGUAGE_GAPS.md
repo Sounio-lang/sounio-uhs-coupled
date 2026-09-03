@@ -749,3 +749,105 @@ any number in the figure.
 **What would close it.** A codegen fix. Until then the practical rule for this
 lane is: **keep string literals passed as arguments under 126 characters**, now
 noted at the point of use in `sio/figure.sio`.
+
+## G12 — Unit types type-check correctly and MISCOMPILE the values. The units rewrite is blocked.
+
+**Status: OPEN, and it blocks the stated goal of carrying everything on units.**
+Found by attempting exactly that rewrite, on the module `CORRECTIONS.md` C20
+identified as the one that declared units and did not use them.
+
+`FEATURES.md` measured the checker and it is genuinely good: it rejects assigning
+one unit into another, adding different units, passing the wrong unit at any
+argument position, and passing a bare `f64` or a bare literal where a unit is
+expected. Every one of those was verified by a run.
+
+**None of that matters, because the values are wrong.**
+
+### Reproduction 1 — a module-level `var` with a unit type does not hold its initialiser
+
+```sio
+unit degK = K;
+unit molal = mol / kg;
+var T_MIN: degK = 298.0
+var M_MAX: molal = 4.0
+// ... print (T_MIN as f64) * 100 and (M_MAX as f64) * 100
+```
+
+| binding | expected ×100 | **actual** |
+|---|---|---|
+| `var T_MIN: degK = 298.0` | 29 800 | **9** |
+| `var M_MAX: molal = 4.0` | 400 | **9** |
+
+Both read back as ≈ 0.09, and **both read back as the same wrong value** despite
+different initialisers. The same declarations typed `f64` are correct (29 800).
+
+### Reproduction 2 — a unit-typed value arrives corrupted as a function argument
+
+```sio
+unit degK = K;
+var T_MIN_PLAIN: f64 = 298.0            // plain f64 module var: correct
+fn check(t: degK) -> bool with Mut, Div, Panic { let raw = t as f64
+    raw < T_MIN_PLAIN }
+fn main() -> i32 with IO, Mut, Div, Panic {
+    let t: degK = 313.15
+    let lo: degK = 290.0
+    print("local t x100 = ") // -> 31314, CORRECT
+    if check(t)  { /* 313.15 < 298 */ }   // FALSE, correct
+    if check(lo) { /* 290    < 298 */ }   // FALSE, WRONG -- should be TRUE
+}
+```
+
+The local `let lo: degK = 290.0` reads back correctly **in the scope where it is
+declared**. Passed to `check`, it compares as though it were ≥ 298. So the
+corruption happens at the call boundary — the same boundary the checker guards
+so well.
+
+### End-to-end consequence, measured on a real module
+
+Annotating `sio/h2_solubility.sio` with the dimensional form — parameters,
+module-level bounds, and typed bindings at every call site, with an explicit
+`as f64` strip at the correlation boundary — **compiled cleanly** and produced:
+
+| | original (`f64`) | unit-annotated |
+|---|---|---|
+| m_nacl = 0.0 | **6.313448550155170e-2** | **0** |
+| m_nacl = 1.0 | 5.106477118630551e-2 | **1e200** |
+| m_nacl = 2.0 | 4.209222515732879e-2 | **1e200** |
+| m_nacl = 3.0 | 3.535966399150986e-2 | **1e200** |
+
+Correct molalities became zero and 10²⁰⁰. The refusal sentinels still fired,
+which would mask the failure from a smoke test.
+
+**The annotated module was reverted.** It is not committed, because a module that
+type-checks and returns 10²⁰⁰ is worse than one that carries no units at all.
+
+### Why this is the worst failure mode available
+
+The three ways a feature can fail are: reject valid code, be absent, or accept
+code and compute the wrong answer. This is the third, and it is combined with a
+**correct** type checker — so the feature actively invites the user to adopt it,
+passes every check they write, and silently corrupts the numbers. A study that
+adopted units on the strength of `FEATURES.md` §3 alone would have published
+wrong results with a clean build.
+
+### What this means for "everything on units and ontologies"
+
+The mechanism is closer than the registry's `prototype / downgraded` tier
+suggests — the *checking* half is real and would have caught the mg/L-of-solution
+versus mmol/kg-of-water confusion this study worried about. **The codegen half is
+unusable.** Until G12 is fixed, unit types can be used for documentation and for
+compile-time checking of code that is then thrown away, and not for anything that
+computes a number that will be reported.
+
+**What would close it:** a codegen fix for unit-typed value representation in
+module-level initialisers and at call boundaries. This is not a design gap like
+G4/G5 (same-dimension scale) — the design works. It is a lowering bug.
+
+### An accidental correctness, worth naming
+
+`CORRECTIONS.md` C20 criticised this study for declaring units and never using
+them, and for not checking what the feature could do before deciding not to use
+it. **That criticism of the process stands.** But the outcome was accidentally
+right: had the study used the feature, every number it reported would have been
+corrupt. The right decision was reached for the wrong reason, which is not the
+same as having been right.

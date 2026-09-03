@@ -1,0 +1,22 @@
+unit degK = K;
+var T_MIN_PLAIN: f64 = 298.0
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn check(t: degK) -> bool with Mut, Div, Panic {
+    let raw = t as f64
+    raw < T_MIN_PLAIN
+}
+fn main() -> i32 with IO, Mut, Div, Panic {
+    print("plain f64 module var x100 = ") pu64((T_MIN_PLAIN * 100.0) as i64) println("   expect 29800")
+    let t: degK = 313.15
+    let lo: degK = 290.0
+    print("unit local t x100 = ") pu64(((t as f64) * 100.0) as i64) println("   expect 31315")
+    if check(t) { println("313.15 < 298 : TRUE (WRONG)") } else { println("313.15 < 298 : FALSE (correct)") }
+    if check(lo) { println("290 < 298 : TRUE (correct)") } else { println("290 < 298 : FALSE (WRONG)") }
+    0
+}

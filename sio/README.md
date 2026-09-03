@@ -202,3 +202,71 @@ is roughly **five orders of magnitude above the instrument** — real, not noise
 **What closes it**: a Debye–Hückel activity model in the engine. Until that
 exists, engine and oracle are not comparable on absolute concentrations, and no
 number from this closure is quoted as an absolute solubility.
+
+### Debye–Hückel: the attribution tested, and it held
+
+The ideal closure's residual against the oracle was attributed **in advance** to
+the omitted activity model. The test of that attribution is to supply the *same*
+activity model and see whether the residual collapses. If it had not, the
+attribution was wrong and something else was going on.
+
+The chain is PHREEQC's own, read from its source rather than a textbook —
+Wagner & Pruss 2002 density, Bradley & Pitzer 1979 dielectric, then
+`DH_B = sqrt(8πN_A·e²/DkT·ρ₀/1e3)/1e8` and `DH_A = DH_B·e²/DkT/(2 ln10)`, with
+WATEQ `log γ = −A z²√μ/(1 + B a√μ) + b μ`. Using a *different* A(T) would have
+introduced a second difference and destroyed the test.
+
+Validated against values known independently of that source:
+
+| | computed | expected |
+|---|---|---|
+| ρ₀ (25 °C, 1 atm) | 0.9970430117423 g/cm³ | 0.997047 |
+| ε_r (25 °C) | 78.38441784056 | ~78.4 |
+| **A (25 °C)** | **0.5100247894123** | ~0.5092 |
+| **B (25 °C)** | **0.3284906339825** | ~0.3283 |
+
+**One factor was wrong on the first attempt, and the validation is what caught
+it.** `DH_B`'s `/1e3` reads like a kg/m³→g/cm³ conversion; it is not. PHREEQC's
+caller overwrites the `rho_0` member with `calc_rho_0`'s *return* value, which is
+already g/cm³, so the division is a genuine extra factor. Cancelling it as a unit
+conversion put A and B out by exactly √1000 — 16.13 and 10.39 instead of 0.510
+and 0.328. Nothing downstream would have looked odd; the activity coefficients
+would simply have been absurd, and the residual would have moved the wrong way.
+
+#### The collapse
+
+| P(CO₂) | Ca error, ideal | Ca error, with activity | factor |
+|---|---|---|---|
+| 0.01 | −13.59 % | **−1.38 %** | 9.9× |
+| 0.1 | −18.95 % | **−2.01 %** | 9.4× |
+| 1.0 | −26.26 % | **−3.45 %** | 7.6× |
+
+| P(CO₂) | ΔpH ideal | ΔpH with activity |
+|---|---|---|
+| 0.1 | −0.04341 | **−0.00223** |
+| 1.0 | −0.06412 | **−0.00557** |
+
+Ionic strength, which the engine now computes rather than ignores, agrees with
+the oracle to **0.02 %** and **0.20 %**.
+
+The attribution held. That is worth stating precisely: it was named before it was
+measured, the prediction was that supplying the term would collapse the residual,
+and it collapsed by roughly an order of magnitude.
+
+#### What is left, named rather than shrugged at
+
+**The remaining 1.4–3.5 % still grows with P(CO₂).** The obvious candidate is
+**ion pairing** — PHREEQC speciates CaHCO₃⁺, CaCO₃⁰ and CaOH⁺, and this engine
+does not. More dissolved carbonate means more pairing, which is the observed
+direction. That is a named, testable next hypothesis, on the same footing the
+activity model had before this section: it will be tested by adding the pairs,
+not by asserting it now.
+
+**The outer fixed point hit its iteration cap.** `solve_ph_activity` runs an
+inner bisection on pH inside an outer fixed point on ionic strength, and the
+outer loop reported **60 sweeps**, its ceiling, rather than meeting the 1e-14
+tolerance it was asked for. The result is converged in practice — μ matches the
+oracle to 0.02 % — but it did **not** meet its own stated criterion, and that is
+a defect in the solver rather than a property of the chemistry. It is recorded
+here rather than papered over by loosening the tolerance to whatever it happened
+to reach.

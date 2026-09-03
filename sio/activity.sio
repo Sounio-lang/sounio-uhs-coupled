@@ -1,0 +1,213 @@
+// Activity coefficients — WATEQ Debye-Hückel, as the oracle computes them.
+//
+// WHY THIS IS A PORT AND NOT AN INDEPENDENT MODEL. The charge-balance closure
+// in `carbonate_equilibria.sio` assumes an ideal solution, and its residual
+// against IPhreeqc grows monotonically with ionic strength -- 13.6 % in [Ca] at
+// mu 3.7e-3 rising to 26.3 % at mu 1.9e-2. That residual was attributed in
+// advance to the omitted activity model. This module is the test of that
+// attribution: if the residual is the activity model, supplying the SAME
+// activity model must collapse it, and if it does not, the attribution was
+// wrong and something else is going on.
+//
+// So the chain below is deliberately PHREEQC's own, read from its source rather
+// than from a textbook, because using a different A(T) would introduce a second
+// difference and destroy the test:
+//
+//   rho_0    Wagner & Pruss 2002 JPCRD 31, 387 eqn 2.6 along the saturation
+//            line, plus PHREEQC's pressure interpolation   (utilities.cpp)
+//   eps_r    Bradley & Pitzer 1979 JPC 83, 1599            (model.cpp)
+//   DH_B     sqrt(8 pi N_A e2_DkT rho_0 / 1e3), then /1e8  (model.cpp)
+//   DH_A     DH_B * e2_DkT / (2 ln10)                      (model.cpp)
+//   gamma    log10 g = -A z^2 sqrt(mu)/(1 + B a sqrt(mu)) + b mu
+//
+// A CONVENTION AXIOM WORTH RECORDING: PHREEQC uses AVOGADRO = 6.02252e23, the
+// pre-2019 value, not 6.02214076e23. The difference is 6e-6 relative and enters
+// DH_B under a square root, so it is ~3e-6 in A and B -- far below the residual
+// under test, but it is a convention, and conventions are the thing this study
+// exists to make visible. The old value is used here BECAUSE the oracle uses it.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+var AVOGADRO_PHREEQC: f64 = 6.02252e23
+var PI_C: f64 = 3.141592653589793
+var LN10_A: f64 = 2.302585092994046
+
+// Wagner & Pruss eqn 2.6 coefficients
+var WP_B1: f64 = 1.99274064
+var WP_B2: f64 = 1.09965342
+var WP_B3: f64 = 0.0 - 0.510839303
+var WP_B4: f64 = 0.0 - 1.75493479
+var WP_B5: f64 = 0.0 - 45.5170352
+var WP_B6: f64 = 0.0 - 6.7469445e5
+var WP_TC: f64 = 647.096
+
+// Bradley & Pitzer coefficients
+var BP_U1: f64 = 3.4279e2
+var BP_U2: f64 = 0.0 - 5.0866e-3
+var BP_U3: f64 = 9.469e-7
+var BP_U4: f64 = 0.0 - 2.0525
+var BP_U5: f64 = 3.1159e3
+var BP_U6: f64 = 0.0 - 1.8289e2
+var BP_U7: f64 = 0.0 - 8.0325e3
+var BP_U8: f64 = 4.2142e6
+var BP_U9: f64 = 2.1417
+
+fn powf(x: f64, y: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 }
+    exp(y * log(x))
+}
+
+fn sqrtf(x: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 }
+    exp(0.5 * log(x))
+}
+
+// Saturation-line density, kg/m^3, Wagner & Pruss eqn 2.6.
+fn rho_sat(tc: f64) -> f64 with Mut, Div, Panic {
+    let t = tc + 273.15
+    let th = 1.0 - t / WP_TC
+    if th <= 0.0 { return 0.0 - 1.0 }
+    322.0 * (1.0 + WP_B1 * powf(th, 1.0 / 3.0)
+                 + WP_B2 * powf(th, 2.0 / 3.0)
+                 + WP_B3 * powf(th, 5.0 / 3.0)
+                 + WP_B4 * powf(th, 16.0 / 3.0)
+                 + WP_B5 * powf(th, 43.0 / 3.0)
+                 + WP_B6 * powf(th, 110.0 / 3.0))
+}
+
+// Saturation pressure, atm, as PHREEQC writes it (a_H2O taken as 1 here).
+fn p_sat_atm(tc: f64) -> f64 with Mut, Div, Panic {
+    let t = tc + 273.15
+    exp(11.6702 - 3816.44 / (t - 46.13))
+}
+
+// Pure-water density in g/cm^3 at (tc, pa in atm).
+fn rho_0(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
+    let rs = rho_sat(tc)
+    if rs < 0.0 { return 0.0 - 1.0 }
+    let p0 = 5.1880000e-02 + tc * (0.0 - 4.1885519e-04 + tc * (6.6780748e-06 + tc * (0.0 - 3.6648699e-08 + tc * 8.3501912e-11)))
+    let p1 = 0.0 - 6.0251348e-06 + tc * (3.6696407e-07 + tc * (0.0 - 9.2056269e-09 + tc * (6.7024182e-11 + tc * (0.0 - 1.5947241e-13))))
+    let p2 = 0.0 - 2.2983596e-09 + tc * (0.0 - 4.0133819e-10 + tc * (1.2619821e-11 + tc * (0.0 - 9.8952363e-14 + tc * 2.3363281e-16)))
+    let p3 = 7.0517647e-11 + tc * (6.8566831e-12 + tc * (0.0 - 2.2829750e-13 + tc * (1.8113313e-15 + tc * (0.0 - 4.2475324e-18))))
+    let ps = p_sat_atm(tc)
+    var pa = pa_atm
+    if pa < ps { pa = ps }
+    pa = pa - (ps - 1.0e-6)
+    let r = rs + pa * (p0 + pa * (p1 + pa * (p2 + sqrtf(pa) * p3)))
+    r / 1000.0
+}
+
+// Relative dielectric constant, Bradley & Pitzer 1979.
+fn eps_r(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
+    let t = tc + 273.15
+    let d1000 = BP_U1 * exp(t * (BP_U2 + t * BP_U3))
+    let c = BP_U4 + BP_U5 / (BP_U6 + t)
+    let b = BP_U7 + BP_U8 / t + BP_U9 * t
+    let pb = pa_atm * 1.01325
+    d1000 + c * log((b + pb) / (b + 1000.0))
+}
+
+// Debye-Hückel B, in 1/Angstrom per (mol/kg)^0.5.
+fn dh_b(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
+    let t = tc + 273.15
+    let e = eps_r(tc, pa_atm)
+    if e <= 0.0 { return 0.0 - 1.0 }
+    let e2_dkt = 1.671008e-3 / (e * t)
+    let r0 = rho_0(tc, pa_atm)
+    if r0 < 0.0 { return 0.0 - 1.0 }
+    // The /1e3 is NOT a unit conversion. PHREEQC's caller overwrites the
+    // rho_0 member with calc_rho_0's RETURN value, which is already g/cm^3,
+    // so the division in the formula is a genuine extra factor. Reading it
+    // as a conversion and cancelling it puts A and B out by sqrt(1000) --
+    // which is exactly what the 25 C validation below caught.
+    sqrtf(8.0 * PI_C * AVOGADRO_PHREEQC * e2_dkt * r0 / 1000.0) / 1.0e8
+}
+
+// Debye-Hückel A, in (mol/kg)^-0.5. Note DH_A is formed from DH_B BEFORE the
+// 1e8 division in PHREEQC, so the factor is restored here.
+fn dh_a(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
+    let t = tc + 273.15
+    let e = eps_r(tc, pa_atm)
+    if e <= 0.0 { return 0.0 - 1.0 }
+    let e2_dkt = 1.671008e-3 / (e * t)
+    let b_pre = dh_b(tc, pa_atm) * 1.0e8
+    b_pre * e2_dkt / (2.0 * LN10_A)
+}
+
+// WATEQ Debye-Hückel activity coefficient.
+//   z  charge (0 for a neutral species)
+//   a  ion-size parameter, Angstrom, from the database's -gamma line
+//   b  WATEQ extension term, from the same line
+// A neutral species (z = 0, a = 0) reduces to the Setchenow form log g = b mu.
+fn gamma_wateq(tc: f64, pa_atm: f64, z: f64, a: f64, b: f64, mu: f64) -> f64 with Mut, Div, Panic {
+    if mu < 0.0 { return 0.0 - 1.0 }
+    if mu == 0.0 { return 1.0 }
+    let sm = sqrtf(mu)
+    let aa = dh_a(tc, pa_atm)
+    let bb = dh_b(tc, pa_atm)
+    if aa < 0.0 { return 0.0 - 1.0 }
+    let lg = (0.0 - aa) * z * z * sm / (1.0 + bb * a * sm) + b * mu
+    exp(lg * LN10_A)
+}
+
+// ── printing ───────────────────────────────────────────────────────────────
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("WATEQ DEBYE-HUCKEL -- PHREEQC's own chain, ported")
+    println("")
+    println("== validation against values that are known independently ==")
+    println("   water density at 25 C, 1 atm   -- expect 0.997047 g/cm3")
+    emit("   rho_0", rho_0(25.0, 1.0))
+    println("   dielectric constant at 25 C    -- expect ~78.4")
+    emit("   eps_r", eps_r(25.0, 1.0))
+    println("   Debye-Huckel A at 25 C         -- expect ~0.5092 (mol/kg)^-0.5")
+    emit("   DH_A ", dh_a(25.0, 1.0))
+    println("   Debye-Huckel B at 25 C         -- expect ~0.3283 1/Angstrom")
+    emit("   DH_B ", dh_b(25.0, 1.0))
+    println("")
+    println("   at 40 C, 1 atm")
+    emit("   rho_0", rho_0(40.0, 1.0))
+    emit("   eps_r", eps_r(40.0, 1.0))
+    emit("   DH_A ", dh_a(40.0, 1.0))
+    emit("   DH_B ", dh_b(40.0, 1.0))
+    println("")
+
+    println("== activity coefficients at 40 C, the ionic strengths measured ==")
+    println("   Ca+2 (a=5, b=0.165), HCO3- (5.4, 0), CO3-2 (5.4, 0), H+ (9, 0)")
+    var i: i64 = 0
+    var mus: [f64; 3] = [0.0; 3]
+    mus[0] = 3.652719222815e-3
+    mus[1] = 8.317060393973e-3
+    mus[2] = 1.936460640262e-2
+    while i < 3 {
+        print("mu = ") emit("", mus[i])
+        emit("   g_Ca  ", gamma_wateq(40.0, 1.0, 2.0, 5.0,  0.165, mus[i]))
+        emit("   g_HCO3", gamma_wateq(40.0, 1.0, 1.0, 5.4,  0.0,   mus[i]))
+        emit("   g_CO3 ", gamma_wateq(40.0, 1.0, 2.0, 5.4,  0.0,   mus[i]))
+        emit("   g_H   ", gamma_wateq(40.0, 1.0, 1.0, 9.0,  0.0,   mus[i]))
+        emit("   g_CO2 ", gamma_wateq(40.0, 1.0, 0.0, 0.0,  0.066, mus[i]))
+        i = i + 1
+    }
+    0
+}

@@ -267,7 +267,8 @@ the wrapper other projects depend on.
 
 ## G9 — A module-level `let` holding a negative f64 is silently wrong
 
-**Status: OPEN. Found by porting a real correlation; it produced a wrong number
+**Status: CLOSED in `lean_single` on `feat/w6-neg-f64-global` (`e2652bbba9`),
+not yet merged. Found by porting a real correlation; it produced a wrong number
 that looked entirely healthy.**
 
 Minimal reproduction, compiled with `gen3.elf` at `origin/main` + the qd128
@@ -290,9 +291,19 @@ a computed expression collapses to `0.0`, and a leading-minus literal keeps the
 magnitude and loses the sign. `var` is correct at module scope, `i64` is correct
 at module scope, and `let` is correct inside a function.
 
+**It is one engine, not the language.** The reproduction above was measured on
+`lean_single` only. Run through Madaros — the default engine — all seven lines
+are correct. Anything this file says about "the compiler" here means
+`self-hosted/compiler/lean_single.sio`; the modular tree never had the defect
+and was not touched by the fix.
+
 Note also that `-1.25` is accepted at all. The language documents that it has no
-unary minus and that one must write `0 - x`; here the rejected form is not
-rejected, it silently yields the positive value.
+unary minus and that one must write `0 - x`. Measured, the documentation is what
+is wrong: unary minus on f64 is correct in a function body on **both** engines,
+in a module-level `var`, and in a module-level `let` of `i64`. Module-scope
+`let f64` was the only place it misbehaved, so the fix makes that case agree
+with every other context rather than rejecting a form the rest of the language
+accepts.
 
 ### How it surfaced
 
@@ -332,6 +343,49 @@ function; none is a module-level `let`. This is stated in the header of each
 `.sio` file that has one. That is a discipline, not a fix — it depends on
 remembering, which is the wrong place to put a correctness argument.
 
-**What would close it**: the compiler either evaluating module-level `let`
-initialisers correctly, or rejecting the forms it cannot evaluate. Either is
-acceptable; silently returning zero is not.
+**The discipline stays until the fix below is in whatever binary the study
+builds with.** A `.sio` file that relies on it is correct under both.
+
+### What closed it
+
+Both halves of "either evaluating them correctly, or rejecting the forms it
+cannot evaluate" — the first for the two forms that have a meaning, the second
+for everything else.
+
+The cause was one representation choice. A module-level `let` becomes a
+compile-time constant, and for f64 the value is rebuilt at each **use site**
+from the literal token's magnitude (`TV`/`TF`/`TD`/`TX`). The token text carries
+no sign, so the negation was recorded into the integer field `CONST_VAL`, which
+that path never reads: the sign was computed and then discarded. `0.0 - 1.25`
+failed differently — the constant folder's entry test does not accept a float
+literal as a first token, so the scanner took the literal path, read `0.0` as
+the whole initializer, and walked away from `- 1.25`.
+
+- `CONST_NEG` carries the sign the token cannot, applied at both use sites with
+  the instruction each backend's own unary-minus path already emits
+  (`btc rax, 63` on x86, `fneg d0, d0` on a64).
+- `0.0 - LITERAL` is recognised as the idiom it is.
+- Any arithmetic still standing after the literal is **refused**. That is the
+  part worth keeping: this block's failure mode was to consume what it
+  understood and drop the rest without a word.
+
+Measured against `gen3.elf` `fe4d49152e4dbb1e5d505db88cb4f175`, built from that
+branch — not through `bin/souc`, whose `lean_single` fallback is the committed
+seed (G8). All seven lines of the reproduction now match Madaros, as do
+scientific notation, `0.0 - 1.5e2`, `-1.5e2`, `0.0` and `-0.001`.
+
+On the ζ constant that surfaced this, `-0.009470244669` as a module-level `let`,
+both spellings now give `-9470244669` × 10⁻¹² — agreeing with the `var` form to
+every printed digit. Against a `gen3.elf` without the change, the same file
+gives `+9470244669` for the leading-minus literal and `0` for `0.0 - x`.
+
+`tests/run-pass/module_let_negative_f64.sio` is the regression test. It passes
+with the fix and **fails**, naming the case, against a `gen3.elf` built without
+it — it compares against literals written inside a function body, the path that
+was never broken, because comparing against module-level constants would have
+compared the defect with itself.
+
+No regression in the corpus: 53 of the first 60 `run-pass` files compile before
+and after, and the same 7 fail on a baseline built from that tree with the
+change stashed — cross-module identifiers and an `[i8;4]` vs `[i64;4]` mismatch,
+neither related.

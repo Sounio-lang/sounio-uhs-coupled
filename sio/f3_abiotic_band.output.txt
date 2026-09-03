@@ -7,8 +7,8 @@ compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
           built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
           -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
           binary named in sio/README.md's own header for this engine.
-model:    sounio-uhs-coupled @ b4c29ae218 (this repo, HEAD at capture time)
-date:     2026-09-03T16:56:55Z
+model:    sounio-uhs-coupled @ 318972987e (this repo, HEAD at capture time)
+date:     2026-09-03T17:11:21Z
 
 F3 -- CAN THE ABIOTIC BAND ALONE EXPLAIN THE FIELD POINT?
 Lobodice is not evaluable (C13), so this turns on Sun Storage.
@@ -62,18 +62,28 @@ Lobodice is not evaluable (C13), so this turns on Sun Storage.
 == the site's OWN abiotic control, which needs no model ==
    Hellerschmied mesocosms M4 and M5: biocide plus 35 kGy gamma,
    so sterile rather than merely gas-swapped.
-      abiotic total-pressure loss, day 10   1.22 % .. 2.20 %
-      biotic, same vessels, same 10 days   10.54 % .. 11.62 %
+      abiotic TOTAL-PRESSURE loss, day 10   1.22 % .. 2.20 %
+      biotic, same vessels, same 10 days    10.54 % .. 11.62 %
+   TOTAL PRESSURE, NOT H2. Supplementary Fig. 9 reports the H2
+   mole-fraction slope as not significantly different from zero
+   (p = 0.352) over six days, and CH4 likewise (p = 0.311), so the
+   abiotic decline is NON-SELECTIVE -- leakage, dissolution or
+   sampling, not an H2-specific reaction. No source in this study
+   gives the H2-specific component of it, nor a detection limit,
+   so this control cannot be turned into a numerical upper bound
+   on abiotic H2 consumption. It is a null without a bound.
    ratio, biotic over abiotic, low   4790909090909e-12
    ratio, biotic over abiotic, high  9524590163934e-12
    Same site, same brine, same cores, same duration; the only
    difference is whether the microbes were alive. Killing them
    removes roughly 5 to 10 times the loss.
 
-   Note this abiotic control loses 1.22-2.20 %, which is close to
-   the under-2 % that dissolution alone predicts at Sg = 50 %.
-   The sterile control is consistent with dissolution and little
-   else -- channels (b), (c) and (d) are not visibly present in it.
+   The control's 1.22-2.20 % sits near the under-2 % dissolution
+   alone predicts at Sg = 50 %, but the two are not like for like
+   -- one is total pressure, the other is H2 -- so that agreement
+   is suggestive and is NOT evidence that channels (b), (c) and
+   (d) are absent. It is consistent with their being small; it
+   does not measure them.
 
 == channels (b), (c), (d): REFUSED ==
    (b) abiotic mineral redox  -- no measured rate in this study
@@ -87,14 +97,22 @@ Lobodice is not evaluable (C13), so this turns on Sun Storage.
    here, and asserting an unmeasured null is the same error as
    inventing a number, with the sign reversed.
 
-== F3 verdict, on what IS measured ==
-   At the gas saturation this study uses throughout (Sg = 50 %),
-   the one abiotic channel that can be computed exactly accounts
-   for under 2 % H2 loss, against roughly 16 % observed. It does
-   NOT encompass the field point.
+== F3 verdict, CORRECTED -- see sio/field_mass_balance.sio ==
+   The comparison this module originally made, under 2 % against
+   roughly 16 % observed, was WRONG. Most of the 15.6 % not
+   recovered was never consumed: about half migrated into cushion
+   gas and remains in the reservoir. Decomposing the field balance
+   with the paper's own numbers gives physical routes 11.0 % of
+   injected H2 and biotic about 3.3 %, a ratio near 3.4 to 1.
 
-   The site's own sterile control agrees: abiotic loss is 1.22 to
-   2.20 %, and killing the microbes removes 5 to 10 times the loss.
+   So the abiotic channels explain roughly 70 % of the shortfall,
+   not the small fraction implied above. F3 still does not fire,
+   because they do not explain all of it and the residual is
+   corroborated by the CO2 balance and by measured methanogen
+   growth -- but the margin is narrow, not large.
+
+   The site's sterile control points the same way: killing the
+   microbes removes 5 to 10 times the total-pressure loss.
 
    F3 DOES NOT FIRE. The abiotic band does not encompass the field
    point, so the coupling is NOT superfluous on this evidence.

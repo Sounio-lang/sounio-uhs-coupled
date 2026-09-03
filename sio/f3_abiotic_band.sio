@@ -1,5 +1,19 @@
 // F3 -- does the ABIOTIC band alone encompass the field points?
 //
+// PARTLY SUPERSEDED BY sio/field_mass_balance.sio. Two statements below were
+// wrong and are corrected there and inline here:
+//   * the comparison "under 2 % against roughly 16 % observed" was WRONG. Most
+//     of the 15.6 % not recovered was never consumed -- about half migrated
+//     into cushion gas and is still in the reservoir. The biotic loss the
+//     chemistry has to explain is about 3 %, not 16 %, so the margin this
+//     module originally claimed was badly overstated.
+//   * the sterile control's 1.22-2.20 % is TOTAL PRESSURE, not H2. The paper's
+//     Supplementary Fig. 9 reports the H2 mole-fraction slope as not
+//     significantly different from zero (p = 0.352) over six days, so the
+//     abiotic pressure decline is non-selective and is not H2-specific.
+// The F3 verdict is unchanged -- it still does not fire -- but by a far
+// narrower margin than this module first reported.
+//
 // F3 as pre-registered: if the abiotic band alone encompasses both field
 // points, the coupling is unnecessary and H1 is superfluous. Lobodice is not
 // evaluable (CORRECTIONS.md C13), so F3, like F2, turns on Sun Storage alone.
@@ -168,18 +182,28 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     println("== the site's OWN abiotic control, which needs no model ==")
     println("   Hellerschmied mesocosms M4 and M5: biocide plus 35 kGy gamma,")
     println("   so sterile rather than merely gas-swapped.")
-    println("      abiotic total-pressure loss, day 10   1.22 % .. 2.20 %")
-    println("      biotic, same vessels, same 10 days   10.54 % .. 11.62 %")
+    println("      abiotic TOTAL-PRESSURE loss, day 10   1.22 % .. 2.20 %")
+    println("      biotic, same vessels, same 10 days    10.54 % .. 11.62 %")
+    println("   TOTAL PRESSURE, NOT H2. Supplementary Fig. 9 reports the H2")
+    println("   mole-fraction slope as not significantly different from zero")
+    println("   (p = 0.352) over six days, and CH4 likewise (p = 0.311), so the")
+    println("   abiotic decline is NON-SELECTIVE -- leakage, dissolution or")
+    println("   sampling, not an H2-specific reaction. No source in this study")
+    println("   gives the H2-specific component of it, nor a detection limit,")
+    println("   so this control cannot be turned into a numerical upper bound")
+    println("   on abiotic H2 consumption. It is a null without a bound.")
     print("   ratio, biotic over abiotic, low  ") emit("", 10.54 / 2.20)
     print("   ratio, biotic over abiotic, high ") emit("", 11.62 / 1.22)
     println("   Same site, same brine, same cores, same duration; the only")
     println("   difference is whether the microbes were alive. Killing them")
     println("   removes roughly 5 to 10 times the loss.")
     println("")
-    println("   Note this abiotic control loses 1.22-2.20 %, which is close to")
-    println("   the under-2 % that dissolution alone predicts at Sg = 50 %.")
-    println("   The sterile control is consistent with dissolution and little")
-    println("   else -- channels (b), (c) and (d) are not visibly present in it.")
+    println("   The control's 1.22-2.20 % sits near the under-2 % dissolution")
+    println("   alone predicts at Sg = 50 %, but the two are not like for like")
+    println("   -- one is total pressure, the other is H2 -- so that agreement")
+    println("   is suggestive and is NOT evidence that channels (b), (c) and")
+    println("   (d) are absent. It is consistent with their being small; it")
+    println("   does not measure them.")
     println("")
 
     println("== channels (b), (c), (d): REFUSED ==")
@@ -195,14 +219,22 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     println("   inventing a number, with the sign reversed.")
     println("")
 
-    println("== F3 verdict, on what IS measured ==")
-    println("   At the gas saturation this study uses throughout (Sg = 50 %),")
-    println("   the one abiotic channel that can be computed exactly accounts")
-    println("   for under 2 % H2 loss, against roughly 16 % observed. It does")
-    println("   NOT encompass the field point.")
+    println("== F3 verdict, CORRECTED -- see sio/field_mass_balance.sio ==")
+    println("   The comparison this module originally made, under 2 % against")
+    println("   roughly 16 % observed, was WRONG. Most of the 15.6 % not")
+    println("   recovered was never consumed: about half migrated into cushion")
+    println("   gas and remains in the reservoir. Decomposing the field balance")
+    println("   with the paper's own numbers gives physical routes 11.0 % of")
+    println("   injected H2 and biotic about 3.3 %, a ratio near 3.4 to 1.")
     println("")
-    println("   The site's own sterile control agrees: abiotic loss is 1.22 to")
-    println("   2.20 %, and killing the microbes removes 5 to 10 times the loss.")
+    println("   So the abiotic channels explain roughly 70 % of the shortfall,")
+    println("   not the small fraction implied above. F3 still does not fire,")
+    println("   because they do not explain all of it and the residual is")
+    println("   corroborated by the CO2 balance and by measured methanogen")
+    println("   growth -- but the margin is narrow, not large.")
+    println("")
+    println("   The site's sterile control points the same way: killing the")
+    println("   microbes removes 5 to 10 times the total-pressure loss.")
     println("")
     println("   F3 DOES NOT FIRE. The abiotic band does not encompass the field")
     println("   point, so the coupling is NOT superfluous on this evidence.")

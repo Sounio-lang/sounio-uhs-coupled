@@ -1,0 +1,100 @@
+Raw stdout of sio/field_mass_balance.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf field_mass_balance.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 318972987e (this repo, HEAD at capture time)
+date:     2026-09-03T17:11:21Z
+
+SUN STORAGE FIELD MASS BALANCE
+Corrects this study's own F3 framing: most of the unrecovered H2
+was never consumed, so it is not a loss the chemistry must explain.
+
+== the hydrogen that was not recovered ==
+   injected  (Suppl. Table 2, Sm3)  1181960000000e-7
+   injected  (abstract, m3, C4)     1193530000000e-7
+   produced  (Sm3)                  9975399999999e-8
+   NOT RECOVERED (Sm3)              1844200000000e-8
+   as a fraction of injected        1560289688314e-13
+
+== decomposition, from the paper's own numbers ==
+   cushion-gas migration (m3)   9309999999999e-9
+      share of unrecovered      5048259407873e-13
+      PHYSICAL, and still in the reservoir -- not consumed
+   dissolution, upper bound     3692000000000e-9
+      share of unrecovered      2001952065936e-13
+      PHYSICAL
+   methanation, 4 x CO2 diff    3842000000000e-9
+      share of unrecovered      2083288146621e-13
+      BIOTIC -- but see the dissolution test below
+   sum of the three (m3)        1684400000000e-8
+      share of unrecovered      9133499620431e-13
+   residual, unexplained (m3)   1598000000000e-9
+
+== the split that matters for F3 ==
+   PHYSICAL, as a fraction of INJECTED H2  1100037226302e-13
+   BIOTIC,   as a fraction of INJECTED H2  3250533012961e-14
+   physical over biotic                    3384174908901e-12
+   So the biotic loss to be explained is about 3 %, NOT the 15.6 %
+   this study previously compared its abiotic channels against.
+
+== is the CO2 decrease actually methanation? A dissolution test ==
+   CO2 is far more soluble than H2, and the paper states its own
+   brine volume, so this can be checked rather than assumed.
+   KH_CO2 at 40 C (molal/atm)  2371090658915e-14
+   P_CO2 (atm)                 1462619886000e-13
+   dissolved CO2 (molal)       3468004349239e-15
+   CO2 the stated brine can hold (mol)  1387201739695e-7
+      as Sm3, at 0 C 1 atm     3109273979354e-9
+      as Sm3, ISO 13443 15 C   3280038513510e-9
+   observed CO2 decrease (m3)  9605000000000e-10
+   capacity over observed, low   3237141050863e-12
+   capacity over observed, high  3414928176481e-12
+
+   The brine can hold three times the CO2 that disappeared. The
+   CO2 mass-balance residual therefore CANNOT be assigned to
+   methanation without first excluding dissolution, and the paper
+   does not exclude it. The biotic share above is an UPPER BOUND,
+   and the true biotic loss may be far smaller.
+
+== the carbon-limited cap, from the FIELD'S OWN gas volumes ==
+   If every injected CO2 molecule were methanated and no mineral
+   resupplied carbon, the most H2 that could be consumed is
+   4 x CO2_injected.
+   cap, as a fraction of injected H2  7776236082439e-14
+   this study's model asymptote, 4*y_CO2/y_H2  7684529828109e-14
+   agreement between the two routes  1179314174080e-14
+   Two independent routes to the same bound -- measured gas volumes
+   on one side, reported mole fractions on the other -- agreeing to
+   about 1 %. The extent limit is not an artefact of the model.
+
+   CO2 actually consumed, as a fraction of injected CO2  4180085298981e-13
+   H2 methanated, as a fraction of the cap              4180085298981e-13
+   THE FIELD STAYED BELOW ITS CARBON-LIMITED CAP. Nothing in the
+   observation requires carbon to have been resupplied by calcite,
+   which is the same conclusion the model reached from its own
+   sweep, now on the field's measured volumes instead.
+
+== a further arithmetic discrepancy, reported not repaired ==
+   paper: cushion gas is 40 % of the unaccounted H2
+   computed from Suppl. Table 2  5048259407873e-13
+   computed from the abstract    4750242359304e-13
+   unaccounted implied if 40 % were right (m3)  2327499999999e-8
+   Neither volume basis yields 40 %. This joins C3 and C4 as a
+   third arithmetic inconsistency in the same mass balance.
+
+== revised F3 reading ==
+   abiotic/physical explains, of the unrecovered H2  7050211473809e-13
+   F3 asks whether the ABIOTIC band ALONE encompasses the field
+   point. It explains most of the shortfall but not all of it, and
+   the residual is corroborated independently by the CO2 balance
+   and by methanogen growth measured at the site.
+
+   F3 STILL DOES NOT FIRE -- but by a much narrower margin than
+   this study first reported, and the earlier margin was overstated
+   because it compared one abiotic channel against a shortfall that
+   is mostly migration. Corrected here.

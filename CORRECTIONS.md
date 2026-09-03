@@ -442,3 +442,73 @@ stoichiometric CO₂, so calcite changes almost nothing there whatever the data
 say. 37 % H₂ is a value *both* model branches pass through on the way down. Even
 a clean Lobodice dataset could not have separated H1a; the site is CO₂-rich,
 which is exactly where the mechanism is inert.
+
+## C14 — A third arithmetic inconsistency in the same Sun Storage mass balance
+
+C3 recorded that 84.3 % recovery does not reproduce from the reported volumes,
+and C4 that 118,196 Sm³ (Suppl. Table 2) and 119,353 m³ (abstract) are
+unreconciled. A third now joins them, found by `sio/field_mass_balance.sio`.
+
+The paper states:
+
+> *"we estimated that **9,310 m³** of H₂ remained in the cushion gas,
+> corresponding to **40%** of the unaccounted H₂."*
+
+| basis | unaccounted H₂ | 9,310 m³ as a share |
+|---|---|---|
+| Suppl. Table 2 (118,196 − 99,754) | 18,442 Sm³ | **50.5 %** |
+| abstract (119,353 − 99,754) | 19,599 m³ | **47.5 %** |
+| what 40 % would require | **23,275 m³** | — |
+
+**Neither volume basis yields 40 %**, and the figure 40 % would need an
+unaccounted volume larger than either. All three of C3, C4 and C14 sit in the
+same mass balance, and none is individually large — but the study's single
+surviving field constraint rests on it, so each is carried rather than smoothed.
+
+Reported, not repaired: the paper does not show this arithmetic, so the
+intended basis cannot be recovered from what is published.
+
+---
+
+## C15 — The field CO₂ decrease is not established as methanation
+
+`sio/field_mass_balance.sio` uses the CO₂ balance (Suppl. Table 5, difference
+960.5 m³) to bound the biotic share of the hydrogen loss, because CO₂ + 4 H₂ →
+CH₄ + 2 H₂O ties the two together. That step needs the CO₂ to have *reacted*.
+**It is not shown to have.**
+
+CO₂ is far more soluble than H₂, and the paper supplies its own brine estimate,
+so this is checkable rather than a matter of opinion. At the paper's own
+reservoir conditions — 78 bar, 40 °C, P(CO₂) = 0.19 % → 0.1463 atm — and its own
+stated **40,000 m³** brine volume, with the Henry constant taken from the pinned
+`phreeqc.dat`:
+
+| | |
+|---|---|
+| dissolved CO₂ at equilibrium | 3.468e-03 molal |
+| CO₂ the stated brine can hold | 1.387e+05 mol |
+| as Sm³, 0 °C 1 atm / ISO 13443 15 °C | **3,109 / 3,280 Sm³** |
+| observed CO₂ decrease | **960.5 m³** |
+| **capacity ÷ observed** | **3.2× to 3.4×** |
+
+**The brine can hold roughly three times the CO₂ that disappeared.** Dissolution
+alone is therefore sufficient to account for the entire CO₂ decrease, and the
+paper does not exclude it.
+
+**Consequence.** The biotic hydrogen loss derived from this balance — 3,842 m³,
+about 3.3 % of injected H₂ — is an **upper bound**, not an estimate. The true
+biotic share may be substantially smaller, and could in principle be near zero
+on this evidence alone. It is not zero on *all* evidence: methanogen growth and
+a microbial isotopic signature for the methane are reported at the site. But the
+*magnitude* is bounded above and not pinned.
+
+This cuts toward F3 rather than away from it: a smaller biotic share means the
+abiotic channels explain even more of the shortfall than the 70 % computed, and
+the F3 margin is narrower still. The verdict does not change — abiotic alone
+does not account for everything — but the confidence attached to it should be
+lower than the arithmetic alone suggests.
+
+A second convention gap is carried alongside: **the paper never defines its
+standard cubic metre.** 0 °C and 1 atm gives 22.414 L/mol, ISO 13443 at 15 °C
+gives 23.645 — a 5.5 % difference on every volume-to-mole conversion. Both are
+reported above rather than one being chosen.

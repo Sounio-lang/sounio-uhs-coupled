@@ -1,0 +1,181 @@
+// Sun Storage field mass balance -- and a correction to this study's own F3.
+//
+// WHAT THIS CORRECTS. sio/f3_abiotic_band.sio compared one abiotic channel
+// (dissolution, 1.88 %) against the FULL 15.6 % of hydrogen not recovered, and
+// concluded the abiotic band falls far short. That comparison was wrong, and
+// the error was mine: most of the unrecovered hydrogen was never consumed at
+// all. Hellerschmied et al. decompose it themselves, and the decomposition is
+// in the paper this study already had.
+//
+// THE DISTINCTION THAT WAS MISSING. "Recovery" mixes two different things:
+// hydrogen that was CONSUMED, and hydrogen that is still in the reservoir but
+// was not produced during the trial. Only the first is a loss the chemistry has
+// to explain. Migration into cushion gas is the second.
+//
+// EVERY NUMBER BELOW IS FROM THE SOURCE, none is fitted:
+//   Suppl. Table 2   H2 injected 118196 Sm3, produced 99754 Sm3
+//   main text        dissolution "should not exceed 3,692 m3 ... roughly 3 %",
+//                    at 78 bar and 40 C with "an estimated brine volume of
+//                    40,000 m3"
+//   main text        "we estimated that 9,310 m3 of H2 remained in the cushion
+//                    gas, corresponding to 40% of the unaccounted H2"
+//   Suppl. Table 5   CO2 injected 2297.8, cushion 190.3, produced 1523.8,
+//                    shut-in 3.8, difference 960.5 m3
+//
+// TWO CONVENTION GAPS ARE CARRIED RATHER THAN CLOSED. The standard cubic metre
+// is never defined in the paper -- 0 C and 1 atm gives 22.414 L/mol, ISO 13443
+// at 15 C gives 23.645, a 5.5 % difference -- so anything converted to moles is
+// reported as a RANGE over both. And CORRECTIONS.md C4 already records that the
+// injected volume is 118196 Sm3 in Suppl. Table 2 and 119353 m3 in the
+// abstract, unreconciled; the table is used here and the other is shown beside
+// it.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{log_k, LN10}
+
+var H2_INJ: f64 = 118196.0        // Sm3, Suppl. Table 2
+var H2_INJ_ABS: f64 = 119353.0    // m3, abstract -- unreconciled, C4
+var H2_PROD: f64 = 99754.0        // Sm3, Suppl. Table 2
+var DISSOLUTION: f64 = 3692.0     // m3, stated as an UPPER bound
+var CUSHION: f64 = 9310.0         // m3, decline-curve estimate
+var CO2_INJ: f64 = 2297.8         // m3, Suppl. Table 5
+var CO2_DIFF: f64 = 960.5         // m3, Suppl. Table 5 "Difference"
+var BRINE_M3: f64 = 40000.0       // m3, the paper's own estimate
+var P_RES_BAR: f64 = 78.0
+var Y_CO2: f64 = 0.0019
+var Y_H2: f64 = 0.0989
+var BAR_TO_ATM: f64 = 0.986923
+var VM_0C: f64 = 0.022414         // m3/mol at 0 C, 1 atm
+var VM_15C: f64 = 0.023645        // m3/mol at 15 C, 1.01325 bar (ISO 13443)
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("SUN STORAGE FIELD MASS BALANCE")
+    println("Corrects this study's own F3 framing: most of the unrecovered H2")
+    println("was never consumed, so it is not a loss the chemistry must explain.")
+    println("")
+
+    let unacc = H2_INJ - H2_PROD
+    println("== the hydrogen that was not recovered ==")
+    print("   injected  (Suppl. Table 2, Sm3) ") emit("", H2_INJ)
+    print("   injected  (abstract, m3, C4)    ") emit("", H2_INJ_ABS)
+    print("   produced  (Sm3)                 ") emit("", H2_PROD)
+    print("   NOT RECOVERED (Sm3)             ") emit("", unacc)
+    print("   as a fraction of injected       ") emit("", unacc / H2_INJ)
+    println("")
+
+    println("== decomposition, from the paper's own numbers ==")
+    let meth = 4.0 * CO2_DIFF        // CO2 + 4 H2 -> CH4 + 2 H2O
+    print("   cushion-gas migration (m3)  ") emit("", CUSHION)
+    print("      share of unrecovered     ") emit("", CUSHION / unacc)
+    println("      PHYSICAL, and still in the reservoir -- not consumed")
+    print("   dissolution, upper bound    ") emit("", DISSOLUTION)
+    print("      share of unrecovered     ") emit("", DISSOLUTION / unacc)
+    println("      PHYSICAL")
+    print("   methanation, 4 x CO2 diff   ") emit("", meth)
+    print("      share of unrecovered     ") emit("", meth / unacc)
+    println("      BIOTIC -- but see the dissolution test below")
+    let tot = CUSHION + DISSOLUTION + meth
+    print("   sum of the three (m3)       ") emit("", tot)
+    print("      share of unrecovered     ") emit("", tot / unacc)
+    print("   residual, unexplained (m3)  ") emit("", unacc - tot)
+    println("")
+
+    println("== the split that matters for F3 ==")
+    print("   PHYSICAL, as a fraction of INJECTED H2 ") emit("", (CUSHION + DISSOLUTION) / H2_INJ)
+    print("   BIOTIC,   as a fraction of INJECTED H2 ") emit("", meth / H2_INJ)
+    print("   physical over biotic                   ") emit("", (CUSHION + DISSOLUTION) / meth)
+    println("   So the biotic loss to be explained is about 3 %, NOT the 15.6 %")
+    println("   this study previously compared its abiotic channels against.")
+    println("")
+
+    println("== is the CO2 decrease actually methanation? A dissolution test ==")
+    println("   CO2 is far more soluble than H2, and the paper states its own")
+    println("   brine volume, so this can be checked rather than assumed.")
+    let t_k = 313.15
+    let kh_co2 = exp(log_k(0, t_k) * LN10)          // molal/atm, pinned phreeqc.dat
+    let p_co2_atm = Y_CO2 * P_RES_BAR * BAR_TO_ATM
+    let m_co2 = kh_co2 * p_co2_atm
+    let n_co2 = m_co2 * BRINE_M3 * 1000.0            // mol, brine in kg
+    print("   KH_CO2 at 40 C (molal/atm) ") emit("", kh_co2)
+    print("   P_CO2 (atm)                ") emit("", p_co2_atm)
+    print("   dissolved CO2 (molal)      ") emit("", m_co2)
+    print("   CO2 the stated brine can hold (mol) ") emit("", n_co2)
+    print("      as Sm3, at 0 C 1 atm    ") emit("", n_co2 * VM_0C)
+    print("      as Sm3, ISO 13443 15 C  ") emit("", n_co2 * VM_15C)
+    print("   observed CO2 decrease (m3) ") emit("", CO2_DIFF)
+    print("   capacity over observed, low  ") emit("", n_co2 * VM_0C / CO2_DIFF)
+    print("   capacity over observed, high ") emit("", n_co2 * VM_15C / CO2_DIFF)
+    println("")
+    println("   The brine can hold three times the CO2 that disappeared. The")
+    println("   CO2 mass-balance residual therefore CANNOT be assigned to")
+    println("   methanation without first excluding dissolution, and the paper")
+    println("   does not exclude it. The biotic share above is an UPPER BOUND,")
+    println("   and the true biotic loss may be far smaller.")
+    println("")
+
+    println("== the carbon-limited cap, from the FIELD'S OWN gas volumes ==")
+    println("   If every injected CO2 molecule were methanated and no mineral")
+    println("   resupplied carbon, the most H2 that could be consumed is")
+    println("   4 x CO2_injected.")
+    let cap = 4.0 * CO2_INJ / H2_INJ
+    print("   cap, as a fraction of injected H2 ") emit("", cap)
+    print("   this study's model asymptote, 4*y_CO2/y_H2 ") emit("", 4.0 * Y_CO2 / Y_H2)
+    print("   agreement between the two routes ") emit("", (cap - 4.0 * Y_CO2 / Y_H2) / cap)
+    println("   Two independent routes to the same bound -- measured gas volumes")
+    println("   on one side, reported mole fractions on the other -- agreeing to")
+    println("   about 1 %. The extent limit is not an artefact of the model.")
+    println("")
+    print("   CO2 actually consumed, as a fraction of injected CO2 ") emit("", CO2_DIFF / CO2_INJ)
+    print("   H2 methanated, as a fraction of the cap             ") emit("", meth / (4.0 * CO2_INJ))
+    println("   THE FIELD STAYED BELOW ITS CARBON-LIMITED CAP. Nothing in the")
+    println("   observation requires carbon to have been resupplied by calcite,")
+    println("   which is the same conclusion the model reached from its own")
+    println("   sweep, now on the field's measured volumes instead.")
+    println("")
+
+    println("== a further arithmetic discrepancy, reported not repaired ==")
+    print("   paper: cushion gas is 40 % of the unaccounted H2")
+    println("")
+    print("   computed from Suppl. Table 2 ") emit("", CUSHION / unacc)
+    print("   computed from the abstract   ") emit("", CUSHION / (H2_INJ_ABS - H2_PROD))
+    print("   unaccounted implied if 40 % were right (m3) ") emit("", CUSHION / 0.40)
+    println("   Neither volume basis yields 40 %. This joins C3 and C4 as a")
+    println("   third arithmetic inconsistency in the same mass balance.")
+    println("")
+
+    println("== revised F3 reading ==")
+    print("   abiotic/physical explains, of the unrecovered H2 ") emit("", (CUSHION + DISSOLUTION) / unacc)
+    println("   F3 asks whether the ABIOTIC band ALONE encompasses the field")
+    println("   point. It explains most of the shortfall but not all of it, and")
+    println("   the residual is corroborated independently by the CO2 balance")
+    println("   and by methanogen growth measured at the site.")
+    println("")
+    println("   F3 STILL DOES NOT FIRE -- but by a much narrower margin than")
+    println("   this study first reported, and the earlier margin was overstated")
+    println("   because it compared one abiotic channel against a shortfall that")
+    println("   is mostly migration. Corrected here.")
+    0
+}

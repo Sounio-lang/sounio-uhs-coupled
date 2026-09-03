@@ -1,0 +1,118 @@
+Raw stdout of sio/coupled_finite.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf coupled_finite.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 8009dda722 (this repo, HEAD at capture time)
+date:     2026-09-03T16:36:59Z
+
+FINITE-HORIZON INTEGRATION of the gas-phase coupled model
+
+== the growth rates the two available sources imply ==
+   USGS archive  mu (1/s)       3599999999999e-23
+   USGS doubling time (yr)      6101252423786e-10
+   Strobel SP2  mu_max (1/s)    1000000000000e-17
+   Strobel doubling time (h)    1925408834888e-11
+   RATIO Strobel / USGS         2777777777777e-7
+   A geological process and a batch-reactor process, five orders
+   of magnitude apart, both cited for 'microbial H2 loss in UHS'.
+
+== Strobel's washout threshold (his decay term, which USGS lacks) ==
+   b / mu_max, the Monod product needed to survive  3000000000000e-14
+   With the H2 term near 1, the CO2 term must exceed that, so
+   dissolved CO2 must stay above (molal)  3402061855670e-19
+   Below that, methanogens DIE OFF rather than merely slowing.
+   This is where the CO2 half-saturation constant finally matters:
+   not for rate at high CO2 (0.055 %, PHASE4_GATE.md sec 3) but for
+   SURVIVAL near exhaustion -- exactly what calcite would prevent.
+
+== FIELD condition, 9.89 % H2 / 0.19 % CO2, 78 bar, V_gas = 1 L/kg ==
+   archive kinetics, cold-start biomass 1e-6 mg/kg
+   285 d (Sun Storage duration)
+      H2 initial (molal)      3019553411335e-13
+      consumed WITH calcite   7001898743255e-24
+      consumed WITHOUT        7001898743255e-24
+      H2 recovery WITH    (%)  9999999999768e-11
+      H2 recovery WITHOUT (%)  9999999999768e-11
+      F1 ratio at this horizon  1000000000000e-12
+
+   100 yr
+      H2 initial (molal)      3019553411335e-13
+      consumed WITH calcite   1141336093315e-21
+      consumed WITHOUT        1141336093315e-21
+      H2 recovery WITH    (%)  9999999962201e-11
+      H2 recovery WITHOUT (%)  9999999962201e-11
+      F1 ratio at this horizon  1000000000000e-12
+
+   1000 yr
+      H2 initial (molal)      3019553411335e-13
+      consumed WITH calcite   6244864144458e-19
+      consumed WITHOUT        6244864144458e-19
+      H2 recovery WITH    (%)  9999979318583e-11
+      H2 recovery WITHOUT (%)  9999979318583e-11
+      F1 ratio at this horizon  1000000000000e-12
+
+   12700 yr
+      H2 initial (molal)      3019553411335e-13
+      consumed WITH calcite   3889045638413e-14
+      consumed WITHOUT        3889045638413e-14
+      H2 recovery WITH    (%)  8712046084757e-11
+      H2 recovery WITHOUT (%)  8712046084757e-11
+      F1 ratio at this horizon  1000000000000e-12
+
+== FIELD, biomass 1e-4 mg/kg (archive's own upper sensitivity bound) ==
+   285 d
+      H2 initial (molal)      3019553411335e-13
+      consumed WITH calcite   7001898742945e-22
+      consumed WITHOUT        7001898742945e-22
+      H2 recovery WITH    (%)  9999999976811e-11
+      H2 recovery WITHOUT (%)  9999999976811e-11
+      F1 ratio at this horizon  1000000000000e-12
+
+   12700 yr
+      H2 initial (molal)      3019553411335e-13
+      consumed WITH calcite   3019553411335e-13
+      consumed WITHOUT        6988478585211e-14
+      H2 recovery WITH    (%)  -1265654248072e-24
+      H2 recovery WITHOUT (%)  7685591995499e-11
+      F1 ratio at this horizon  4320759339128e-12
+
+== MESOCOSM condition, for contrast, 12700 yr ==
+   12700 yr
+      H2 initial (molal)      1565711758230e-13
+      consumed WITH calcite   3880447088945e-14
+      consumed WITHOUT        3880447088945e-14
+      H2 recovery WITH    (%)  7521608259919e-11
+      H2 recovery WITHOUT (%)  7521608259919e-11
+      F1 ratio at this horizon  1000000000000e-12
+
+== the recovery CAP, field condition, swept over gas volume ==
+   No kinetics can push loss past the no-calcite cap: carbon runs out.
+   The with-calcite branch has no cap at all.
+   V_gas =  1000000000000e-13
+      max H2 loss WITHOUT calcite (%)  1000000000000e-10
+      min recovery WITHOUT calcite (%)  0
+      min recovery WITH calcite (%)  0   (all H2 goes, given time)
+   V_gas =  1000000000000e-12
+      max H2 loss WITHOUT calcite (%)  2314394806990e-11
+      min recovery WITHOUT calcite (%)  7685605193009e-11
+      min recovery WITH calcite (%)  0   (all H2 goes, given time)
+   V_gas =  1000000000000e-11
+      max H2 loss WITHOUT calcite (%)  9257067020344e-12
+      min recovery WITHOUT calcite (%)  9074293297965e-11
+      min recovery WITH calcite (%)  0   (all H2 goes, given time)
+   V_gas =  1000000000000e-10
+      max H2 loss WITHOUT calcite (%)  7842054542508e-12
+      min recovery WITHOUT calcite (%)  9215794545749e-11
+      min recovery WITH calcite (%)  0   (all H2 goes, given time)
+
+== F2 reference points, NOT yet a verdict ==
+   Sun Storage reports 84.3 % H2 recovery at 285 d (see CORRECTIONS
+   C3: 99754/118196 = 84.397 %, and the volume basis is unreconciled).
+   The no-calcite branch carries a HARD STOICHIOMETRIC CAP on loss
+   that no kinetics can exceed; the with-calcite branch has none.
+   Compare the caps against the observation above.

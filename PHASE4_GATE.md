@@ -504,3 +504,124 @@ absent from the source and is still not carried.
 3. **F2 is untested.** Whether this model's band encompasses the 84.3 %
    recovery at Sun Storage and the 54 %→37 % drop at Lobodice is a separate
    criterion, and nothing here should be read as bearing on it.
+
+---
+
+## Finite-horizon integration, 2026-09-03: the kinetics decide, and the two available sources disagree by 2.8e5
+
+`sio/coupled_gasphase.sio` gave the extent bound — exact, stoichiometric,
+infinite-horizon. `sio/coupled_finite.sio` asks whether a real storage reaches
+it inside a storage horizon. The answer turns on a choice of kinetic source,
+and that choice matters far more than any chemistry in this study.
+
+### The two sources are not describing the same process
+
+| source | growth rate | doubling time | what it is |
+|---|---|---|---|
+| USGS Aux Vases archive | µ = yield × k = 3.60e-11 /s | **610 years** | geological, 12 700-yr reservoir model |
+| Strobel et al. 2023, sp. 2 (37 °C) | µmax = 1.0e-5 /s | **19.25 hours** | engineered methanation, batch reactor |
+
+**Ratio: 2.78e5.** Both are cited in this literature for "microbial H2 loss in
+underground storage." Neither is wrong. They are not the same process, and
+substituting one for the other changes a finite-horizon prediction by five
+orders of magnitude — more than every parameter uncertainty quantified
+elsewhere in this study combined.
+
+### With the archive's kinetics, nothing happens at operational timescales
+
+Field condition, V_gas = 1 L/kg, cold-start biomass, archive parameters:
+
+| horizon | H2 recovery |
+|---|---|
+| 285 d | 99.999999998 % |
+| 100 yr | 99.9999996 % |
+| 1 000 yr | 99.99979 % |
+| 12 700 yr | 87.12 % |
+
+To match the observed Sun Storage loss of 15.7 % at 285 days, this parameter
+set is short by roughly **ten orders of magnitude**. This is worth stating
+plainly: **the only fully self-consistent microbial kinetic parameter set
+available to this study cannot reproduce a field observation at operational
+timescales.** It was built for, and validated against, a 12 700-year model.
+
+The integration uses the archive's set rather than Strobel's because Strobel
+states biomass in *cells* and yield in cells/mol; converting to this study's
+mg/kg and molal requires a mass per cell that Strobel does not supply, and
+inventing one is barred. Strobel therefore enters only through two unit-free
+quantities: the growth-rate ratio above, and the washout threshold below.
+
+### The integrator reproduces the analytic extent bound
+
+At 1e-4 mg/kg biomass (the archive's own upper sensitivity bound) over
+12 700 yr, the field condition reaches its bound and gives **F1 = 4.320759**,
+against the analytic extent bound's **4.320784** — agreement to 6e-6 relative,
+consistent with Euler truncation. The bound is confirmed by an independent
+route, not merely restated.
+
+But at cold-start biomass, even 12 700 years is not enough to get there:
+3.889e-2 molal consumed against a no-calcite cap of 6.99e-2, so carbon never
+becomes limiting and **F1 = 1.000 at every horizon**. H1a's mechanism is real
+and large, and it is *not always reached*. Whether it operates is a question
+about biomass and time, not only about chemistry.
+
+### Strobel's decay term adds a washout threshold the archive lacks
+
+Strobel gives a decay coefficient b = 3e-7 /s; the archived scripts give none.
+With decay, a population sustains itself only while
+
+    µmax · MonodH2 · MonodCO2 > b   →   Monod product > b/µmax = 0.030
+
+With the H2 term near 1, that requires dissolved CO2 above **3.40e-7 molal**.
+Below it methanogens **die off** rather than merely slowing.
+
+This is the one place the CO2 half-saturation constant finally matters. Section
+3 above measured it as worth 0.055 % on *rate* at high CO2, and that stands.
+Near exhaustion it decides *survival* — and sustaining CO2 above that floor is
+exactly what calcite resupply would do. The structural role of calcite in H1a
+is therefore sharper than a carbon budget: it is the difference between a
+throttled population and a dead one.
+
+### F2 becomes checkable — and the answer cuts against H1a at this site
+
+The no-calcite branch carries a **hard cap** on H2 loss that no kinetics can
+exceed, because carbon runs out. The with-calcite branch has **no cap**: given
+time, all H2 goes. Field condition, swept over gas volume:
+
+| V_gas (L/kg) | max loss, no calcite | **min recovery, no calcite** | min recovery, with calcite |
+|---|---|---|---|
+| 0.1 | 100 % | 0 % | 0 % |
+| 1.0 | 23.14 % | **76.86 %** | 0 % |
+| 10 | 9.26 % | **90.74 %** | 0 % |
+| 100 | 7.84 % | **92.16 %** | 0 % |
+
+**The observed 84.3 % recovery falls inside the no-calcite branch's reachable
+range**, between V_gas = 1 and 10 L/kg — both physically ordinary gas
+saturations. Nothing was tuned to put it there; the sweep was fixed before the
+comparison, and V_gas remains a declared swept input.
+
+For the with-calcite branch, the bound is 0 % recovery at every gas volume, so
+reproducing 84.3 % requires kinetics stopped at exactly 15.7 % of completion —
+possible, but it is a coincidence the no-calcite branch does not need.
+
+**So: H1a's mechanism is real and large in extent (F1 = 4.3 to 13), but the Sun
+Storage observation does not require it.** The field number sits comfortably
+where carbon limitation *without* mineral resupply puts it. That is evidence
+about this site, not about the mechanism's existence — and it is the opposite
+of what H1a would have predicted for it.
+
+### Not claimed
+
+1. **F2 is not decided.** It requires *both* field points, and the Lobodice
+   54 %→37 % composition change is not computed here — it is a change in gas
+   composition under a shrinking mole count (4 H2 + CO2 → CH4), not a recovery
+   fraction, and needs its own treatment.
+2. **The carbon gas/aqueous partition is linearised** at its initial DIC/P_CO2
+   ratio rather than re-solving the carbonate closure each step, which would
+   cost ~1e9 speciation calls per run. The linearisation makes carbon look
+   slightly *more* available than it is near exhaustion, so it is conservative
+   against H1a rather than favourable to it.
+3. **No kinetic parameter set appropriate to a 285-day reservoir observation
+   exists in this study's sources.** The archive is 1e10 too slow; Strobel is a
+   batch reactor with units that cannot be converted without inventing a
+   number. That gap is now the single largest obstacle to a quantitative F2
+   verdict, and it is a data gap, not a modelling one.

@@ -1,0 +1,292 @@
+// Finite-horizon integration of the gas-phase coupled model.
+//
+// sio/coupled_gasphase.sio computed the EXTENT limit -- exact, stoichiometric,
+// infinite-horizon. This module asks the kinetic question that bound cannot
+// answer: does a real storage REACH that bound inside a storage horizon?
+//
+// THE ANSWER TURNS ON A CHOICE OF SOURCE, AND THE TWO AVAILABLE SOURCES
+// DISAGREE BY FIVE ORDERS OF MAGNITUDE. That is the headline of this module,
+// and it is measured rather than asserted:
+//
+//   USGS Aux Vases archive     mu = yield * k = 1250 * 2.88e-14 = 3.60e-11 /s
+//                              methanogen doubling time 610 YEARS
+//   Strobel et al. 2023        mu_max = 1.0e-5 /s (species 2, 37 C, Table 3)
+//                              stated doubling time 10 HOURS
+//
+// Ratio 2.8e5. The archive describes a GEOLOGICAL process over 12 700 years;
+// Strobel describes ENGINEERED methanation in a batch reactor over hours. Both
+// are cited by this field's literature for "microbial H2 loss in storage", and
+// which one is used decides any finite-horizon prediction far more than any
+// chemistry in this study does. Neither is wrong; they are not the same process.
+//
+// STROBEL ALSO HAS A DECAY TERM THE ARCHIVE DOES NOT (b = 3e-7 /s, Table 3),
+// and that changes the structure, not just the speed. With decay, a population
+// only sustains itself while
+//
+//     mu_max * MonodH2 * MonodCO2  >  b        i.e.  Monod product > b/mu_max
+//
+// which is a WASHOUT THRESHOLD. Below it methanogens die off rather than merely
+// slowing. This is the one place the CO2 half-saturation constant finally bites:
+// PHASE4_GATE.md section 3 measured it as worth 0.055 % on RATE at high CO2,
+// and that stands -- but near the threshold it decides SURVIVAL. The threshold
+// is a pure ratio of two of Strobel's own numbers, so it is computed here
+// without needing the cell-to-biomass conversion Strobel does not supply.
+//
+// WHY THE INTEGRATION ITSELF USES THE ARCHIVE'S PARAMETER SET. Strobel states
+// biomass in CELLS and yield in cells/mol; converting to the mg/kg and molal
+// units this study works in needs a mass per cell, which Strobel does not give.
+// Inventing one is barred. So the integrator runs the archive's fully
+// self-consistent parameter set -- already validated against the archived
+// trajectory in sio/microbial_kinetics.sio -- and Strobel enters only as the
+// growth-rate ratio and the washout threshold above, both unit-free.
+//
+// DECLARED SIMPLIFICATION. Carbon is partitioned gas/aqueous with an effective
+// Henry constant DIC/P_CO2 fixed at its initial value, rather than re-solving
+// the full carbonate closure every step. That is a LINEARISATION: it holds
+// while pH does not move much, and it degrades as carbon is drawn down and pH
+// rises. It is used because re-solving the closure inside the loop costs about
+// 1e9 speciation calls per run. Where it matters -- the no-calcite branch near
+// exhaustion -- it makes the carbon look slightly MORE available than it is, so
+// it is conservative against H1a rather than favourable to it.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{solve_nocalcite, solve_ph_pairs, NC_DIC, NC_HCO3, SP_DIC, SP_M_HCO3}
+use microbial::{microbial_rate}
+
+var R_L_ATM: f64 = 0.0820574
+var BAR_TO_ATM: f64 = 0.986923
+var KH_H2: f64 = 7.4530e-4
+var SO4_TOTAL: f64 = 0.008269
+var YIELD_MET: f64 = 1250.0
+var YIELD_SRB: f64 = 5000.0
+
+// Strobel Table 3, species 2 (37 C, the one nearest this study's 40 C)
+var STROBEL_MUMAX: f64 = 1.0e-5
+var STROBEL_DECAY: f64 = 3.0e-7
+var STROBEL_KCO2: f64 = 1.1e-5      // 0.011 mol/m3, Table 2
+var STROBEL_KH2: f64 = 2.0e-5       // 0.020 mol/m3, Table 2
+
+// state
+var S_H2: f64 = 0.0        // total H2, gas + aqueous, mol per kg water
+var S_C: f64 = 0.0         // total carbon, gas + aqueous
+var S_SO4: f64 = 0.0
+var S_XMET: f64 = 0.0
+var S_XSRB: f64 = 0.0
+var S_CUM: f64 = 0.0       // cumulative biotic H2 consumed
+var S_H2_0: f64 = 0.0      // initial total H2, for recovery fraction
+
+// per-run constants
+var C_VGAS: f64 = 0.0
+var C_RT: f64 = 0.0
+var C_KHEFF: f64 = 0.0     // effective Henry constant for total DIC
+var C_HCO3FRAC: f64 = 0.0  // free HCO3- as a fraction of DIC
+var C_DIC_CALCITE: f64 = 0.0
+
+fn setup(t_k: f64, y_h2: f64, y_co2: f64, p_bar: f64, v_gas: f64, biomass0: f64) with Mut, Div, Panic {
+    let p_atm = p_bar * BAR_TO_ATM
+    let p_h2 = y_h2 * p_atm
+    let p_co2 = y_co2 * p_atm
+    C_RT = R_L_ATM * t_k
+    C_VGAS = v_gas
+
+    let ph_nc = solve_nocalcite(t_k, p_co2)
+    let dic0 = NC_DIC
+    C_KHEFF = dic0 / p_co2
+    C_HCO3FRAC = NC_HCO3 / dic0
+
+    let ph_c = solve_ph_pairs(t_k, p_co2)
+    C_DIC_CALCITE = SP_DIC
+
+    S_H2 = p_h2 * v_gas / C_RT + KH_H2 * p_h2
+    S_C = p_co2 * v_gas / C_RT + dic0
+    S_H2_0 = S_H2
+    S_SO4 = SO4_TOTAL
+    S_XMET = biomass0
+    S_XSRB = biomass0
+    S_CUM = 0.0
+}
+
+// One explicit Euler step. calcite_on: 1 = carbon buffered by the mineral.
+fn step_finite(dt: f64, calcite_on: i64) with Mut, Div, Panic {
+    // H2 partitions linearly between gas and water
+    let denom_h2 = C_VGAS / C_RT + KH_H2
+    var m_h2 = 0.0
+    if denom_h2 > 0.0 { m_h2 = KH_H2 * (S_H2 / denom_h2) }
+    if m_h2 < 0.0 { m_h2 = 0.0 }
+
+    // carbon: buffered at the calcite ceiling, or partitioned from the pool
+    var dic = C_DIC_CALCITE
+    if calcite_on != 1 {
+        let denom_c = C_VGAS / C_RT + C_KHEFF
+        dic = 0.0
+        if denom_c > 0.0 { dic = C_KHEFF * (S_C / denom_c) }
+        if dic < 0.0 { dic = 0.0 }
+    }
+    let hco3_free = dic * C_HCO3FRAC
+
+    let r_met = microbial_rate(0, S_XMET, m_h2, hco3_free, 1.0)
+    let r_srb = microbial_rate(1, S_XSRB, m_h2, S_SO4 * 0.3962, 1.0)
+    if r_met < 0.0 { return }
+    if r_srb < 0.0 { return }
+
+    let used = 4.0 * (r_met + r_srb) * dt
+    S_H2 = S_H2 - used
+    S_CUM = S_CUM + used
+    S_SO4 = S_SO4 - r_srb * dt
+    if calcite_on != 1 { S_C = S_C - r_met * dt }
+    S_XMET = S_XMET + YIELD_MET * r_met * dt
+    S_XSRB = S_XSRB + YIELD_SRB * r_srb * dt
+
+    if S_H2 < 0.0 { S_H2 = 0.0 }
+    if S_SO4 < 0.0 { S_SO4 = 0.0 }
+    if S_C < 0.0 { S_C = 0.0 }
+}
+
+fn run_to(t_end_s: f64, dt: f64, calcite_on: i64) with Mut, Div, Panic {
+    var t = 0.0
+    var guard: i64 = 0
+    while t < t_end_s && guard < 3000000 {
+        step_finite(dt, calcite_on)
+        t = t + dt
+        guard = guard + 1
+    }
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+// Run one horizon on both branches and report recovery and F1.
+fn horizon(label: string, t_k: f64, y_h2: f64, y_co2: f64, p_bar: f64,
+           v_gas: f64, biomass0: f64, t_end_s: f64, dt: f64) with IO, Mut, Div, Panic {
+    setup(t_k, y_h2, y_co2, p_bar, v_gas, biomass0)
+    run_to(t_end_s, dt, 1)
+    let cum_with = S_CUM
+    let h2_0 = S_H2_0
+    setup(t_k, y_h2, y_co2, p_bar, v_gas, biomass0)
+    run_to(t_end_s, dt, 0)
+    let cum_without = S_CUM
+
+    print("   ") println(label)
+    print("      H2 initial (molal)     ") emit("", h2_0)
+    print("      consumed WITH calcite  ") emit("", cum_with)
+    print("      consumed WITHOUT       ") emit("", cum_without)
+    if h2_0 > 0.0 {
+        print("      H2 recovery WITH    (%) ") emit("", 100.0 * (1.0 - cum_with / h2_0))
+        print("      H2 recovery WITHOUT (%) ") emit("", 100.0 * (1.0 - cum_without / h2_0))
+    }
+    if cum_without > 0.0 { print("      F1 ratio at this horizon ") emit("", cum_with / cum_without) }
+    println("")
+}
+
+// The RECOVERY CAP: the highest H2 loss the no-calcite branch can ever reach,
+// at any biomass and any horizon, because carbon runs out. No kinetics can
+// exceed it. The with-calcite branch has NO such cap -- carbon is resupplied,
+// so given enough time all H2 goes.
+//
+// This is what makes F2 checkable without fitting anything: the observation
+// either falls inside a branch's reachable range or it does not.
+fn recovery_cap(t_k: f64, y_h2: f64, y_co2: f64, p_bar: f64, v_gas: f64) with IO, Mut, Div, Panic {
+    let p_atm = p_bar * BAR_TO_ATM
+    let p_h2 = y_h2 * p_atm
+    let p_co2 = y_co2 * p_atm
+    let rt = R_L_ATM * t_k
+    let n_h2 = p_h2 * v_gas / rt + KH_H2 * p_h2
+    let ph = solve_nocalcite(t_k, p_co2)
+    let n_c = p_co2 * v_gas / rt + NC_DIC
+    let so4_sink = 4.0 * SO4_TOTAL
+    let h2_left = n_h2 - so4_sink
+    print("   V_gas = ") emit("", v_gas)
+    if h2_left <= 0.0 {
+        println("      sulfate alone exhausts the H2; no methanogenesis either way")
+        return
+    }
+    var c_used = n_c
+    if h2_left / 4.0 < c_used { c_used = h2_left / 4.0 }
+    let without = so4_sink + 4.0 * c_used
+    print("      max H2 loss WITHOUT calcite (%) ") emit("", 100.0 * without / n_h2)
+    print("      min recovery WITHOUT calcite (%) ") emit("", 100.0 * (1.0 - without / n_h2))
+    println("      min recovery WITH calcite (%)  0   (all H2 goes, given time)")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("FINITE-HORIZON INTEGRATION of the gas-phase coupled model")
+    println("")
+
+    println("== the growth rates the two available sources imply ==")
+    let mu_usgs = YIELD_MET * 2.88e-14
+    print("   USGS archive  mu (1/s)      ") emit("", mu_usgs)
+    print("   USGS doubling time (yr)     ") emit("", 0.693147180560 / mu_usgs / 3.15576e7)
+    print("   Strobel SP2  mu_max (1/s)   ") emit("", STROBEL_MUMAX)
+    print("   Strobel doubling time (h)   ") emit("", 0.693147180560 / STROBEL_MUMAX / 3600.0)
+    print("   RATIO Strobel / USGS        ") emit("", STROBEL_MUMAX / mu_usgs)
+    println("   A geological process and a batch-reactor process, five orders")
+    println("   of magnitude apart, both cited for 'microbial H2 loss in UHS'.")
+    println("")
+
+    println("== Strobel's washout threshold (his decay term, which USGS lacks) ==")
+    let thresh = STROBEL_DECAY / STROBEL_MUMAX
+    print("   b / mu_max, the Monod product needed to survive ") emit("", thresh)
+    println("   With the H2 term near 1, the CO2 term must exceed that, so")
+    print("   dissolved CO2 must stay above (molal) ") emit("", thresh * STROBEL_KCO2 / (1.0 - thresh))
+    println("   Below that, methanogens DIE OFF rather than merely slowing.")
+    println("   This is where the CO2 half-saturation constant finally matters:")
+    println("   not for rate at high CO2 (0.055 %, PHASE4_GATE.md sec 3) but for")
+    println("   SURVIVAL near exhaustion -- exactly what calcite would prevent.")
+    println("")
+
+    let t_k = 313.15
+    let day = 86400.0
+    println("== FIELD condition, 9.89 % H2 / 0.19 % CO2, 78 bar, V_gas = 1 L/kg ==")
+    println("   archive kinetics, cold-start biomass 1e-6 mg/kg")
+    horizon("285 d (Sun Storage duration)", t_k, 0.0989, 0.0019, 78.0, 1.0, 1.0e-6, 285.0 * day, 3600.0)
+    horizon("100 yr",   t_k, 0.0989, 0.0019, 78.0, 1.0, 1.0e-6, 100.0 * 3.15576e7, 1.0e6)
+    horizon("1000 yr",  t_k, 0.0989, 0.0019, 78.0, 1.0, 1.0e-6, 1000.0 * 3.15576e7, 1.0e7)
+    horizon("12700 yr", t_k, 0.0989, 0.0019, 78.0, 1.0, 1.0e-6, 12700.0 * 3.15576e7, 1.0e7)
+
+    println("== FIELD, biomass 1e-4 mg/kg (archive's own upper sensitivity bound) ==")
+    horizon("285 d",    t_k, 0.0989, 0.0019, 78.0, 1.0, 1.0e-4, 285.0 * day, 3600.0)
+    horizon("12700 yr", t_k, 0.0989, 0.0019, 78.0, 1.0, 1.0e-4, 12700.0 * 3.15576e7, 1.0e7)
+
+    println("== MESOCOSM condition, for contrast, 12700 yr ==")
+    horizon("12700 yr", t_k, 0.10, 0.025, 40.0, 1.0, 1.0e-6, 12700.0 * 3.15576e7, 1.0e7)
+
+    println("== the recovery CAP, field condition, swept over gas volume ==")
+    println("   No kinetics can push loss past the no-calcite cap: carbon runs out.")
+    println("   The with-calcite branch has no cap at all.")
+    var vv: f64 = 0.1
+    var nn: i64 = 0
+    while nn < 4 {
+        recovery_cap(t_k, 0.0989, 0.0019, 78.0, vv)
+        vv = vv * 10.0
+        nn = nn + 1
+    }
+    println("")
+
+    println("== F2 reference points, NOT yet a verdict ==")
+    println("   Sun Storage reports 84.3 % H2 recovery at 285 d (see CORRECTIONS")
+    println("   C3: 99754/118196 = 84.397 %, and the volume basis is unreconciled).")
+    println("   The no-calcite branch carries a HARD STOICHIOMETRIC CAP on loss")
+    println("   that no kinetics can exceed; the with-calcite branch has none.")
+    println("   Compare the caps against the observation above.")
+    0
+}

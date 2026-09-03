@@ -1,0 +1,124 @@
+Raw stdout of sio/coupled_gasphase.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf coupled_gasphase.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 8009dda722 (this repo, HEAD at capture time)
+date:     2026-09-03T16:36:59Z
+
+COUPLED MODEL, GAS PHASE AS THE H2 RESERVOIR
+F1 extent limit: cumulative biotic H2 loss, with calcite over without.
+Exact and stoichiometric -- no rate constant, no surface area, no
+half-saturation constant enters. Infinite-horizon bound.
+
+This RETRACTS the F1 = 1.000000 verdict of coupled_kinetics.sio,
+which supplied 7-14x less H2 than its own oracle and let sulfate
+reduction consume all of it before methanogenesis reached carbon.
+
+Sulfate sink, 4 x SO4_total (molal H2)  3307600000000e-14
+V_gas = 1.0 L/kg corresponds to porosity 0.2 at 50 % gas saturation.
+V_gas is a SWEPT INPUT: no source here reports one for these sites.
+
+== the reference model's own inventory, for orientation ==
+   H2(aq) 4.226e-2 molal at H2(g) = 91 bar fugacity
+   H2 needed to exhaust sulfate + carbon  4210208399999e-14
+   against 4.226e-2 available -- balanced to 0.4 %, so carbon is
+   a genuine limiting reagent there, as its CO2(g) collapse shows.
+
+== MESOCOSM  10 % H2 / 2.5 % CO2, 40 bar  (H2:CO2 = 4:1) ==
+   H2:CO2 in the gas           4000000000000e-12
+   asymptote y_H2/(4*y_CO2)    1000000000000e-12
+   V_gas =  1000000000000e-13
+      H2 total    1830511094514e-14
+      C total     2735153458231e-14
+      sulfate alone exhausts the H2: no methanogenesis either way
+   V_gas =  1000000000000e-12
+      H2 total    1565711758230e-13
+      C total     6191805080179e-14
+      with calcite     1565711758230e-13
+      without calcite  1565711758230e-13
+      F1 RATIO         1000000000000e-12
+   V_gas =  1000000000000e-11
+      H2 total    1539231824602e-12
+      C total     4075832129965e-13
+      with calcite     1539231824602e-12
+      without calcite  1539231824602e-12
+      F1 RATIO         1000000000000e-12
+   V_gas =  1000000000000e-10
+      H2 total    1536583831239e-11
+      C total     3864234834944e-12
+      with calcite     1536583831239e-11
+      without calcite  1536583831239e-11
+      F1 RATIO         1000000000000e-12
+
+== FIELD  9.89 % H2 / 0.19 % CO2, 78 bar  (H2:CO2 = 52:1) ==
+   H2:CO2 in the gas           5205263157894e-11
+   asymptote y_H2/(4*y_CO2)    1301315789473e-11
+   V_gas =  1000000000000e-13
+      H2 total    3530232171325e-14
+      C total     4079339132840e-15
+      with calcite     3530232171325e-14
+      without calcite  3530232171325e-14
+      F1 RATIO         1000000000000e-12
+   V_gas =  1000000000000e-12
+      H2 total    3019553411335e-13
+      C total     9202096836566e-15
+      with calcite     3019553411335e-13
+      without calcite  6988438734626e-14
+      F1 RATIO         4320783977648e-12
+   V_gas =  1000000000000e-11
+      H2 total    2968485535336e-12
+      C total     6042967387383e-14
+      with calcite     2968485535336e-12
+      without calcite  2747946954953e-13
+      F1 RATIO         1080255763301e-11
+   V_gas =  1000000000000e-10
+      H2 total    2963378747736e-11
+      C total     5727054442464e-13
+      with calcite     2963378747736e-11
+      without calcite  2323897776985e-12
+      F1 RATIO         1275176032734e-11
+
+== LOBODICE  54 % H2 / 12 % CO2, 40 bar  (as injected) ==
+   H2:CO2 in the gas           4500000000000e-12
+   asymptote y_H2/(4*y_CO2)    1125000000000e-12
+   V_gas =  1000000000000e-13
+      H2 total    9884759910378e-14
+      C total     1310018323798e-13
+      with calcite     9884759910378e-14
+      without calcite  9884759910378e-14
+      F1 RATIO         1000000000000e-12
+   V_gas =  1000000000000e-12
+      H2 total    8454843494444e-13
+      C total     2969211102333e-13
+      with calcite     8454843494444e-13
+      without calcite  8454843494444e-13
+      F1 RATIO         1000000000000e-12
+   V_gas =  1000000000000e-11
+      H2 total    8311851852851e-12
+      C total     1956113888768e-12
+      with calcite     8311851852851e-12
+      without calcite  7857531555072e-12
+      F1 RATIO         1057819722974e-12
+   V_gas =  1000000000000e-10
+      H2 total    8297552688692e-11
+      C total     1854804167411e-11
+      with calcite     8297552688692e-11
+      without calcite  7422524269646e-11
+      F1 RATIO         1117888253006e-12
+
+== reading ==
+   The mesocosm feed is AT stoichiometry, so its co-injected CO2
+   covers the H2 it arrives with and calcite changes nothing: the
+   ratio is 1 at every gas volume. The field feed carries 13 times
+   more H2 than its own CO2 can convert, so carbon runs out first
+   and calcite is what relieves it. Lobodice, at 12 % CO2, is
+   CO2-rich and calcite is again nearly irrelevant.
+
+   So H1a is NOT universally true, and this test says where it is
+   false: at a stoichiometric or CO2-rich feed. It survives F1 only
+   for a CO2-POOR feed, which is what the field trial actually was.

@@ -146,3 +146,59 @@ pH — closing the system on charge balance is a separate step, and folding it i
 silently would hide which constraint produced a number. Until that exists there
 is no trajectory, and without a trajectory there is no step bisection and no
 statement about truncation.
+
+### Charge-balance closure, and the first engine↔oracle parity
+
+The system closes on electroneutrality, `2[Ca²⁺] + [H⁺] = [HCO₃⁻] + 2[CO₃²⁻] + [OH⁻]`,
+with calcite equilibrium supplying `[Ca²⁺] = Ksp/[CO₃²⁻]`. One equation, one
+unknown, solved by **bisection** — chosen over Newton because it needs no
+derivative, cannot diverge, and its error after n steps is exactly `(hi−lo)/2ⁿ`,
+so convergence is arithmetic rather than hope. The iteration count and the
+residual at the root are both reported: a root is exhibited, not claimed.
+
+At 40 °C, tolerance 1e-12 over pH ∈ [4, 12]: **43 iterations** every time, which
+is what `8/2⁴³ = 9.1e-13 < 1e-12` requires, with charge residuals of 6e-16 to
+2e-14. An interval with no sign change (`[4.0, 4.5]`) returns the refusal
+sentinel rather than an endpoint dressed as a root.
+
+#### The engine reproduces the analytic limiting laws
+
+For calcite open to a fixed P(CO₂) the classical result is `[Ca] ∝ P^(1/3)` and a
+pH slope of −2/3 per decade.
+
+| | Ca ratio per decade | pH slope per decade |
+|---|---|---|
+| **theory** | **2.1544** | **−0.6667** |
+| Sounio (ideal solution) | 2.1517, 2.1538 | −0.6664, −0.6666 |
+| IPhreeqc (Debye–Hückel) | 2.2937, 2.3674 | −0.6526, −0.6459 |
+
+The engine lands on the limiting law to four digits. That is the correct
+outcome and not a coincidence: **those laws are derived for the ideal case,
+which is what the engine solves.**
+
+#### The residual against the oracle is the activity model, and it was named first
+
+| P(CO₂) | ΔpH | ΔCa | ionic strength (oracle) |
+|---|---|---|---|
+| 0.01 | −0.0296 | −13.59 % | 3.65e-03 |
+| 0.1 | −0.0434 | −18.95 % | 8.32e-03 |
+| 1.0 | −0.0641 | −26.26 % | 1.94e-02 |
+
+The disagreement **grows monotonically with ionic strength**, which is the
+signature of the term the engine omits. The direction is right too: with γ < 1
+the ion activity product falls, so more calcite must dissolve to reach Ksp, and
+the oracle's `[Ca]` is duly higher at every point. The oracle's departure from
+the limiting laws grows in step.
+
+So neither is wrong. They solve different problems, and the difference is the
+**declared** one — `carbonate_equilibria.sio` states that activity coefficients
+are unity and that a parity test therefore carries the activity model as a named
+difference. It was named before it was measured, which is the only way that
+statement is worth anything.
+
+The residual is 13–26 %, against an oracle resolution measured at ~2 ppm, so it
+is roughly **five orders of magnitude above the instrument** — real, not noise.
+
+**What closes it**: a Debye–Hückel activity model in the engine. Until that
+exists, engine and oracle are not comparable on absolute concentrations, and no
+number from this closure is quoted as an absolute solubility.

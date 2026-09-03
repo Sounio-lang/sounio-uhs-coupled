@@ -139,6 +139,77 @@ fn omega_calcite(t_k: f64, p_co2_atm: f64, ph: f64, ca_molal: f64) -> f64 with M
     ca_molal * c3 / exp(log_k(4, t_k) * LN10)
 }
 
+
+// ── charge-balance closure ─────────────────────────────────────────────────
+//
+// The system closes on electroneutrality. For calcite in contact with a gas
+// phase of fixed P(CO2), with no other ions present:
+//
+//   2[Ca2+] + [H+]  =  [HCO3-] + 2[CO3-2] + [OH-]
+//
+// and calcite equilibrium supplies the calcium:  [Ca2+] = Ksp / [CO3-2].
+// Everything on both sides is a function of pH alone once T and P(CO2) are
+// fixed, so this is one equation in one unknown.
+//
+// IDEAL SOLUTION. Activity coefficients are unity here; concentrations and
+// activities are not distinguished. The oracle uses Debye-Huckel, so a parity
+// comparison against it carries the ACTIVITY MODEL as a named difference, not
+// as an unexplained residual. At the ionic strengths of interest that term is
+// not small, and pretending the two solve the same problem would be false.
+
+var CB_ITERS: i64 = 0          // iterations the last solve actually took
+var CB_RESIDUAL: f64 = 0.0     // charge residual at the returned root
+
+// Signed charge imbalance, in equivalents per kg water. Positive means excess
+// cation charge, so pH must rise.
+fn charge_residual(t_k: f64, p_co2_atm: f64, ph: f64) -> f64 with Mut, Div, Panic {
+    let h = exp((0.0 - ph) * LN10)
+    let oh = exp(log_k(3, t_k) * LN10) / h
+    let b = hco3(t_k, p_co2_atm, ph)
+    let c3 = co3(t_k, p_co2_atm, ph)
+    if b < 0.0 { return 0.0 }
+    if c3 <= 0.0 { return 0.0 }
+    let ca = exp(log_k(4, t_k) * LN10) / c3
+    2.0 * ca + h - b - 2.0 * c3 - oh
+}
+
+// Bisection. Chosen over Newton deliberately: it needs no derivative, it cannot
+// diverge, and its error bound after n steps is exactly (hi-lo)/2^n, so the
+// convergence claim is arithmetic rather than a hope. The iteration count and
+// the residual at the root are both recorded and reported -- a root is not
+// claimed, it is exhibited.
+//
+// Returns a negative sentinel rather than a number when it cannot bracket:
+//   -1.0  the interval endpoints do not straddle a sign change
+fn solve_ph(t_k: f64, p_co2_atm: f64, ph_lo: f64, ph_hi: f64, tol: f64) -> f64 with Mut, Div, Panic {
+    var lo = ph_lo
+    var hi = ph_hi
+    let f_lo = charge_residual(t_k, p_co2_atm, lo)
+    let f_hi = charge_residual(t_k, p_co2_atm, hi)
+    CB_ITERS = 0
+    CB_RESIDUAL = 0.0
+    // Refuse rather than return an endpoint dressed as a root.
+    if f_lo > 0.0 && f_hi > 0.0 { return 0.0 - 1.0 }
+    if f_lo < 0.0 && f_hi < 0.0 { return 0.0 - 1.0 }
+    var mid = 0.5 * (lo + hi)
+    var n: i64 = 0
+    while n < 200 {
+        mid = 0.5 * (lo + hi)
+        let f_mid = charge_residual(t_k, p_co2_atm, mid)
+        if hi - lo < tol { n = 200 } else {
+            if (f_lo < 0.0 && f_mid < 0.0) || (f_lo > 0.0 && f_mid > 0.0) {
+                lo = mid
+            } else {
+                hi = mid
+            }
+            n = n + 1
+            CB_ITERS = CB_ITERS + 1
+        }
+    }
+    CB_RESIDUAL = charge_residual(t_k, p_co2_atm, mid)
+    mid
+}
+
 // ── printing ───────────────────────────────────────────────────────────────
 fn digit(d: i64) with IO, Mut, Div, Panic {
     if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
@@ -203,5 +274,26 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     emit("omega_pH7 ", omega_calcite(313.15, 0.01, 7.0, 1.0e-3))
     emit("omega_pH8 ", omega_calcite(313.15, 0.01, 8.0, 1.0e-3))
     emit("omega_pH9 ", omega_calcite(313.15, 0.01, 9.0, 1.0e-3))
+    println("")
+    println("== charge-balance closure: calcite + CO2(g), ideal solution ==")
+    println("   (activity coefficients are unity here; the oracle uses Debye-Huckel)")
+    var i: i64 = 0
+    var pcs: [f64; 4] = [0.0; 4]
+    pcs[0] = 0.0003162277660168379    // 10^-3.5, atmospheric
+    pcs[1] = 0.01
+    pcs[2] = 0.1
+    pcs[3] = 1.0
+    while i < 4 {
+        let ph = solve_ph(313.15, pcs[i], 4.0, 12.0, 1.0e-12)
+        print("P_CO2 ") emit("", pcs[i])
+        print("   pH  ") emit("", ph)
+        print("   iters ") pi64(CB_ITERS) print("   charge residual ") emit("", CB_RESIDUAL)
+        let c3 = co3(313.15, pcs[i], ph)
+        print("   Ca  ") emit("", exp(log_k(4, 313.15) * LN10) / c3)
+        println("")
+        i = i + 1
+    }
+    println("== bracketing control: an interval with no sign change must refuse ==")
+    emit("solve_ph(4.0..4.5)", solve_ph(313.15, 0.01, 4.0, 4.5, 1.0e-12))
     0
 }

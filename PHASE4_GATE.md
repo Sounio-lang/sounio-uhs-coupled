@@ -276,3 +276,90 @@ touched, and `PREREGISTRATION.md`'s own H1b (pure carbonate, in silico only)
 was scoped for exactly this kind of extension. Proceeding to S1/S5's full swept
 verdict, or accepting this as sufficient and reporting H1a falsified, is a
 decision this report surfaces rather than makes.
+
+---
+
+## Result, 2026-09-03 (continued): the targeted sweep, and it does not move
+
+The previous section flagged three untested conditions that could, in
+principle, put carbon back in reach: salinity, a genuinely CO2-rich gas
+stream, and a resident rather than cold-start biomass. All three are now
+tested, each against a source-grounded bound rather than an invented number,
+and none changes the verdict.
+
+`sio/coupled_kinetics.sio` gained `f1_condition` (a parameterised version of
+the existing F1 test) and three sweep drivers. `init_coupled`/`run_coupled`
+took a new `biomass_init` parameter; every existing call site was updated to
+pass the same `1.0e-6` cold start used before, so the original two-condition
+result is unchanged, not just re-run.
+
+### Sweep 1 — salinity, at the organisms' own viability limits
+
+Not a Lehen number: Lehen's salinity was never reported (CORRECTIONS.md C6).
+Tremosa et al. 2023 — the Lobodice source already in `data/tremosa-lobodice`
+— states the bound directly: *"most methanogens may grow at salinities up to
+0.77 M NaCl and most sulfate-reducers and acetogens at between 0 and 0.4 M
+NaCl."* Both bounds were run, at both the mesocosm and field conditions, over
+12 700 years.
+
+**Ratio: 1.000000, all four runs.** Total dissolved carbon moves by under
+0.001% between the 0.40 M and 0.77 M cases (activity-coefficient effects at
+these ionic strengths are real but second order) and H2 is still fully
+exhausted in the no-calcite branch in every case. Raising ionic strength
+toward the edge of what these organisms can survive at all does not touch the
+mechanism: H2, not carbon, is still what runs out.
+
+### Sweep 2 — Lobodice's actual injected composition
+
+Not a synthetic condition: 54% H2, 22% CH4, **12% CO2**, 9% CO, 2.5% N2 at 4
+MPa (40 bar), 25–45 °C, is what Tremosa et al. 2023 report was actually
+injected at Lobodice (CORRECTIONS.md C5; T taken at 40 °C, mid-range). At 12%,
+this is the most CO2-rich condition available anywhere in this study — six
+times the field gate condition's CO2 fraction.
+
+**Ratio: 1.000000**, at the 12 700-year horizon and, separately, at
+**Lobodice's own actual storage duration, seven months** — real, not
+extrapolated. At seven months the pattern is the same one already seen at 285
+days: aqueous H2 barely moves (2.9812e-3 → 2.9812e-3 to displayed precision),
+so this reading is time-limited, the same way the operational-horizon test
+above was, and says nothing about carbon either.
+
+### Sweep 3 — established rather than cold-start biomass
+
+No source used in this study gives a resident cell density for any of these
+reservoirs. What is available: the USGS Aux Vases archive's own sensitivity
+sweep for this exact input
+(`data/usgs-auxvases/sensitivity_analysis_biomass.csv`), run at 1e-8 through
+1e-4 mg/kg. 1e-4 — the archive's own upper bound, 100x the cold start used
+everywhere else in this study — was run at the operational (285 d) horizon,
+at both mesocosm and field conditions, and at the geological horizon for
+completeness.
+
+**Ratio: 1.000000**, all three. Even at 100x the starting population, aqueous
+H2 still moves by under 0.00001% over 285 days: the doubling times this study
+already established (103 yr SRB, 610 yr MET) put any starting population two
+orders of magnitude above cold-start still deep in the early-exponential
+regime at under a year. This is not evidence that biomass never matters — it
+is evidence that the *specific* upper bound this study can point to, without
+inventing one, is still far too small to matter at operational timescales.
+
+### Verdict
+
+Every condition this study has data or a defensible, source-grounded bound
+for — two labelled gas compositions, two salinities at the edge of microbial
+viability, the one real CO2-rich composition available, and the one
+literature-grounded biomass upper bound available — returns the same number:
+**ratio = 1.000000.** Not close to the factor-of-2 bar F1 sets; exactly at the
+point of no effect, everywhere checked.
+
+**H1a is falsified on both readings this study can test, at every condition
+this study has data for.** The kinetic channel failed at ratio 1.000552
+(`PHASE4_GATE.md`, section 3). The mass-balance channel fails at ratio
+1.000000, robustly, across the salinity range these organisms can survive, the
+most CO2-rich real composition on record for a site like this, and the
+largest biomass this study can point to without guessing. What remains
+genuinely untested is outside this study's data: H1b (pure carbonate, in
+silico only, pre-registered as such) and any condition beyond what a real,
+cited source supports. Within that boundary, this sweep is not a spot-check
+that happened to miss the effect — it is the effect's own most favourable
+directions, checked, and it is not there.

@@ -544,3 +544,67 @@ No regression in the corpus: 53 of the first 60 `run-pass` files compile before
 and after, and the same 7 fail on a baseline built from that tree with the
 change stashed — cross-module identifiers and an `[i8;4]` vs `[i64;4]` mismatch,
 neither related.
+
+---
+
+## G10 — No rate-law composition or catalyst-cycle representation
+
+**Status: OPEN (by decision) — anticipated, not yet model-forced.**
+
+Every other entry in this file is scoped to what a run of this study actually
+hit. This one is not: no phase here has yet needed a catalytic mechanism, so by
+this file's own header ("what this model forced the language to need") it does
+not belong. It is entered anyway, at a workstream-planning decision point,
+because the cost is worth measuring before the decision to build it is made
+rather than after — the same reasoning that put a number on G4 and G5 before
+either was started. **What would move it to IN PROGRESS:** a phase of this or a
+future study actually needing a catalytic mechanism — the mineral-surface-
+catalyzed abiotic pathway is the candidate, since it is what Phase 4's stopped
+coupling work would have touched next (`PHASE4_GATE.md` §7).
+
+**The gap, in three parts.**
+
+1. **Rate-law composability beyond mass-action.** The general CRN engine,
+   `stdlib/chemistry/kinetics.sio:619` (`compute_rates_general`), takes an
+   arbitrary stoichiometry matrix, but each species' rate order is derived only
+   from the *negative* — net-consumed — entries of that matrix
+   (`kinetics.sio:625`, `if coeff < 0.0`). A catalyst is net-zero stoichiometry
+   by definition, so it cannot appear in a rate expression under this scheme at
+   all, composable or otherwise. Non-mass-action laws exist only as one-off
+   scalar formulas outside this engine: Michaelis–Menten as `mm_rate()`
+   (`stdlib/chemistry/acids.sio:121`) and dual-Monod as `monod()` /
+   `microbial_rate()` (`sio/microbial.sio:62,72` in this repo — the rate law
+   `PHASE4_GATE.md` actually runs), the latter hardcoding two parameter sets
+   behind a `which: i64` switch rather than a general mechanism. Neither plugs
+   into `compute_rates_general`; nothing shares a rate-law shape.
+2. **A catalyst/intermediate species-role tag.** No species-role typing exists
+   anywhere in the language — reactant, product, catalyst and intermediate are
+   all the same kind of thing wherever species appear. The one "enzyme" hit in
+   the tree, `self-hosted/collections/epistemic_reaction.sio:106,182`
+   (`enzyme_prov_l64`), is a Merkle-provenance/data-lineage concept, unrelated
+   to kinetics. Reaction literals — `reaction NAME { ... }`, compile-time
+   mass/charge balance checking — exist on `feat/w5-reaction-literals`
+   (`self-hosted/compiler/lean_single.sio:4257`, not on `main`), and their own
+   doc comment, verbatim in `docs/CHEMICAL_SYNTAX.md:103–107`, states they do
+   "not check that a reaction is ... elementary, that its direction is right,
+   or that its rate law is sound." A species-role tag is cheapest once that
+   branch merges, since roles would naturally attach to the existing species
+   position in that syntax rather than needing their own declaration form —
+   but nothing about it is blocked on the rate-law-composability piece above.
+3. **Turnover-number bookkeeping.** Absent everywhere in both repositories.
+   It is not a separate primitive: it falls out of (1) and (2) once a rate law
+   can be evaluated per-catalyst and a catalyst is a typed role, as moles
+   product formed per mole of tagged catalyst per unit time.
+
+**Cost to close properly:** in the same style as G4/G5 — weeks, not months. A
+rate-law trait/interface pluggable into `compute_rates_general` so mass-action,
+Michaelis–Menten and Monod-style laws share one composable shape; a
+catalyst/intermediate species-role tag riding the reaction-literal syntax; and
+turnover-number derivation on top of both. Comparable in size to one W-sized
+workstream, with the explicit caveat that the species-role piece is additionally
+blocked on `feat/w5-reaction-literals` merging first.
+
+**What is used instead:** standalone hardcoded rate formulas per model
+(`mm_rate()`, `monod()`/`microbial_rate()`), each hand-written outside any
+shared abstraction and reviewed as a class — the same fallback discipline
+already in force for G4 and G5.

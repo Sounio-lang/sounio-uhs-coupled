@@ -785,7 +785,7 @@ type.** The two declarations are unreferenced after the line that introduces the
 The claim was not wrong about the compiler. It was wrong about this module.
 
 **What the compiler actually does**, measured at the end of the study against
-`gen3.elf` md5 `0f3aa2c9dd3be4e407ce546130f7614c`:
+`gen3.elf` md5 `c45d5cba730ff616c17a6e2a63a0bbc2`:
 
 | test | result |
 |---|---|

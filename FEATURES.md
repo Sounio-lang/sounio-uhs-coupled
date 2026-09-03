@@ -188,7 +188,7 @@ which the abiotic model requires (Van't Hoff, Arrhenius, log K, pH).
 ```
 Linux x86-64, 64 cores, 188 GB RAM
 Sounio: origin/main @ 57f87da54f, SOUNIO_SOUC_ENGINE=lean_single
-make build (boot → gen1 → gen2 → gen3 + fixed point): 6 s, ✓ FIXED POINT OK (0f3aa2c9dd3be4e407ce546130f7614c)
+make build (boot → gen1 → gen2 → gen3 + fixed point): 6 s, ✓ FIXED POINT OK (c45d5cba730ff616c17a6e2a63a0bbc2)
 one self-compile of self-hosted/compiler/lean_single.sio (39,372 lines): 2 s
 test corpus: 1692 tests/run-pass + 289 tests/compile-fail; ~0.22 s/file
 ```
@@ -199,7 +199,7 @@ test corpus: 1692 tests/run-pass + 289 tests/compile-fail; ~0.22 s/file
 
 Filled at the end of the study, by running the compiler against errors a
 scientist would actually make — not by expectation. Every row below is a
-command that was run, against `gen3.elf` md5 `0f3aa2c9dd3be4e407ce546130f7614c`.
+command that was run, against `gen3.elf` md5 `c45d5cba730ff616c17a6e2a63a0bbc2`.
 **A feature whose measured value is zero is reported with zero.**
 
 ## 3. What each feature caught, measured

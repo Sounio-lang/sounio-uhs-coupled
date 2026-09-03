@@ -724,7 +724,7 @@ crashed at runtime after writing 71 correct lines, on the caption calls. The
 first diagnosis — a string-length limit — **was wrong**, and is recorded as wrong
 because the correct one is stranger.
 
-**Reproduction**, against `gen3.elf` md5 `0f3aa2c9dd3be4e407ce546130f7614c`:
+**Reproduction**, against `gen3.elf` md5 `c45d5cba730ff616c17a6e2a63a0bbc2`:
 
 ```sio
 fn txt(x: f64, y: f64, anchor: string, size: f64, col: string, t: string) with IO, Mut, Div, Panic {
@@ -764,9 +764,9 @@ any number in the figure.
 lane is: **keep string literals passed as arguments under 126 characters**, now
 noted at the point of use in `sio/figure.sio`.
 
-## G12 — Unit types type-check correctly and MISCOMPILE the values. The units rewrite is blocked.
+## G12 — Unit types type-checked correctly and MISCOMPILED the values (CLOSED)
 
-**Status: OPEN, and it blocks the stated goal of carrying everything on units.**
+**Status: CLOSED — fixed in the compiler, 2026-09-03. See the closure record at the end of this entry.** It formerly read: *Status: OPEN, and it blocks the stated goal of carrying everything on units.*
 Found by attempting exactly that rewrite, on the module `CORRECTIONS.md` C20
 identified as the one that declared units and did not use them.
 
@@ -865,3 +865,77 @@ it. **That criticism of the process stands.** But the outcome was accidentally
 right: had the study used the feature, every number it reported would have been
 corrupt. The right decision was reached for the wrong reason, which is not the
 same as having been right.
+
+### G12 — CLOSED, 2026-09-03
+
+Fixed in `Sounio-lang/sounio` `feat/w1-qd128-transcend` @ **`321e8aa90e`**,
+*"[check] Resolve a declared unit name as f64 in type position, not as an
+unknown type"*. This study is re-pinned to that compiler, `gen3.elf` md5
+**`c45d5cba730ff616c17a6e2a63a0bbc2`**.
+
+**Root cause.** `unit NAME;` registered the name in `UNIT_HASH_TABLE`, but
+`scan_type` never consulted that table for a bare type annotation. `var T: degK
+= 298.0` fell through to the unknown-type branch and received `SCAN_TY = 0`. The
+dimension *checking* was unaffected because it resolves the raw name hash
+through `unit_lookup_dim` on a separate path — which is exactly why the failure
+was silent rather than loud.
+
+**The fix**, in `scan_type` before the unknown-type fallback:
+
+```sio
+if unit_is_user_declared_h(h) {
+    SCAN_TY = 2        // f64
+    SCAN_TY_HASH = h   // keep the name hash: every existing check untouched
+} else { ... }
+```
+
+**A second bug was found by fixing the first, and it is the more interesting
+one.** The first attempt tested `unit_is_registered_h`, which also matches the
+*preloaded SI table* — and `K` is kelvin. That made the type parameter in
+`struct Map<K, V>` resolve as a unit and broke generic instantiation. Only a
+name the user declared with an explicit `unit NAME;` may name a type;
+`UNIT_USER_TABLE` now records that, and preloaded symbols (`K`, `m`, `s`, `g`,
+`L`, `A`, `N`) remain available as type parameters.
+
+**That regression was caught only by an A/B of the full suite**, not by the
+reproduction, not by the fixed-point check, and not by any reasoning about the
+patch. It would have shipped.
+
+### Verification
+
+| | |
+|---|---|
+| fixed point | gen2 == gen3, `c45d5cba730ff616c17a6e2a63a0bbc2` |
+| `var T_MIN: degK = 298.0` | 0.09 → **298.0** |
+| `290 < 298` through a `degK` parameter | FALSE → **TRUE** |
+| `generic_struct_instantiate.sio` | **passes** (regressed on the first attempt) |
+| five dimension checks | all preserved — `molar`→`molal` param, cross-addition, cross-assignment and bare literal still rejected; `molal`→`molal` still accepted |
+| full suite, genuine failures (`run exited 1`) | baseline **51**, fixed **51**, **identical set** |
+| this study's 10 committed outputs | **byte-identical** under the new compiler |
+
+**On the suite numbers.** Timeout counts swing between runs (3, 46, 72) with
+machine load while `exit 1` holds at 51–52, so only `exit 1` is compared. An
+earlier reading of this A/B claimed **69 newly-passing tests**; that was timeout
+noise and is **withdrawn**. The correct figure is **zero** — the fix repairs the
+defect and changes nothing else in the suite.
+
+### What is now unblocked, and what is not
+
+`sio/h2_solubility.sio` annotated with the dimensional form — parameters,
+module-level bounds, typed bindings at every call site, explicit `as f64` at the
+correlation boundary — now reproduces the bare-`f64` version **byte for byte**
+(6313448550155170e-17 and the rest, all three refusal sentinels intact). The
+rewrite `CORRECTIONS.md` C20 called for is technically possible.
+
+**It is still not committed.** Two of the four measured limits in `FEATURES.md`
+survive the fix and are design gaps, not lowering bugs:
+
+- **the return position is not unit-checked**, so a unit cannot propagate through
+  a pipeline — `-> molal` is documentation, and the value that emerges is `f64`;
+- **same dimension at a different scale is interchangeable** (G4/G5), so `bar`
+  and `atm` cannot be separated — which is precisely the "1 bar vs 1 atm"
+  confusion this study's own negative control was written to catch.
+
+A rewrite would therefore guard inputs and not outputs, and would still not
+catch the error the study most wanted caught. That is a judgement about value,
+not a blocker, and it is recorded here rather than made silently.

@@ -4,8 +4,8 @@ An outside check of commit `9da4c3c` ("Retract the F1 falsification: the model
 inverted its own oracle's limiting reagent"), run without assuming its
 conclusions. Every claim below was re-derived or re-executed, not re-read.
 
-Compiler: `gen3.elf`, md5 `0f3aa2c9dd3be4e407ce546130f7614c`, built from
-`Sounio-lang/sounio` `feat/w1-qd128-transcend` @ `865dd6db87` — not through
+Compiler: `gen3.elf`, md5 `c45d5cba730ff616c17a6e2a63a0bbc2`, built from
+`Sounio-lang/sounio` `feat/w1-qd128-transcend` @ `321e8aa90e` — not through
 `bin/souc` (G8). Checked against `sounio-uhs-coupled` @ `2eb2cc8`.
 
 ## 1. The units bug the retraction claims to fix

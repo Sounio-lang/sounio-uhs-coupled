@@ -3,12 +3,14 @@ Raw stdout of sio/coupled_gasphase.sio, unedited.
 command:
   cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf coupled_gasphase.sio /tmp/out && /tmp/out
 
-compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
-          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
-          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
-          binary named in sio/README.md's own header for this engine.
-model:    sounio-uhs-coupled @ 8009dda722 (this repo, HEAD at capture time)
-date:     2026-09-03T16:36:59Z
+compiler: gen3.elf, md5 c45d5cba730ff616c17a6e2a63a0bbc2
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 321e8aa90e
+          -- carries the G12 fix (LANGUAGE_GAPS.md): a declared unit name now
+          resolves as f64 in type position. Verified to leave every number in
+          this study byte-identical to the previous pin 0f3aa2c9dd3be4e407ce546130f7614c.
+          Not through bin/souc, per LANGUAGE_GAPS.md G8.
+model:    sounio-uhs-coupled @ 8abb55ae90 (this repo, HEAD at capture time)
+date:     2026-09-03T20:27:05Z
 
 COUPLED MODEL, GAS PHASE AS THE H2 RESERVOIR
 F1 extent limit: cumulative biotic H2 loss, with calcite over without.

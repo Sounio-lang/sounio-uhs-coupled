@@ -173,7 +173,8 @@ a class.
 
 ## G6 — Uncertainty: the coherent path exists, the naive path is unguarded
 
-**Status: IN PROGRESS.**
+**Status: IN PROGRESS — item 1 closed, item 2 half, item 3 one cap of four. Per
+item, with what is still open, under "Where the three stand" below.**
 
 Correlation-aware propagation is **already real** and compiled: forward-sensitivity
 shadow slots in the production compiler, plus noise-symbol sets whose `E230`
@@ -195,9 +196,50 @@ Three things are missing, and the study needs all three:
    covariance matrices capped at 24. A model with tens of uncertain parameters
    runs into these.
 
-**Fallback if items 1–3 do not land:** first-order coherent band by forward
-sensitivities, verified against Monte Carlo N ≥ 10⁴ in the oracle, with the
-independence assumption stated explicitly at every combination site.
+### Where the three stand (2026-09-03)
+
+Measured on `feat/w4b-e072-allocation` (`26dcff2e42`), which carries both lanes.
+
+**1 — done.** `Sub` and `Div` are gated. A signed noise-symbol domain makes the
+coefficient signs part of the transfer, so `E230` now separates `x - x`
+(same-sign reuse: the naive variance overstates, safe) from `(p - a) - a`
+(opposite-sign: it understates). `ns_union_opaque` is the default transfer and
+`ns_union` the `OpAdd`-only exception, so any unmodelled operator marks its
+result sign-unknown and every later sign query fails closed. Gated by
+`ns_antigarbling_gate.sh` and `ns_dataflow_trace_gate.sh`, both green.
+
+**2 — half.** Two different surfaces compute a quadrature, and only one of them
+now costs a proof.
+
+- `stdlib/epistemic/graded_effects.sio` — **closed.** `indep_proven()` is gone: a
+  zero-argument constructor that handed out the tight bound to anyone willing to
+  *assert* independence is the same as not requiring it. Its replacement,
+  `indep_dsep(proof)`, only accepts the result of `d_separated(A, B | Z)`, which
+  does not compile unless a `causal graph` declared in source actually
+  d-separates them. True on **both** engines — the type-level obligation and the
+  proof token were carried to Madaros, which is the default and had neither.
+- `stdlib/epistemic/gum.sio` — **untouched.** `gum_combine2`, `gum_add` and
+  `gum_sub` still take bare components with no source identity and still compute
+  plain root-sum-of-squares; `gum_sub` is literally `gum_combine2` on the
+  difference, so `u(x − x) = √2·u(x)` still holds exactly as this entry
+  describes. Nothing above changes that: the two surfaces are unrelated, and
+  closing one is not closing the other.
+
+**3 — one of four.** The independent-noise-source cap moved 64 → 256. The other
+three stand, and the W4 capacity audit's contribution was to make them *named*
+rather than merely true: `covariance.sio` now carries "KNOWN DEFECT … The clamp
+below is SILENT" over the 24-variable clamp, `correlation.sio` says the fifth
+source is absorbed into `residual_u2` with the total preserved and the identity
+lost, and `lean_single.sio` records why the 8 forward-sensitivity channels are
+not a constant anyone can edit — they are hand-unrolled across 1221
+`EXPR_HSHADOW_jk`, 252 `VAR_HSHADOW_jk` and 458 `SSHADOW_n` references, because
+the language has no closures and no way to index a family of globals by number.
+Documented, not raised: the clamps are still silent at run time.
+
+**Fallback, still in force for what is not closed:** first-order coherent band by
+forward sensitivities, verified against Monte Carlo N ≥ 10⁴ in the oracle, with
+the independence assumption stated explicitly at every combination site. Item 2's
+`gum.sio` half and item 3's three remaining caps are what it still covers.
 
 ---
 

@@ -7,8 +7,8 @@ compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
           built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
           -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
           binary named in sio/README.md's own header for this engine.
-model:    sounio-uhs-coupled @ f1f55c1aec (this repo, HEAD at capture time)
-date:     2026-09-03T17:16:51Z
+model:    sounio-uhs-coupled @ 60c84eaa23 (this repo, HEAD at capture time)
+date:     2026-09-03T17:43:37Z
 
 F3 -- CAN THE ABIOTIC BAND ALONE EXPLAIN THE FIELD POINT?
 Lobodice is not evaluable (C13), so this turns on Sun Storage.
@@ -62,8 +62,9 @@ Lobodice is not evaluable (C13), so this turns on Sun Storage.
 == the site's OWN abiotic control, which needs no model ==
    Hellerschmied mesocosms M4 and M5: biocide plus 35 kGy gamma,
    so sterile rather than merely gas-swapped.
-      abiotic TOTAL-PRESSURE loss, day 10   1.22 % .. 2.20 %
-      biotic, same vessels, same 10 days    10.54 % .. 11.62 %
+      abiotic TOTAL-PRESSURE loss, day 10   1.2181 % .. 2.1953 %
+      biotic, same vessels, same 10 days    10.5419 % .. 11.6225 %
+      (computed by sio/hellerschmied_controls.sio, in the engine)
    TOTAL PRESSURE, NOT H2. Supplementary Fig. 9 reports the H2
    mole-fraction slope as not significantly different from zero
    (p = 0.352) over six days, and CH4 likewise (p = 0.311), so the
@@ -72,8 +73,8 @@ Lobodice is not evaluable (C13), so this turns on Sun Storage.
    gives the H2-specific component of it, nor a detection limit,
    so this control cannot be turned into a numerical upper bound
    on abiotic H2 consumption. It is a null without a bound.
-   ratio, biotic over abiotic, low   4790909090909e-12
-   ratio, biotic over abiotic, high  9524590163934e-12
+   ratio, biotic over abiotic, low   4802118865061e-12
+   ratio, biotic over abiotic, high  9541312671396e-12
    Same site, same brine, same cores, same duration; the only
    difference is whether the microbes were alive. Killing them
    removes roughly 5 to 10 times the loss.

@@ -1,0 +1,177 @@
+Raw stdout of sio/h2_selflimiting.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf h2_selflimiting.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 60c84eaa23 (this repo, HEAD at capture time)
+date:     2026-09-03T17:43:37Z
+
+H2 -- THE SELF-LIMITING LOOP, TESTED FOR THE FIRST TIME
+PREREGISTRATION.md line 43. Registered with H1a, never run until now.
+
+Methanogenesis HCO3- + 4 H2 + H+ -> CH4 + 3 H2O removes one DIC and
+one H+, so it is ALKALINITY-NEUTRAL: it strips carbon at constant
+alkalinity, exactly as degassing does, and pH rises. Rising pH
+raises the carbonate fraction and so raises Omega; falling DIC
+lowers it. H2 is the claim that the first wins somewhere.
+
+   initial DIC (molal)       2256521000000e-15
+   initial pH                6100000000000e-12
+   implied alkalinity (eq/kg)  1083935094229e-15
+
+== does pH actually rise as carbon is consumed? ==
+   carbon consumed  0
+      pH     6100000000000e-12
+      Omega  5231990789211e-13
+   carbon consumed  1799999999999e-13
+      pH     6284263049993e-12
+      Omega  7992182875415e-13
+   carbon consumed  3599999999999e-13
+      pH     6610655010895e-12
+      Omega  1692483234866e-12
+   carbon consumed  5400000000000e-13
+      pH     8351796964935e-12
+      Omega  8534207009730e-11
+   carbon consumed  7199999999999e-13
+      pH     9596373573298e-12
+      Omega  5511259554530e-10
+   carbon consumed  9000000000000e-13
+      pH     1017028688252e-11
+      Omega  3410791701999e-10
+   pH rises monotonically, as the alkalinity argument predicts.
+
+== THE BOUNDARY: sweep calcium, find where the loop closes ==
+   Omega >= 1 means calcite precipitates, carbon leaves the water,
+   and the loop is self-limiting. Below that it never closes.
+
+   Ca (molal)  1000000000000e-16
+      max Omega over the whole extent range  6370984405975e-13
+      loop does NOT close: Omega stays below 1 throughout
+   Ca (molal)  3162277660168e-16
+      max Omega over the whole extent range  2014682166029e-12
+      LOOP CLOSES, at carbon consumed =  6100000000000e-13
+   Ca (molal)  1000000000000e-15
+      max Omega over the whole extent range  6370984405975e-12
+      LOOP CLOSES, at carbon consumed =  5500000000000e-13
+   Ca (molal)  3162277660168e-15
+      max Omega over the whole extent range  2014682166029e-11
+      LOOP CLOSES, at carbon consumed =  5200000000000e-13
+   Ca (molal)  1000000000000e-14
+      max Omega over the whole extent range  6370984405975e-11
+      LOOP CLOSES, at carbon consumed =  5000000000000e-13
+   Ca (molal)  3162277660168e-14
+      max Omega over the whole extent range  2014682166029e-10
+      LOOP CLOSES, at carbon consumed =  4300000000000e-13
+   Ca (molal)  1000000000000e-13
+      max Omega over the whole extent range  6370984405975e-10
+      LOOP CLOSES, at carbon consumed =  2200000000000e-13
+
+== verdict on H2 ==
+   H2 predicted self-limitation over PART of parameter space, and
+   that is what the sweep shows: there is a calcium threshold, the
+   loop closes above it and never closes below it. The hypothesis
+   is CONFIRMED IN FORM. Its content is the threshold, which was
+   not stated in advance and is reported here as measured.
+
+   Note what this means alongside H1a. H1a needs calcite to
+   DISSOLVE and supply carbon; H2 has it PRECIPITATE and remove
+   carbon. They are the same mineral running in opposite
+   directions, and which one runs is set by the saturation state.
+   A reservoir cannot be in both regimes at once.
+
+== H1a AGAINST H2, at calcite saturation ==
+   Solving for the calcite extent psi that holds Omega = 1 as
+   methanogenesis proceeds. psi > 0 is dissolution, the mineral
+   FEEDING the microbes, which is H1a working. psi < 0 is
+   precipitation, the mineral TAKING carbon out, which is H2
+   shutting H1a off.
+
+   Ca (Aux Vases, molal)  8980000000000e-14
+
+   carbon methanated  0
+      calcite extent psi  1558040910364e-16
+      pH   6271141256320e-12
+      DIC  2412325091036e-15
+      -> DISSOLVING: H1a regime, mineral supplies carbon
+   carbon methanated  1000000000000e-13
+      calcite extent psi  9646783343478e-17
+      pH   6310057910042e-12
+      DIC  2127336733434e-15
+      -> DISSOLVING: H1a regime, mineral supplies carbon
+   carbon methanated  2000000000000e-13
+      calcite extent psi  3276365038524e-17
+      pH   6356062595137e-12
+      DIC  1837980450385e-15
+      -> DISSOLVING: H1a regime, mineral supplies carbon
+   carbon methanated  3000000000000e-13
+      calcite extent psi  -3643035334671e-17
+      pH   6412171414246e-12
+      DIC  1543134346653e-15
+      -> PRECIPITATING: H2 regime, mineral removes carbon
+   carbon methanated  4000000000000e-13
+      calcite extent psi  -1128183335888e-16
+      pH   6483781109570e-12
+      DIC  1241094266411e-15
+      -> PRECIPITATING: H2 regime, mineral removes carbon
+   carbon methanated  5000000000000e-13
+      calcite extent psi  -1992246483452e-16
+      pH   6582005702183e-12
+      DIC  9290358516547e-16
+      -> PRECIPITATING: H2 regime, mineral removes carbon
+   carbon methanated  6000000000000e-13
+      calcite extent psi  -3010111806037e-16
+      pH   6735908137214e-12
+      DIC  6015972193962e-16
+      -> PRECIPITATING: H2 regime, mineral removes carbon
+   carbon methanated  7000000000000e-13
+      calcite extent psi  -4311885783338e-16
+      pH   7075927893110e-12
+      DIC  2457677216661e-16
+      -> PRECIPITATING: H2 regime, mineral removes carbon
+
+== what this does to F1 ==
+   sio/coupled_gasphase.sio computes F1 with the with-calcite
+   branch holding DIC at a FIXED calcite ceiling, which assumes the
+   mineral supplies carbon without limit. The sweep above tests
+   that assumption directly, and it is the assumption on which the
+   F1 = 4.3 to 13 result rests.
+
+   It turns negative. The crossover, and what calcite is actually
+   worth before it, are located below.
+
+== the crossover, and calcite's real carbon contribution ==
+   calcite switches from source to sink at carbon methanated =  2484677573970e-13
+   most calcite ever contributes, psi_max (molal)  1558040910364e-16
+   as a fraction of the water's own initial DIC    6904615159196e-14
+
+   calcite-equilibrium DIC at 0 percent methanated   2412325091036e-15
+   calcite-equilibrium DIC at 70 percent methanated  2457677216661e-16
+   the ceiling FALLS by a factor of  9815467526340e-12
+
+== consequence for F1, stated carefully ==
+   sio/coupled_gasphase.sio holds DIC at a FIXED calcite ceiling in
+   its with-calcite branch. That ceiling is not fixed: it falls by
+   an order of magnitude as methanogenesis raises pH, and past the
+   crossover the mineral is removing carbon rather than supplying
+   it. Calcite's own net contribution never exceeds a few per cent
+   of the carbon the water already held.
+
+   So F1 = 4.3 to 13 is an UPPER BOUND that a closed system does
+   not attain. H1a contains the seed of its own termination: the
+   reaction it enables drives the water to the state where the
+   mineral stops enabling it.
+
+   ONE IDEALISATION IS DOING WORK HERE AND IS DECLARED. This test
+   is CLOSED -- no gas phase resupplies CO2, so nothing buffers the
+   pH rise. A gas reservoir rich in CO2 would hold pH down and keep
+   the mineral dissolving. But the regime where H1a matters at all
+   is the CO2-POOR feed, where that buffer is weakest and depletes
+   first. H2 therefore bites hardest exactly where H1a lives, and
+   the two pre-registered hypotheses are not independent.
+
+   Quantifying the buffered case is the next increment and is NOT
+   claimed here.

@@ -1,0 +1,39 @@
+Raw stdout of sio/hellerschmied_controls.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf hellerschmied_controls.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 60c84eaa23 (this repo, HEAD at capture time)
+date:     2026-09-03T17:43:37Z
+
+HELLERSCHMIED STERILE CONTROLS -- computed in Sounio, not Python
+Corrects a rule violation: tools/abiotic_check.py was doing this
+arithmetic, and three Sounio modules cited its output as fact.
+
+Source Data Fig. 5, sheets Fig5A_pabio and Fig5A_pbio, final row
+at t = 9.99987228 d. Normalised total pressure p_t/p_0 per cycle.
+
+== ABIOTIC, 10 cycles (biocide + 35 kGy gamma) ==
+   total-pressure loss, smallest  1218120089999e-14
+   total-pressure loss, largest   2195269799999e-14
+   mean p_t/p_0                   9848377225299e-13
+
+== BIOTIC, 14 cycles, same vessels ==
+   total-pressure loss, smallest  1054194652000e-13
+   total-pressure loss, largest   1162246464999e-13
+   mean p_t/p_0                   8905170680714e-13
+
+== the contrast ==
+   biotic over abiotic, most conservative  4802118864842e-12
+   biotic over abiotic, least conservative  9541312671396e-12
+   Killing the microbes removes between those factors of the
+   total-pressure loss. Same site, same brine, same cores, same
+   duration; the only difference is whether the microbes lived.
+
+   NOTE the biotic series has 14 cycles and the abiotic 10, so the
+   two ranges are not paired cycle-by-cycle and the ratio above is
+   a range over ranges, not a per-cycle ratio.

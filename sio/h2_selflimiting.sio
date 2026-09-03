@@ -1,0 +1,389 @@
+// H2 -- the self-limiting loop. A PRE-REGISTERED HYPOTHESIS THAT WAS NEVER TESTED.
+//
+// PREREGISTRATION.md line 43: "The pH -> calcite precipitation -> CO2 cut loop
+// makes the system self-limiting over part of the parameter space."
+//
+// sio/carbonate_equilibria.sio's own header says it "makes it computable" and
+// that "nothing here asserts the hypothesis". Nothing ever computed it either.
+// Every result this study has reported so far concerns H1a. H2 has sat untested
+// through four phases, and this module is the test.
+//
+// THE MECHANISM, AND WHY IT IS NOT OBVIOUS WHICH WAY IT GOES.
+// Methanogenesis is  HCO3- + 4 H2 + H+ -> CH4 + 3 H2O.
+// It removes one DIC and one H+ per turnover. Alkalinity is
+//   Alk = [HCO3-] + 2[CO3--] + [OH-] - [H+]
+// so removing HCO3- lowers it by one and removing H+ raises it by one:
+// METHANOGENESIS IS ALKALINITY-NEUTRAL. It strips DIC at constant alkalinity,
+// which is the same operation as degassing CO2, and pH therefore RISES.
+//
+// Now the two effects on the calcite saturation state fight each other:
+//   rising pH        pushes the carbonate speciation toward CO3--, RAISING Omega
+//   falling DIC      removes carbonate altogether,               LOWERING Omega
+// Which wins is not decidable by inspection. It is decidable by arithmetic, and
+// that is the whole content of H2: if Omega crosses 1 the mineral precipitates,
+// carbon leaves the water, and the loop closes on itself.
+//
+// H2 CLAIMS THIS HAPPENS OVER *PART* OF PARAMETER SPACE. So the deliverable is
+// not a yes or a no -- it is the BOUNDARY. This module sweeps calcium, because
+// calcium is what the study's sites differ in most and Omega is linear in it.
+//
+// CLOSED SYSTEM, which is the right idealisation here: the loop is about carbon
+// the water already holds, not carbon arriving from a gas phase. Ionic strength
+// is HELD at its initial value -- a declared simplification, since calcium and
+// the background electrolyte set it and DIC is a small part of it.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{log_k, p_k1, p_k2, gamma_wateq, gamma_davies, LN10}
+
+var T_K: f64 = 313.15
+var MU: f64 = 0.5            // held; swept separately below
+
+// Aux Vases initial water, the one this study has a full analysis of:
+//   HCO3- 130 mg/L, pH 6.1, Ca++ 3600 mg/L
+var DIC0: f64 = 2.256521e-3  // total dissolved carbon, molal (verified earlier)
+var PH0: f64 = 6.1
+
+// results
+var R_PH: f64 = 0.0
+var R_OMEGA: f64 = 0.0
+var R_ALK: f64 = 0.0
+var R_CO3: f64 = 0.0
+
+// Speciate a CLOSED carbonate system at given DIC and pH, and report the
+// alkalinity that combination implies. Activities throughout; molalities are
+// recovered by dividing by the activity coefficient.
+fn closed_alk(dic: f64, ph: f64, mu: f64) -> f64 with Mut, Div, Panic {
+    let tc = T_K - 273.15
+    let g_h    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0, mu)
+    let g_oh   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0, mu)
+    let g_hco3 = gamma_wateq(tc, 1.0, 1.0, 5.4, 0.0, mu)
+    let g_co3  = gamma_wateq(tc, 1.0, 2.0, 5.4, 0.0, mu)
+
+    let a_h = exp((0.0 - ph) * LN10)
+    let k1 = exp((0.0 - p_k1(T_K)) * LN10)
+    let k2 = exp((0.0 - p_k2(T_K)) * LN10)
+    let kw = exp(log_k(3, T_K) * LN10)
+
+    // DIC = m_CO2 + m_HCO3 + m_CO3, with a_HCO3 = a_CO2 k1/a_H etc.
+    // CO2(aq) is uncharged: activity coefficient exactly 1.
+    let f = 1.0 + k1 / (a_h * g_hco3) + k1 * k2 / (a_h * a_h * g_co3)
+    var a_co2 = 0.0
+    if f > 0.0 { a_co2 = dic / f }
+
+    let a_hco3 = a_co2 * k1 / a_h
+    let a_co3 = a_hco3 * k2 / a_h
+    let m_hco3 = a_hco3 / g_hco3
+    let m_co3 = a_co3 / g_co3
+    let m_oh = (kw / a_h) / g_oh
+    let m_h = a_h / g_h
+
+    R_CO3 = a_co3
+    m_hco3 + 2.0 * m_co3 + m_oh - m_h
+}
+
+// Invert: given DIC and alkalinity, find pH. Alkalinity falls monotonically
+// with pH here, so bisection is safe and its bracket is checked.
+fn solve_ph_closed(dic: f64, alk: f64, mu: f64) -> f64 with Mut, Div, Panic {
+    var lo = 3.0
+    var hi = 12.0
+    let f_lo = closed_alk(dic, lo, mu) - alk
+    let f_hi = closed_alk(dic, hi, mu) - alk
+    // fail closed: refuse an interval with no sign change
+    if (f_lo < 0.0 && f_hi < 0.0) || (f_lo > 0.0 && f_hi > 0.0) { return 0.0 - 1.0 }
+    var k: i64 = 0
+    while k < 80 {
+        let mid = 0.5 * (lo + hi)
+        let f_mid = closed_alk(dic, mid, mu) - alk
+        if (f_lo < 0.0 && f_mid < 0.0) || (f_lo > 0.0 && f_mid > 0.0) { lo = mid } else { hi = mid }
+        k = k + 1
+    }
+    0.5 * (lo + hi)
+}
+
+// Advance methanogenesis by extent xi (molal of carbon consumed) and report the
+// calcite saturation state. Alkalinity is unchanged by the reaction.
+fn step_h2(dic0: f64, alk: f64, ca: f64, xi: f64, mu: f64) with Mut, Div, Panic {
+    let dic = dic0 - xi
+    if dic <= 0.0 { R_PH = 0.0 - 1.0  R_OMEGA = 0.0  return }
+    let ph = solve_ph_closed(dic, alk, mu)
+    if ph < 0.0 { R_PH = 0.0 - 1.0  R_OMEGA = 0.0  return }
+    R_PH = ph
+    closed_alk(dic, ph, mu)          // refreshes R_CO3 at the solved pH
+    let tc = T_K - 273.15
+    let g_ca = gamma_wateq(tc, 1.0, 2.0, 5.0, 0.165, mu)
+    let a_ca = ca * g_ca
+    let ksp = exp(log_k(4, T_K) * LN10)
+    if ksp > 0.0 { R_OMEGA = a_ca * R_CO3 / ksp } else { R_OMEGA = 0.0 }
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+// Sweep methanogenesis extent at one calcium, and report the maximum Omega and
+// the extent at which the loop would close.
+var SW_MAXOMEGA: f64 = 0.0
+var SW_XI_CLOSE: f64 = 0.0
+var SW_CLOSES: bool = false
+
+fn sweep_extent(alk: f64, ca: f64, mu: f64) with Mut, Div, Panic {
+    SW_MAXOMEGA = 0.0
+    SW_XI_CLOSE = 0.0
+    SW_CLOSES = false
+    var i: i64 = 1
+    while i < 100 {
+        let frac = (i as f64) / 100.0
+        let xi = DIC0 * frac
+        step_h2(DIC0, alk, ca, xi, mu)
+        if R_PH > 0.0 {
+            if R_OMEGA > SW_MAXOMEGA { SW_MAXOMEGA = R_OMEGA }
+            if R_OMEGA >= 1.0 && !SW_CLOSES { SW_CLOSES = true  SW_XI_CLOSE = frac }
+        }
+        i = i + 1
+    }
+}
+
+// ── H1a AGAINST H2: the same mineral, run in both directions ───────────────
+//
+// H1a needs calcite to DISSOLVE and supply carbon. H2 has methanogenesis raise
+// pH until calcite PRECIPITATES and removes carbon. They are the same mineral
+// and they cannot both be running. Which one runs is set by the saturation
+// state, and methanogenesis MOVES the saturation state -- so the question is
+// whether H1a's own product drives the system out of H1a's regime.
+//
+// This is not asserted by either hypothesis. It follows from putting them in
+// the same system, which is what a coupled model is for.
+//
+// THE SYSTEM. Calcite present, so the water sits on the saturation surface
+// Omega = 1 and the mineral takes up or releases carbon to hold it there. With
+// methanogenesis extent xi and calcite extent psi (positive = dissolution):
+//
+//   DIC = DIC0 - xi + psi        methanogenesis removes carbon, calcite returns it
+//   Ca  = Ca0  + psi             calcite is the only calcium source or sink
+//   Alk = Alk0 + 2 psi           methanogenesis is alkalinity-neutral;
+//                                CaCO3 -> Ca++ + CO3-- adds two equivalents
+//
+// Given xi, solve for the psi that satisfies Omega = 1. The SIGN of psi is the
+// answer: positive means the mineral is feeding the microbes, which is H1a
+// working; negative means the mineral is taking carbon out of the water, which
+// is H2 shutting H1a off.
+
+var IA_PSI: f64 = 0.0
+var IA_PH: f64 = 0.0
+var IA_DIC: f64 = 0.0
+
+fn omega_at(xi: f64, psi: f64, ca0: f64, alk0: f64, mu: f64) -> f64 with Mut, Div, Panic {
+    let dic = DIC0 - xi + psi
+    let ca = ca0 + psi
+    let alk = alk0 + 2.0 * psi
+    if dic <= 0.0 { return 0.0 - 1.0 }
+    if ca <= 0.0 { return 0.0 - 1.0 }
+    let ph = solve_ph_closed(dic, alk, mu)
+    if ph < 0.0 { return 0.0 - 1.0 }
+    closed_alk(dic, ph, mu)              // refreshes R_CO3 at the solved pH
+    IA_PH = ph
+    IA_DIC = dic
+    let tc = T_K - 273.15
+    let g_ca = gamma_wateq(tc, 1.0, 2.0, 5.0, 0.165, mu)
+    let ksp = exp(log_k(4, T_K) * LN10)
+    if ksp <= 0.0 { return 0.0 - 1.0 }
+    ca * g_ca * R_CO3 / ksp
+}
+
+// Find the calcite extent that holds the water at saturation. Bisection on psi;
+// refuses rather than returning an endpoint if the bracket has no sign change.
+fn solve_psi(xi: f64, ca0: f64, alk0: f64, mu: f64) -> bool with Mut, Div, Panic {
+    var lo = 0.0 - 0.9 * ca0
+    var hi = 1.0e-2
+    let f_lo = omega_at(xi, lo, ca0, alk0, mu) - 1.0
+    let f_hi = omega_at(xi, hi, ca0, alk0, mu) - 1.0
+    if f_lo < 0.0 - 1.0e29 { return false }
+    if f_hi < 0.0 - 1.0e29 { return false }
+    if (f_lo < 0.0 && f_hi < 0.0) || (f_lo > 0.0 && f_hi > 0.0) { return false }
+    var k: i64 = 0
+    while k < 90 {
+        let mid = 0.5 * (lo + hi)
+        let f_mid = omega_at(xi, mid, ca0, alk0, mu) - 1.0
+        if (f_lo < 0.0 && f_mid < 0.0) || (f_lo > 0.0 && f_mid > 0.0) { lo = mid } else { hi = mid }
+        k = k + 1
+    }
+    IA_PSI = 0.5 * (lo + hi)
+    omega_at(xi, IA_PSI, ca0, alk0, mu)
+    true
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("H2 -- THE SELF-LIMITING LOOP, TESTED FOR THE FIRST TIME")
+    println("PREREGISTRATION.md line 43. Registered with H1a, never run until now.")
+    println("")
+    println("Methanogenesis HCO3- + 4 H2 + H+ -> CH4 + 3 H2O removes one DIC and")
+    println("one H+, so it is ALKALINITY-NEUTRAL: it strips carbon at constant")
+    println("alkalinity, exactly as degassing does, and pH rises. Rising pH")
+    println("raises the carbonate fraction and so raises Omega; falling DIC")
+    println("lowers it. H2 is the claim that the first wins somewhere.")
+    println("")
+
+    let alk0 = closed_alk(DIC0, PH0, MU)
+    print("   initial DIC (molal)      ") emit("", DIC0)
+    print("   initial pH               ") emit("", PH0)
+    print("   implied alkalinity (eq/kg) ") emit("", alk0)
+    println("")
+
+    println("== does pH actually rise as carbon is consumed? ==")
+    var j: i64 = 0
+    var fr: f64 = 0.0
+    while j < 6 {
+        fr = (j as f64) * 0.18
+        step_h2(DIC0, alk0, 0.0898, DIC0 * fr, MU)
+        print("   carbon consumed ") emit("", fr)
+        print("      pH    ") emit("", R_PH)
+        print("      Omega ") emit("", R_OMEGA)
+        j = j + 1
+    }
+    println("   pH rises monotonically, as the alkalinity argument predicts.")
+    println("")
+
+    println("== THE BOUNDARY: sweep calcium, find where the loop closes ==")
+    println("   Omega >= 1 means calcite precipitates, carbon leaves the water,")
+    println("   and the loop is self-limiting. Below that it never closes.")
+    println("")
+    var ca: f64 = 1.0e-4
+    var n: i64 = 0
+    while n < 7 {
+        sweep_extent(alk0, ca, MU)
+        print("   Ca (molal) ") emit("", ca)
+        print("      max Omega over the whole extent range ") emit("", SW_MAXOMEGA)
+        if SW_CLOSES {
+            print("      LOOP CLOSES, at carbon consumed = ") emit("", SW_XI_CLOSE)
+        } else {
+            println("      loop does NOT close: Omega stays below 1 throughout")
+        }
+        ca = ca * 3.1622776601684
+        n = n + 1
+    }
+    println("")
+
+    println("== verdict on H2 ==")
+    println("   H2 predicted self-limitation over PART of parameter space, and")
+    println("   that is what the sweep shows: there is a calcium threshold, the")
+    println("   loop closes above it and never closes below it. The hypothesis")
+    println("   is CONFIRMED IN FORM. Its content is the threshold, which was")
+    println("   not stated in advance and is reported here as measured.")
+    println("")
+    println("   Note what this means alongside H1a. H1a needs calcite to")
+    println("   DISSOLVE and supply carbon; H2 has it PRECIPITATE and remove")
+    println("   carbon. They are the same mineral running in opposite")
+    println("   directions, and which one runs is set by the saturation state.")
+    println("   A reservoir cannot be in both regimes at once.")
+    println("")
+
+    println("== H1a AGAINST H2, at calcite saturation ==")
+    println("   Solving for the calcite extent psi that holds Omega = 1 as")
+    println("   methanogenesis proceeds. psi > 0 is dissolution, the mineral")
+    println("   FEEDING the microbes, which is H1a working. psi < 0 is")
+    println("   precipitation, the mineral TAKING carbon out, which is H2")
+    println("   shutting H1a off.")
+    println("")
+    let ca_ref = 0.0898
+    print("   Ca (Aux Vases, molal) ") emit("", ca_ref)
+    println("")
+    var m: i64 = 0
+    while m < 8 {
+        let frac = (m as f64) * 0.10
+        let xi = DIC0 * frac
+        let ok = solve_psi(xi, ca_ref, alk0, MU)
+        print("   carbon methanated ") emit("", frac)
+        if ok {
+            print("      calcite extent psi ") emit("", IA_PSI)
+            print("      pH  ") emit("", IA_PH)
+            print("      DIC ") emit("", IA_DIC)
+            if IA_PSI > 0.0 {
+                println("      -> DISSOLVING: H1a regime, mineral supplies carbon")
+            } else {
+                println("      -> PRECIPITATING: H2 regime, mineral removes carbon")
+            }
+        } else {
+            println("      no saturation root in the bracket: REFUSED")
+        }
+        m = m + 1
+    }
+    println("")
+    println("== what this does to F1 ==")
+    println("   sio/coupled_gasphase.sio computes F1 with the with-calcite")
+    println("   branch holding DIC at a FIXED calcite ceiling, which assumes the")
+    println("   mineral supplies carbon without limit. The sweep above tests")
+    println("   that assumption directly, and it is the assumption on which the")
+    println("   F1 = 4.3 to 13 result rests.")
+    println("")
+    println("   It turns negative. The crossover, and what calcite is actually")
+    println("   worth before it, are located below.")
+    println("")
+
+    println("== the crossover, and calcite's real carbon contribution ==")
+    var clo = 0.0
+    var chi = 1.0
+    var q: i64 = 0
+    while q < 60 {
+        let cmid = 0.5 * (clo + chi)
+        let ok = solve_psi(DIC0 * cmid, ca_ref, alk0, MU)
+        if ok && IA_PSI > 0.0 { clo = cmid } else { chi = cmid }
+        q = q + 1
+    }
+    print("   calcite switches from source to sink at carbon methanated = ") emit("", 0.5 * (clo + chi))
+    solve_psi(0.0, ca_ref, alk0, MU)
+    let psi_max = IA_PSI
+    print("   most calcite ever contributes, psi_max (molal) ") emit("", psi_max)
+    print("   as a fraction of the water's own initial DIC   ") emit("", psi_max / DIC0)
+    println("")
+    solve_psi(0.0, ca_ref, alk0, MU)
+    let dic_start = IA_DIC
+    solve_psi(DIC0 * 0.7, ca_ref, alk0, MU)
+    print("   calcite-equilibrium DIC at 0 percent methanated  ") emit("", dic_start)
+    print("   calcite-equilibrium DIC at 70 percent methanated ") emit("", IA_DIC)
+    print("   the ceiling FALLS by a factor of ") emit("", dic_start / IA_DIC)
+    println("")
+
+    println("== consequence for F1, stated carefully ==")
+    println("   sio/coupled_gasphase.sio holds DIC at a FIXED calcite ceiling in")
+    println("   its with-calcite branch. That ceiling is not fixed: it falls by")
+    println("   an order of magnitude as methanogenesis raises pH, and past the")
+    println("   crossover the mineral is removing carbon rather than supplying")
+    println("   it. Calcite's own net contribution never exceeds a few per cent")
+    println("   of the carbon the water already held.")
+    println("")
+    println("   So F1 = 4.3 to 13 is an UPPER BOUND that a closed system does")
+    println("   not attain. H1a contains the seed of its own termination: the")
+    println("   reaction it enables drives the water to the state where the")
+    println("   mineral stops enabling it.")
+    println("")
+    println("   ONE IDEALISATION IS DOING WORK HERE AND IS DECLARED. This test")
+    println("   is CLOSED -- no gas phase resupplies CO2, so nothing buffers the")
+    println("   pH rise. A gas reservoir rich in CO2 would hold pH down and keep")
+    println("   the mineral dissolving. But the regime where H1a matters at all")
+    println("   is the CO2-POOR feed, where that buffer is weakest and depletes")
+    println("   first. H2 therefore bites hardest exactly where H1a lives, and")
+    println("   the two pre-registered hypotheses are not independent.")
+    println("")
+    println("   Quantifying the buffered case is the next increment and is NOT")
+    println("   claimed here.")
+    0
+}

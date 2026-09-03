@@ -1,0 +1,148 @@
+// The sterile-control statistics, computed in the ENGINE.
+//
+// WHY THIS MODULE EXISTS, WHICH IS A RULE VIOLATION BEING CORRECTED.
+// The mission rule is: Sounio is the engine; Python only for oracle binding and
+// data marshalling, NEVER for calculation of our own. `tools/abiotic_check.py`
+// broke it. Its own docstring said so plainly -- it "computes nothing beyond
+// 1 - p_t/p_0 and a min/max across cycles" -- and that is still calculation.
+// Worse, the numbers it produced propagated: sio/hellerschmied_validation.sio
+// quoted them in its header as established fact, and sio/f3_abiotic_band.sio
+// printed them as hardcoded strings. A Python-produced number was being cited
+// by three Sounio modules and by the write-up.
+//
+// The division of labour is now the one the rule specifies. `xlsx_to_tsv.py`
+// EXTRACTS the series from the workbook, which is marshalling and is allowed.
+// Everything arithmetic happens here.
+//
+// THE DATA, marshalled from Hellerschmied et al. 2024 Source Data Fig. 5
+// (CC BY 4.0), sheets Fig5A_pabio and Fig5A_pbio, final row at
+// t = 9.99987228 days. These are normalised total pressures p_t/p_0, one per
+// cycle, transcribed verbatim from the extraction and not rounded.
+//
+// TOTAL PRESSURE, NOT H2. Supplementary Fig. 9 reports the H2 mole-fraction
+// slope as not significantly different from zero (p = 0.352) over six days, so
+// the abiotic decline is non-selective. This module bounds total abiotic gas
+// loss and says nothing about an H2-specific reaction.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+var PABIO: [f64; 10] = [0.0; 10]
+var PBIO: [f64; 14] = [0.0; 14]
+
+fn load_series() with Mut {
+    PABIO[0] = 0.98095251309999998
+    PABIO[1] = 0.98600086310000001
+    PABIO[2] = 0.98377582279999998
+    PABIO[3] = 0.98733345979999998
+    PABIO[4] = 0.98553837119999999
+    PABIO[5] = 0.98723282089999997
+    PABIO[6] = 0.98587213819999997
+    PABIO[7] = 0.98781879910000003
+    PABIO[8] = 0.97804730200000001
+    PABIO[9] = 0.98580513510000001
+
+    PBIO[0]  = 0.89458053479999999
+    PBIO[1]  = 0.89287191740000005
+    PBIO[2]  = 0.89236649219999997
+    PBIO[3]  = 0.89430141860000001
+    PBIO[4]  = 0.89084805450000004
+    PBIO[5]  = 0.88861510060000004
+    PBIO[6]  = 0.88480589269999999
+    PBIO[7]  = 0.88771708869999999
+    PBIO[8]  = 0.88377535350000003
+    PBIO[9]  = 0.8872715323
+    PBIO[10] = 0.88935808910000003
+    PBIO[11] = 0.89380056240000005
+    PBIO[12] = 0.89266202269999995
+    PBIO[13] = 0.89426489350000005
+}
+
+var ST_LO: f64 = 0.0
+var ST_HI: f64 = 0.0
+var ST_MEAN: f64 = 0.0
+
+// which: 0 = abiotic (10 cycles), 1 = biotic (14 cycles)
+fn stats(which: i64) with Mut, Div, Panic {
+    var n: i64 = 10
+    if which != 0 { n = 14 }
+    var lo = 2.0
+    var hi = 0.0
+    var sum = 0.0
+    var i: i64 = 0
+    while i < n {
+        var v = 0.0
+        if which == 0 { v = PABIO[i] } else { v = PBIO[i] }
+        if v < lo { lo = v }
+        if v > hi { hi = v }
+        sum = sum + v
+        i = i + 1
+    }
+    // loss = 1 - p_t/p_0, so the LARGEST loss comes from the SMALLEST pressure
+    ST_LO = 1.0 - hi
+    ST_HI = 1.0 - lo
+    ST_MEAN = sum / (n as f64)
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("HELLERSCHMIED STERILE CONTROLS -- computed in Sounio, not Python")
+    println("Corrects a rule violation: tools/abiotic_check.py was doing this")
+    println("arithmetic, and three Sounio modules cited its output as fact.")
+    println("")
+    println("Source Data Fig. 5, sheets Fig5A_pabio and Fig5A_pbio, final row")
+    println("at t = 9.99987228 d. Normalised total pressure p_t/p_0 per cycle.")
+    println("")
+
+    load_series()
+
+    println("== ABIOTIC, 10 cycles (biocide + 35 kGy gamma) ==")
+    stats(0)
+    print("   total-pressure loss, smallest ") emit("", ST_LO)
+    print("   total-pressure loss, largest  ") emit("", ST_HI)
+    print("   mean p_t/p_0                  ") emit("", ST_MEAN)
+    let ab_lo = ST_LO
+    let ab_hi = ST_HI
+    println("")
+
+    println("== BIOTIC, 14 cycles, same vessels ==")
+    stats(1)
+    print("   total-pressure loss, smallest ") emit("", ST_LO)
+    print("   total-pressure loss, largest  ") emit("", ST_HI)
+    print("   mean p_t/p_0                  ") emit("", ST_MEAN)
+    let bi_lo = ST_LO
+    let bi_hi = ST_HI
+    println("")
+
+    println("== the contrast ==")
+    print("   biotic over abiotic, most conservative ") emit("", bi_lo / ab_hi)
+    print("   biotic over abiotic, least conservative ") emit("", bi_hi / ab_lo)
+    println("   Killing the microbes removes between those factors of the")
+    println("   total-pressure loss. Same site, same brine, same cores, same")
+    println("   duration; the only difference is whether the microbes lived.")
+    println("")
+    println("   NOTE the biotic series has 14 cycles and the abiotic 10, so the")
+    println("   two ranges are not paired cycle-by-cycle and the ratio above is")
+    println("   a range over ranges, not a per-cycle ratio.")
+    0
+}

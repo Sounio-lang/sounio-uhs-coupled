@@ -2,9 +2,11 @@
 //
 // THE MEASUREMENT. Source Data Fig. 5, sheet Fig5A_pabio (CC BY 4.0): ten
 // abiotic cycles, ten days each, 482 points per cycle, normalised total
-// pressure p_t/p_0. Reproduced independently by tools/abiotic_check.py:
-//   abiotic total-pressure loss at day 10 = 1.22 % .. 2.20 %, mean p_t/p0 0.9848
-//   biotic, for contrast                 = 10.54 % .. 11.62 %
+// pressure p_t/p_0. Computed by sio/hellerschmied_controls.sio -- IN THE
+// ENGINE, which it previously was not; see that module's header for the rule
+// violation this corrects:
+//   abiotic total-pressure loss at day 10 = 1.2181 % .. 2.1953 %, mean 0.98483772
+//   biotic, for contrast                 = 10.5419 % .. 11.6225 %
 //
 // The controls are genuinely abiotic: mesocosms M4 and M5 received a biocide
 // and 35 kGy of gamma irradiation, so this is a sterility control and not

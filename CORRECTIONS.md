@@ -617,3 +617,69 @@ A parallel warning from the same literature: McCollom & Donaldson (2016),
 over 213 days at 90 °C traced entirely to **butyl rubber stoppers** — the
 mineral-free controls produced the same signal. Where this study eventually
 specifies experiments, a rock-free blank is not optional.
+
+## C18 — This study broke its own Python rule, and a number was wrong because of it
+
+The mission rule is explicit: *"Sounio é a engine … Python só onde não existe
+binding C++ e só para oráculo, nunca para cálculo próprio."* Python for oracle
+binding and data marshalling; **never for calculation of our own.** The README
+restates it. This study broke it in three places, found by challenge rather than
+by its own checks.
+
+**1. A committed tool computed.** `tools/abiotic_check.py` read the mesocosm
+pressure series and then computed `1 − p_t/p_0`, a min, a max and a mean across
+cycles. Its own docstring said so — *"computes nothing beyond 1 - p_t/p_0 and a
+min/max across cycles"* — which concedes the point rather than defending it.
+
+**2. It propagated into the engine.** `sio/hellerschmied_validation.sio` quoted
+that Python output in its header as established fact, and
+`sio/f3_abiotic_band.sio` printed the same numbers as hardcoded string literals
+and divided them. **Three Sounio modules and the write-up were all citing a
+Python-produced number.**
+
+**3. And it was wrong.** Not the extraction — the rounding. The Python printed
+`1.22 % .. 2.20 %` and `10.54 % .. 11.62 %` to two decimals, and the ratio was
+then formed *from those rounded strings*: 10.54/2.20 and 11.62/1.22, giving
+**4.79 to 9.52**. Computed in the engine from the unrounded series, the same
+ratio is **4.802 to 9.541**. A small error, and exactly the kind the rule exists
+to prevent: a printed intermediate became an input.
+
+**The corrected division of labour.** `tools/xlsx_to_tsv.py` extracts the series
+from the workbook — marshalling, which the rule allows.
+`sio/hellerschmied_controls.sio` does every arithmetic step in Sounio, from the
+verbatim per-cycle values. `tools/abiotic_check.py` is **deleted**: its
+extraction was already covered and its arithmetic had no business existing.
+
+| quantity | was (Python) | is (engine) |
+|---|---|---|
+| abiotic total-pressure loss, day 10 | 1.22 % .. 2.20 % | **1.2181 % .. 2.1953 %** |
+| biotic, same vessels | 10.54 % .. 11.62 % | **10.5419 % .. 11.6225 %** |
+| mean abiotic p_t/p_0 | 0.9848 | **0.98483772** |
+| biotic ÷ abiotic | 4.79 .. 9.52 | **4.802 .. 9.541** |
+
+**A second instance is recorded and not yet removed.**
+`tools/thaysen_envelopes.py` computes *"empirical growth envelopes per metabolic
+group"* — calculation, by its own description. Its envelope numbers are
+superseded by `sio/thaysen_band.sio`, which does that work in the engine; the
+tool's remaining documented use in `data/README.md` is producing strain counts
+per metabolic group, which is classification of source rows rather than
+calculation. It is left in place with that use narrowed, and flagged here rather
+than quietly reclassified.
+
+**A third instance has no artefact to correct.** Exploratory arithmetic was run
+in Python during this session — the field decomposition, the CO₂ dissolution
+capacity, the Truche bound, the reaction-free comparison. Most was
+re-implemented in Sounio and checked to agree before anything was committed, so
+the committed numbers have Sounio producers. One did not: `RESULTS.md` stated
+unrecovered H₂ of *"9 % to 36 %"*, which was the complement of a published
+recovery range, taken in Python and never reproduced anywhere. It now quotes the
+source's own published figures (64–91 % recovery) instead of a complement this
+study computed.
+
+**Why this is recorded as a correction rather than fixed silently.** The rule is
+not stylistic. Its purpose is that every number in the deliverable has one
+producer, in one language, that a reader can re-run. Three Sounio modules citing
+a deleted Python script's rounded stdout is precisely the failure the provenance
+discipline is meant to catch — and it was caught by a reader's question, not by
+`audit_provenance.py`. **That the mechanical check did not flag it is itself a
+finding**, and closing that gap belongs on the tooling list.

@@ -145,10 +145,12 @@ numbers give cushion-gas migration **9 310 m³ (50.5 %)**, dissolution ≤ **3 6
 
 An independent **reaction-free** reservoir simulation — Eckel et al. 2025, Ketzin,
 open access, hysteretic relative permeability, 10-month cycles, **no microbial or
-geochemical reactions of any kind** — puts unrecovered H₂ at **9 % to 36 %**
-(5–11 % residually trapped, up to 25 % mobile-but-unrecovered, ≤ 3 % dissolved).
-**The observed 15.60 % lies inside that range.** Physical trapping and incomplete
-sweep alone are numerically sufficient to produce the Lehen shortfall.
+geochemical reactions of any kind** — reports H₂ recovery of **64 % (long
+vertical well) to 91 % (long horizontal well)**, with 5–11 % residually trapped,
+up to 25 % mobile-but-unrecovered and ≤ 3 % dissolved (all values as published).
+**The observed recovery of 84.40 % / 83.58 % lies inside that published range.**
+Physical trapping and incomplete sweep alone are numerically sufficient to
+produce the Lehen shortfall.
 
 And **composition change is not evidence of reaction**: the same reaction-free
 model shifts produced-stream H₂ purity from 12–27 % to 68–84 % across ten cycles,

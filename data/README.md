@@ -141,7 +141,7 @@ entity declaration.
 
 ```sh
 python3 tools/xlsx_to_tsv.py data/thaysen-strains/*.xlsx --sheet "all info" > allinfo.tsv
-python3 tools/thaysen_envelopes.py allinfo.tsv
+python3 tools/thaysen_envelopes.py allinfo.tsv   # strain COUNTS only; envelope arithmetic is superseded by sio/thaysen_band.sio -- see CORRECTIONS.md C18
 ```
 
 Columns give, per strain, optimum and lower/upper critical values for

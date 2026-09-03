@@ -512,3 +512,108 @@ A second convention gap is carried alongside: **the paper never defines its
 standard cubic metre.** 0 °C and 1 atm gives 22.414 L/mol, ISO 13443 at 15 °C
 gives 23.645 — a 5.5 % difference on every volume-to-mole conversion. Both are
 reported above rather than one being chosen.
+
+## C16 — The field's anchor for "abiotic H₂ reactivity is negligible" is an extrapolation presented as a measurement
+
+Two numbers carry essentially the whole quantitative case that abiotic hydrogen
+reactivity can be neglected in underground storage. Both are transmitted through
+Trémosa et al. (2023) §2.2, verbatim:
+
+> *"the experiments conducted by Truche et al. (2009) **found** a half-life of
+> sulfate undergoing sulfate reduction, in the absence of bacteria, of **210,000
+> years at 90 °C**. Similarly, the same range of half-life (**160,000 years**) was
+> **measured** under sterile conditions for oxidized carbon during methanogenesis
+> at **100 °C** (Seewald et al., 2006)."*
+
+**The first is not a measurement at 90 °C.** Truche et al. (2010), *GCA*
+74:2894–2914 — the same group, author-hosted PDF openly available, read directly
+and independently by two separate searches — states:
+
+> *"the **extrapolation** of experiments conducted at **250–280 °C** (Truche et al.,
+> 2009) led to a value of 210,000 years for the sulfate half-life at 90 °C"*
+
+So a **160–190 °C downward extrapolation** is restated downstream with the verb
+*found*. Not a misquotation of a value — a change of epistemic category, from
+extrapolated to measured, in a single citation step.
+
+**The second cannot be adjudicated.** Trémosa calls the 160,000-year carbon
+half-life *measured*; Truche et al. (2013) reportedly call the same figure
+*estimated*. The primary source — Seewald, Zolotov & McCollom (2006), *GCA*
+70:446–460, DOI `10.1016/j.gca.2005.09.002` — is **closed access**, and the WHOI
+open repository copy returned **HTTP 403** on three separate routes. Which
+characterisation is right cannot be determined from what is publicly reachable.
+
+**This is not a complaint about other people's papers.** It matters because F3
+asks whether abiotic processes alone explain the field observation, and these two
+numbers are what the literature offers in place of a measured rate. A study that
+inherited them would be inheriting an extrapolation and an unverifiable figure
+while believing it had inherited two measurements.
+
+**What this study does instead.** It does not use either number. Channel (b) in
+`sio/f3_abiotic_band.sio` is bounded from Truche et al. (2010) **run #P20**, which
+is a measurement and not an extrapolation: 90 °C, 8 bar H₂, calcite-buffered,
+40–80 µm pyrite, sampled to 2472 h, aqueous sulfide **below 0.1 mmol/L at every
+timepoint**. That gives **< 0.033 %** of the field hydrogen inventory over the
+run, **< 0.053 %** scaled to 285 days using Truche's own fitted time exponent
+(0.47). The bound is measured at 90 °C and applied to a 40 °C field, so only the
+**sign** of the temperature dependence is used, never its magnitude — the
+distinction C16 exists to protect. Truche's fitted rate constants stop at 120 °C;
+a quantitative extrapolation to 40 °C would run 80 °C below the calibration floor,
+on a parabolic law the authors themselves describe as mechanistically mixed.
+
+**Corroborating the gap rather than the number**, the field's own authoritative
+review — Braid, Taylor, Hough, Rochelle, Niasar & Ma (2024), *Earth-Science
+Reviews* 259:104975, with British Geological Survey co-authorship, green OA at
+NERC NORA — says plainly:
+
+> *"Currently, there is **little quantitative analysis** on geochemical reactions
+> concerning temperature and pressure relevant to the expected storage conditions
+> across a variety of host rock mineralogies."*
+> *"The available literature **fails to clarify** the potential for reactions over
+> relevant storage time scales of 10s of years."*
+
+One further trap, recorded so it is not walked into: the frequently-quoted **9.5 %
+hydrogen loss to calcite** (Bo et al. 2021) is a **PHREEQC model output**, not a
+measurement, as are the goethite and anhydrite consumption of Hemme & van Berk
+(2018) and the 50 °C / 1000-day pyrrhotite result of Labus & Tarkowski (2022).
+All three circulate in citing literature without that qualifier.
+
+---
+
+## C17 — A sterile control's own leakage can exceed the effect it is controlling for
+
+`sio/f3_abiotic_band.sio` leans on Hellerschmied's γ-irradiated abiotic mesocosms
+(M4, M5), which lost **1.22–2.20 %** of total pressure over 10 days against
+**10.54–11.62 %** biotic. C15's correction already noted that this is *total
+pressure*, not H₂. There is a second limit on what it can support.
+
+Černá et al. (2025), *World J. Microbiol. Biotechnol.*, DOI
+`10.1007/s11274-025-04542-0`, open access — a **four-laboratory round-robin** on
+microbial hydrogen-consumption testing — reports:
+
+> *"**abiotic hydrogen loss, particularly leakage from experimental bottles, was
+> identified as a significant factor**"*
+> *"Because H₂ is a highly diffusive and permeable molecule, it tends to leak from
+> experimental systems gradually"*
+
+Hydrogen loss in **sterile controls**, same incubation period, four labs:
+**26 %, negligible, 8.8 %, none detected.** One laboratory reduced its own loss
+from 26 % to about 5 % after optimisation.
+
+**So an 8.8–26 % apparent H₂ loss is achievable from septa and fittings alone.**
+The real detection limit of any such experiment is its vessel blank — rock-free,
+sterile, same septa, same sampling schedule — and not its gas chromatograph.
+
+This does **not** invalidate the Hellerschmied control: those were welded
+stainless mesocosms with continuous logging, and its 1.22–2.20 % is at the low
+end of the round-robin's range. But it fixes how much weight the control can
+carry. The control is consistent with apparatus leakage, with dissolution, and
+with a genuine small abiotic reaction, and **it does not distinguish between
+them.** Reading it as evidence that abiotic *reaction* is small is reading more
+than it says.
+
+A parallel warning from the same literature: McCollom & Donaldson (2016),
+*Astrobiology* 16:389–406, found that apparent low-temperature methane generation
+over 213 days at 90 °C traced entirely to **butyl rubber stoppers** — the
+mineral-free controls produced the same signal. Where this study eventually
+specifies experiments, a rock-free blank is not optional.

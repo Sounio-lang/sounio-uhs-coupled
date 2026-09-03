@@ -63,7 +63,7 @@
 //
 // NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
 
-use carbonate_equilibria::{LN10}
+use carbonate_equilibria::{LN10, powf}
 
 // H2(g) = H2(aq) Henry, five-term analytic form, verbatim from the pinned
 // phreeqc.dat -- the same constants sio/hellerschmied_validation.sio uses.
@@ -75,6 +75,20 @@ var H2_A4: f64 = 1.4341
 var H2_A5: f64 = 1.2815e5
 
 var R_LATM: f64 = 0.082057338
+
+// Truche, Berger, Destrigneville, Guillaume & Giffaut (2010), GCA 74:2894-2914,
+// run #P20 -- a MEASURED NULL, and the only quantitative abiotic bound this
+// study has found anywhere near its own temperature window.
+//   90 C, P(H2) = 8 bar, calcite-buffered, sized pyrite 40-80 um,
+//   sampled at 96, 264, 456, 624, 960, 1200, 1608 and 2472 h;
+//   [S2-]aq BELOW 0.1 mmol/L at every timepoint.
+// Pyrite reduction FeS2 + (1-x)H2 -> FeS(1+x) + (1-x)H2S consumes at most one
+// H2 per sulfide produced, so the sulfide ceiling is an H2 ceiling.
+var TRUCHE_S_BOUND: f64 = 1.0e-4     // mol/L, i.e. molal in dilute brine
+var TRUCHE_HOURS: f64 = 2472.0
+var TRUCHE_B: f64 = 0.47             // their fitted time exponent, parabolic
+var FIELD_HOURS: f64 = 6840.0        // 285 d
+var FIELD_H2_MOLAL: f64 = 0.30196    // field gas at V_gas = 1 L/kg
 
 // Sun Storage, as recorded in CORRECTIONS.md C3: 84.397 % on one volume basis,
 // 83.579 % on the other, and the two bases are unreconciled. Both are carried.
@@ -206,17 +220,49 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     println("   does not measure them.")
     println("")
 
-    println("== channels (b), (c), (d): REFUSED ==")
-    println("   (b) abiotic mineral redox  -- no measured rate in this study")
-    println("   (c) abiotic methanation    -- K is 1e28..1e37, barrier is purely")
-    println("       kinetic, and no rate is supplied by any source here")
-    println("   (d) caprock diffusion, capillary trapping -- no transport data")
+    println("== channel (b): abiotic mineral redox -- NOW BOUNDED ==")
+    println("   Truche et al. 2010, GCA 74:2894-2914, run #P20. A measured null:")
+    println("   90 C, 8 bar H2, calcite-buffered, 40-80 um pyrite, sampled to")
+    println("   2472 h, with aqueous sulfide below 0.1 mmol/L at EVERY timepoint.")
+    println("   Pyrite reduction consumes at most one H2 per sulfide, so that")
+    println("   sulfide ceiling is an H2 ceiling.")
+    let frac = TRUCHE_S_BOUND / FIELD_H2_MOLAL
+    print("   H2 consumed over 2472 h, as a fraction of the field inventory ") emit("", frac)
+    let scaled = frac * powf(FIELD_HOURS / TRUCHE_HOURS, TRUCHE_B)
+    print("   scaled to 285 d with their own exponent t^0.47              ") emit("", scaled)
+    println("   So channel (b) is under about 0.05 % of the stored hydrogen.")
     println("")
-    println("   THIS MODULE REFUSES TO EMIT A TOTAL ABIOTIC BAND.")
-    println("   Summing (a) alone and calling it the abiotic band would assert")
-    println("   that (b), (c) and (d) are ZERO. That null has not been measured")
-    println("   here, and asserting an unmeasured null is the same error as")
-    println("   inventing a number, with the sign reversed.")
+    println("   NO TEMPERATURE EXTRAPOLATION IS USED. The bound is measured at")
+    println("   90 C and applied to a 40 C field; since the activation energy is")
+    println("   positive the reaction is SLOWER at 40 C, so the 90 C figure is")
+    println("   conservative. Only the SIGN of the temperature dependence is")
+    println("   relied on, never its magnitude -- and that matters, because")
+    println("   Truche's fitted rate constants stop at 120 C, so a quantitative")
+    println("   extrapolation to 40 C would run 80 C below the calibration floor")
+    println("   on a parabolic law whose mechanism the authors call mixed.")
+    println("   CORRECTIONS.md C16 records what happened when someone did that.")
+    println("")
+    println("== channels (c) and (d): still REFUSED, but for a sharper reason ==")
+    println("   (c) abiotic methanation. There are now several MEASURED NULLS at")
+    println("       UHS-like conditions -- Etiope & Ionescu 2015 report that Fe,")
+    println("       Ni and Cr oxides produce NO methane below 100 C; Al-Yaseri")
+    println("       2023 saw no CH4 from H2/brine/limestone at 75 C, 96.5 bar,")
+    println("       125 d; Hassanpouryouzband 2022 detected only water vapour to")
+    println("       ppb across 250-plus paired H2/N2 runs at 59-80 C, 1-20 MPa.")
+    println("       But NONE publishes a detection limit or a rate, so none can")
+    println("       be converted into a number. They bound the channel only to")
+    println("       'below whatever these methods resolved', and that resolution")
+    println("       is never stated.")
+    println("   (d) caprock diffusion and capillary trapping. Still no transport")
+    println("       data. Note the field's own caprock permeabilities are nearly")
+    println("       equal for H2 and CH4 (2.3-2.7 vs 2.1-2.5 e-18 m2), which")
+    println("       argues against preferential H2 diffusion but is not a flux.")
+    println("")
+    println("   THIS MODULE STILL REFUSES TO EMIT A TOTAL ABIOTIC BAND, because")
+    println("   (c) and (d) remain unbounded. A null without a detection limit")
+    println("   is not a zero, and summing as though it were would assert an")
+    println("   unmeasured null -- the same error as inventing a number, with")
+    println("   the sign reversed.")
     println("")
 
     println("== F3 verdict, CORRECTED -- see sio/field_mass_balance.sio ==")

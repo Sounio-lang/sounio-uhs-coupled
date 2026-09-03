@@ -7,8 +7,8 @@ compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
           built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
           -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
           binary named in sio/README.md's own header for this engine.
-model:    sounio-uhs-coupled @ 318972987e (this repo, HEAD at capture time)
-date:     2026-09-03T17:11:21Z
+model:    sounio-uhs-coupled @ f1f55c1aec (this repo, HEAD at capture time)
+date:     2026-09-03T17:16:51Z
 
 F3 -- CAN THE ABIOTIC BAND ALONE EXPLAIN THE FIELD POINT?
 Lobodice is not evaluable (C13), so this turns on Sun Storage.
@@ -85,17 +85,47 @@ Lobodice is not evaluable (C13), so this turns on Sun Storage.
    (d) are absent. It is consistent with their being small; it
    does not measure them.
 
-== channels (b), (c), (d): REFUSED ==
-   (b) abiotic mineral redox  -- no measured rate in this study
-   (c) abiotic methanation    -- K is 1e28..1e37, barrier is purely
-       kinetic, and no rate is supplied by any source here
-   (d) caprock diffusion, capillary trapping -- no transport data
+== channel (b): abiotic mineral redox -- NOW BOUNDED ==
+   Truche et al. 2010, GCA 74:2894-2914, run #P20. A measured null:
+   90 C, 8 bar H2, calcite-buffered, 40-80 um pyrite, sampled to
+   2472 h, with aqueous sulfide below 0.1 mmol/L at EVERY timepoint.
+   Pyrite reduction consumes at most one H2 per sulfide, so that
+   sulfide ceiling is an H2 ceiling.
+   H2 consumed over 2472 h, as a fraction of the field inventory  3311696913498e-16
+   scaled to 285 d with their own exponent t^0.47               5343110697385e-16
+   So channel (b) is under about 0.05 % of the stored hydrogen.
 
-   THIS MODULE REFUSES TO EMIT A TOTAL ABIOTIC BAND.
-   Summing (a) alone and calling it the abiotic band would assert
-   that (b), (c) and (d) are ZERO. That null has not been measured
-   here, and asserting an unmeasured null is the same error as
-   inventing a number, with the sign reversed.
+   NO TEMPERATURE EXTRAPOLATION IS USED. The bound is measured at
+   90 C and applied to a 40 C field; since the activation energy is
+   positive the reaction is SLOWER at 40 C, so the 90 C figure is
+   conservative. Only the SIGN of the temperature dependence is
+   relied on, never its magnitude -- and that matters, because
+   Truche's fitted rate constants stop at 120 C, so a quantitative
+   extrapolation to 40 C would run 80 C below the calibration floor
+   on a parabolic law whose mechanism the authors call mixed.
+   CORRECTIONS.md C16 records what happened when someone did that.
+
+== channels (c) and (d): still REFUSED, but for a sharper reason ==
+   (c) abiotic methanation. There are now several MEASURED NULLS at
+       UHS-like conditions -- Etiope & Ionescu 2015 report that Fe,
+       Ni and Cr oxides produce NO methane below 100 C; Al-Yaseri
+       2023 saw no CH4 from H2/brine/limestone at 75 C, 96.5 bar,
+       125 d; Hassanpouryouzband 2022 detected only water vapour to
+       ppb across 250-plus paired H2/N2 runs at 59-80 C, 1-20 MPa.
+       But NONE publishes a detection limit or a rate, so none can
+       be converted into a number. They bound the channel only to
+       'below whatever these methods resolved', and that resolution
+       is never stated.
+   (d) caprock diffusion and capillary trapping. Still no transport
+       data. Note the field's own caprock permeabilities are nearly
+       equal for H2 and CH4 (2.3-2.7 vs 2.1-2.5 e-18 m2), which
+       argues against preferential H2 diffusion but is not a flux.
+
+   THIS MODULE STILL REFUSES TO EMIT A TOTAL ABIOTIC BAND, because
+   (c) and (d) remain unbounded. A null without a detection limit
+   is not a zero, and summing as though it were would assert an
+   unmeasured null -- the same error as inventing a number, with
+   the sign reversed.
 
 == F3 verdict, CORRECTED -- see sio/field_mass_balance.sio ==
    The comparison this module originally made, under 2 % against

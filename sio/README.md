@@ -326,3 +326,78 @@ still real and not instrument. Naming the next candidate honestly: PHREEQC
 applies molar-volume pressure corrections (`-Vm`) to these species and carries a
 water activity that this engine holds at 1. Which of those it is has not been
 tested, and it is not claimed.
+
+### Abiotic methanation, and how wrong Van't Hoff is
+
+**A labelled reconstruction**, as the pre-registration requires. The calibrated
+analytic K(T) this stands in for is paywalled and confirmed unavailable, so what
+is used is Van't Hoff with a constant enthalpy — precisely the "default"
+treatment that the same study criticises. This module therefore also **measures
+the approximation's error** rather than leaving the label to do the work.
+
+Assembled from the pinned database's own half-reactions, so every number is
+traceable:
+
+```
+R1  CO3-2 + 10 H+ + 8 e- = CH4 + 3 H2O    log K  41.071   dH -61.039 kcal
+R2  2 H+ + 2 e- = H2                      log K  -3.15    dH  -1.759 kcal
+R3  CO3-2 + 2 H+ = CO2 + H2O              log K  16.681   dH  -5.738 kcal
+overall = R1 - R3 - 4 R2  ->  CO2 + 4 H2 = CH4 + 2 H2O
+```
+
+CO₃²⁻, 10 H⁺ and 8 e⁻ all cancel. Result:
+
+| | |
+|---|---|
+| log₁₀ K (25 °C) | **36.99** |
+| ΔH | **−201 940.76 J/mol = −201.94 kJ/mol** |
+
+#### Thermodynamics is not the barrier, and that is the point
+
+| T | log₁₀ K |
+|---|---|
+| 25 °C | 36.990 |
+| 40 °C | 35.295 |
+| 70 °C | 32.351 |
+| 120 °C | 28.441 |
+
+K falls with temperature, as an exothermic reaction must, and stays between
+**10²⁸ and 10³⁷ across the entire range**. Methanation is overwhelmingly
+favourable everywhere in this study's window.
+
+And it does not happen. The field study's own abiotic controls report no
+conversion, and the decoupled-redox oracle runs show hydrogen dissolving and
+staying dissolved. **So the barrier is entirely kinetic, not thermodynamic** —
+which is the mechanistic reason microbial catalysis is the operative process and
+why a biotic term is not optional in the coupled model.
+
+#### The Van't Hoff error, measured
+
+Some database reactions carry **both** a `delta_h` and an `-analytic` fit, so
+Van't Hoff can be checked against the database's own better answer for the *same*
+reaction. Using `CO3-2 + 2 H+ = CO2 + H2O`:
+
+| T | Van't Hoff | analytic | error (log K) | factor in K |
+|---|---|---|---|---|
+| 40 °C | 16.4795 | 16.5191 | −0.0396 | 1.10 |
+| 70 °C | 16.1294 | 16.4365 | −0.3071 | 2.03 |
+| 120 °C | 15.6647 | 16.7700 | **−1.1053** | **12.74** |
+
+**At the field temperatures the approximation is defensible; at the top of the
+sweep it is not.** Lehen is 40 °C and Lobodice 25–45 °C, where the error is under
+0.04 log units. At 120 °C — the upper end of the temperature sweep the protocol
+asks for — Van't Hoff is off by a factor of **12.7 in K**.
+
+This is a measured version of the criticism the paywalled study makes of default
+treatments, obtained without access to that study, using only the pinned
+database's internal disagreement with itself.
+
+#### ΔH sensitivity
+
+The database states **no uncertainty** on `delta_h`, so this is a **sweep**, not a
+propagated uncertainty: it says how far the answer moves, not how uncertain it is.
+
+At 120 °C, ±10 % in ΔH moves log₁₀ K by ∓0.855 — a factor of **7.2 in K**, the
+same order as the approximation error itself. Both belong in the band, and
+neither can be reduced by choosing more carefully; closing them needs the
+calibrated expression that is not available.

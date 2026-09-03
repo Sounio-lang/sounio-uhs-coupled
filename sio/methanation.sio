@@ -1,0 +1,157 @@
+// Abiotic methanation, CO2 + 4 H2 = CH4 + 2 H2O, with K(T) by Van't Hoff.
+//
+// THIS IS A LABELLED RECONSTRUCTION, and the pre-registration says so. The
+// calibrated analytic K(T) of the study that motivates it is behind a paywall
+// and is NOT publicly available -- confirmed, not assumed. What is used instead
+// is Van't Hoff with a constant enthalpy, which is precisely the "default"
+// treatment that same study criticises. Reporting it as anything else would be
+// dishonest, so this module also MEASURES how wrong the approximation is.
+//
+// The reaction is assembled from the pinned database's own half-reactions
+// (phreeqc.dat, sha256 59373961...), so every number is traceable:
+//
+//   R1   CO3-2 + 10 H+ + 8 e- = CH4 + 3 H2O    log K  41.071   dH -61.039 kcal
+//   R2   2 H+ + 2 e- = H2                      log K  -3.15    dH  -1.759 kcal
+//   R3   CO3-2 + 2 H+ = CO2 + H2O              log K  16.681   dH  -5.738 kcal
+//
+//   overall = R1 - R3 - 4*R2   ->   CO2 + 4 H2 = CH4 + 2 H2O
+//
+// Balance check, done by hand and reproduced by the arithmetic below:
+//   CO3-2, 10 H+ and 8 e- all cancel, leaving CO2 + 4 H2 = CH4 + 2 H2O.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+var LN10_M: f64 = 2.302585092994046
+var R_J: f64 = 8.31446261815324        // J mol^-1 K^-1
+var KCAL_J: f64 = 4184.0               // J per kcal, the thermochemical calorie
+var T0: f64 = 298.15
+
+// Half-reaction data, verbatim from the database
+var R1_LOGK: f64 = 41.071
+var R1_DH_KCAL: f64 = 0.0 - 61.039
+var R2_LOGK: f64 = 0.0 - 3.15
+var R2_DH_KCAL: f64 = 0.0 - 1.759
+var R3_LOGK: f64 = 16.681
+var R3_DH_KCAL: f64 = 0.0 - 5.738
+
+// Reference reactions that carry BOTH a delta_h and an analytic fit, so the
+// Van't Hoff error can be measured against the database's own better answer.
+//   CO2 :  CO3-2 + 2 H+ = CO2 + H2O
+var CO2_ANA1: f64 = 464.1965
+var CO2_ANA2: f64 = 0.09344813
+var CO2_ANA3: f64 = 0.0 - 26986.16
+var CO2_ANA4: f64 = 0.0 - 165.75951
+var CO2_ANA5: f64 = 2248628.9
+//   CH4(g) Henry :  CH4 = CH4,  log_k -2.8, valid 25-100 C per the database
+var MTG_LOGK: f64 = 0.0 - 2.8
+var MTG_ANA1: f64 = 10.44
+var MTG_ANA2: f64 = 0.0 - 7.65e-3
+var MTG_ANA3: f64 = 0.0 - 6669.0
+var MTG_ANA4: f64 = 0.0
+var MTG_ANA5: f64 = 1.014e6
+
+fn log10_m(x: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 - 745.0 }
+    log(x) / LN10_M
+}
+
+// Overall methanation log K at 25 C, assembled from the half-reactions.
+fn methanation_logk25() -> f64 with Mut { R1_LOGK - R3_LOGK - 4.0 * R2_LOGK }
+
+// Overall enthalpy, J/mol. The database states these in kcal.
+fn methanation_dh_j() -> f64 with Mut {
+    (R1_DH_KCAL - R3_DH_KCAL - 4.0 * R2_DH_KCAL) * KCAL_J
+}
+
+// Van't Hoff with CONSTANT enthalpy -- the approximation under test.
+//   log10 K(T) = log10 K(T0) - dH/(R ln10) * (1/T - 1/T0)
+fn vant_hoff(logk_t0: f64, dh_j: f64, t_k: f64) -> f64 with Mut, Div, Panic {
+    logk_t0 - dh_j / (R_J * LN10_M) * (1.0 / t_k - 1.0 / T0)
+}
+
+// The database's five-term analytic fit, for the reactions that have one.
+//   which: 0 = CO2 formation, 1 = CH4(g) Henry
+fn analytic_logk(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
+    var a1 = 0.0
+    var a2 = 0.0
+    var a3 = 0.0
+    var a4 = 0.0
+    var a5 = 0.0
+    if which == 0 {
+        a1 = CO2_ANA1  a2 = CO2_ANA2  a3 = CO2_ANA3  a4 = CO2_ANA4  a5 = CO2_ANA5
+    } else {
+        a1 = MTG_ANA1  a2 = MTG_ANA2  a3 = MTG_ANA3  a4 = MTG_ANA4  a5 = MTG_ANA5
+    }
+    a1 + a2 * t_k + a3 / t_k + a4 * log10_m(t_k) + a5 / (t_k * t_k)
+}
+
+// ── printing ───────────────────────────────────────────────────────────────
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("ABIOTIC METHANATION -- CO2 + 4 H2 = CH4 + 2 H2O")
+    println("RECONSTRUCTION: Van't Hoff with constant enthalpy. The calibrated")
+    println("K(T) this stands in for is paywalled and not publicly available.")
+    println("")
+
+    println("== assembled from the pinned database's half-reactions ==")
+    emit("log10 K(25 C)", methanation_logk25())
+    emit("dH (J/mol)   ", methanation_dh_j())
+    emit("dH (kJ/mol)  ", methanation_dh_j() / 1000.0)
+    println("")
+
+    println("== K(T) by Van't Hoff across the study's temperature range ==")
+    let lk = methanation_logk25()
+    let dh = methanation_dh_j()
+    emit("log10K_25C ", vant_hoff(lk, dh, 298.15))
+    emit("log10K_40C ", vant_hoff(lk, dh, 313.15))
+    emit("log10K_70C ", vant_hoff(lk, dh, 343.15))
+    emit("log10K_120C", vant_hoff(lk, dh, 393.15))
+    println("")
+
+    println("== HOW WRONG IS VAN'T HOFF? measured, not asserted ==")
+    println("   For reactions the database gives BOTH a delta_h and an analytic")
+    println("   fit, Van't Hoff can be compared against that better answer.")
+    println("   CO3-2 + 2H+ = CO2 + H2O   (dH -5.738 kcal, analytic present)")
+    let co2_lk25 = 16.681
+    let co2_dh = (0.0 - 5.738) * KCAL_J
+    print("   40 C  vant_hoff ") emit("", vant_hoff(co2_lk25, co2_dh, 313.15))
+    print("         analytic  ") emit("", analytic_logk(0, 313.15))
+    print("         error     ") emit("", vant_hoff(co2_lk25, co2_dh, 313.15) - analytic_logk(0, 313.15))
+    print("   70 C  vant_hoff ") emit("", vant_hoff(co2_lk25, co2_dh, 343.15))
+    print("         analytic  ") emit("", analytic_logk(0, 343.15))
+    print("         error     ") emit("", vant_hoff(co2_lk25, co2_dh, 343.15) - analytic_logk(0, 343.15))
+    print("  120 C  vant_hoff ") emit("", vant_hoff(co2_lk25, co2_dh, 393.15))
+    print("         analytic  ") emit("", analytic_logk(0, 393.15))
+    print("         error     ") emit("", vant_hoff(co2_lk25, co2_dh, 393.15) - analytic_logk(0, 393.15))
+    println("")
+
+    println("== sensitivity of methanation log K to dH ==")
+    println("   The database states no uncertainty for delta_h, so this is a")
+    println("   SWEEP, not a propagated uncertainty. It says how much the answer")
+    println("   would move, not how much it is actually uncertain.")
+    print("   dH -10%  at 120 C  ") emit("", vant_hoff(lk, dh * 0.90, 393.15))
+    print("   dH  as given       ") emit("", vant_hoff(lk, dh, 393.15))
+    print("   dH +10%  at 120 C  ") emit("", vant_hoff(lk, dh * 1.10, 393.15))
+    0
+}

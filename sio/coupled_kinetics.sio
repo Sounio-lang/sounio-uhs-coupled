@@ -129,9 +129,10 @@ var DECAY: f64 = 0.0            // no decay coefficient given by any source used
 var SO4_FREE_FRAC: f64 = 0.3962 // reused from microbial_kinetics.sio, same background
 
 // calcite_on: 1 = with calcite (buffered), 0 = without (finite, depleting)
-fn init_coupled(calcite_on: i64, t_k: f64, p_co2_atm: f64, so4_total: f64, h2_init: f64) with Mut, Div, Panic {
-    CP_XMET = 1.0e-6
-    CP_XSRB = 1.0e-6
+fn init_coupled(calcite_on: i64, t_k: f64, p_co2_atm: f64, so4_total: f64, h2_init: f64,
+                biomass_init: f64) with Mut, Div, Panic {
+    CP_XMET = biomass_init
+    CP_XSRB = biomass_init
     CP_H2 = h2_init
     CP_SO4T = so4_total
     CP_CH4 = 0.0
@@ -183,9 +184,9 @@ fn step_coupled(dt: f64, calcite_on: i64) with Mut, Div, Panic {
 
 // Returns cumulative biotic H2 consumed (molal) over t_end_yr, at dt_s steps.
 fn run_coupled(calcite_on: i64, t_k: f64, p_co2_atm: f64, so4_total: f64,
-              h2_init: f64, t_end_yr: f64, dt_s: f64) -> f64 with Mut, Div, Panic {
+              h2_init: f64, biomass_init: f64, t_end_yr: f64, dt_s: f64) -> f64 with Mut, Div, Panic {
     let yr = 3.1557600e7
-    init_coupled(calcite_on, t_k, p_co2_atm, so4_total, h2_init)
+    init_coupled(calcite_on, t_k, p_co2_atm, so4_total, h2_init, biomass_init)
     var t = 0.0
     let t_end = t_end_yr * yr
     var guard: i64 = 0
@@ -232,8 +233,8 @@ fn f1_at_horizon(label: string, t_end_yr: f64, dt_s: f64) with IO, Mut, Div, Pan
     // mesocosm: 10% H2 / 2.5% CO2 at 40 bar (H2:CO2 = 4:1)
     let m_pco2 = 0.025 * 40.0
     let m_h2i = h2_from_gas(40.0, 0.10)
-    let m_with = run_coupled(1, t_k, m_pco2, so4_total, m_h2i, t_end_yr, dt_s)
-    let m_without = run_coupled(0, t_k, m_pco2, so4_total, m_h2i, t_end_yr, dt_s)
+    let m_with = run_coupled(1, t_k, m_pco2, so4_total, m_h2i, 1.0e-6, t_end_yr, dt_s)
+    let m_without = run_coupled(0, t_k, m_pco2, so4_total, m_h2i, 1.0e-6, t_end_yr, dt_s)
     print("   MESOCOSM condition (P_CO2 ") emit("", m_pco2) print("atm)")
     print("      with calcite    H2 consumed ") emit("", m_with)
     print("      without calcite H2 consumed ") emit("", m_without)
@@ -246,8 +247,8 @@ fn f1_at_horizon(label: string, t_end_yr: f64, dt_s: f64) with IO, Mut, Div, Pan
     // field: 9.89% H2 / 0.19% CO2 at 78 bar (H2:CO2 = 52:1)
     let f_pco2 = 0.0019 * 78.0
     let f_h2i = h2_from_gas(78.0, 0.0989)
-    let f_with = run_coupled(1, t_k, f_pco2, so4_total, f_h2i, t_end_yr, dt_s)
-    let f_without = run_coupled(0, t_k, f_pco2, so4_total, f_h2i, t_end_yr, dt_s)
+    let f_with = run_coupled(1, t_k, f_pco2, so4_total, f_h2i, 1.0e-6, t_end_yr, dt_s)
+    let f_without = run_coupled(0, t_k, f_pco2, so4_total, f_h2i, 1.0e-6, t_end_yr, dt_s)
     print("   FIELD condition (P_CO2 ") emit("", f_pco2) print("atm)")
     print("      with calcite    H2 consumed ") emit("", f_with)
     print("      without calcite H2 consumed ") emit("", f_without)
@@ -256,6 +257,99 @@ fn f1_at_horizon(label: string, t_end_yr: f64, dt_s: f64) with IO, Mut, Div, Pan
     print("      [diag] final DIC,    no-calcite branch ") emit("", CP_DIC)
     print("      [diag] initial DIC,  no-calcite branch ") emit("", CP_DIC_EQ)
     println("")
+}
+
+// ── targeted sweep over the three conditions PHASE4_GATE.md left open ──────
+//
+// SALINITY. Lehen's own salinity was never reported (CORRECTIONS.md C6), so
+// this does not use a Lehen number. Tremosa et al. 2023 (data/tremosa-lobodice,
+// the Lobodice source itself) states the viable range directly: "most
+// methanogens may grow at salinities up to 0.77 M NaCl and most sulfate-
+// reducers and acetogens at between 0 and 0.4 M NaCl" -- swept here as the
+// organisms' own upper survival bounds, not an invented reservoir value.
+//
+// CO2-RICH STREAM. Lobodice's actual injected composition (CORRECTIONS.md C5):
+// 54% H2, 22% CH4, 12% CO2, 9% CO, 2.5% N2, at 4 MPa (40 bar) and 25-45 C
+// (Tremosa et al. 2023, section 2.2) -- a real reported condition, not swept,
+// because it does not need to be: it is the one CO2-rich condition this study
+// has data for.
+//
+// RESIDENT BIOMASS. No source used in this study gives a resident cell density
+// for any of these reservoirs. What IS available is the USGS Aux Vases
+// archive's own sensitivity range for this exact parameter
+// (data/usgs-auxvases/sensitivity_analysis_biomass.csv): initial biomass swept
+// 1e-8 to 1e-4 mg/kg, with 1e-6 as the archive's own default (already used
+// above). 1e-4 mg/kg -- the archive's own upper bound, 100x the cold start --
+// is used here as the least-cold-start condition this study can point to
+// without inventing a number.
+
+fn f1_condition(label: string, t_k: f64, p_co2_atm: f64, so4_total: f64,
+                h2_init: f64, biomass_init: f64, nacl: f64,
+                t_end_yr: f64, dt_s: f64) with IO, Mut, Div, Panic {
+    BACKGROUND_NACL = nacl
+    let with_c = run_coupled(1, t_k, p_co2_atm, so4_total, h2_init, biomass_init, t_end_yr, dt_s)
+    let without_c = run_coupled(0, t_k, p_co2_atm, so4_total, h2_init, biomass_init, t_end_yr, dt_s)
+    print("   ") print(label)
+    print("      with calcite    H2 consumed ") emit("", with_c)
+    print("      without calcite H2 consumed ") emit("", without_c)
+    if without_c > 0.0 { print("      ratio ") emit("", with_c / without_c) }
+    print("      [diag] final H2(aq), no-calcite ") emit("", CP_H2)
+    print("      [diag] final DIC,    no-calcite ") emit("", CP_DIC)
+    print("      [diag] initial DIC,  no-calcite ") emit("", CP_DIC_EQ)
+    BACKGROUND_NACL = 0.0
+    println("")
+}
+
+fn sweep_salinity() with IO, Mut, Div, Panic {
+    println("== SWEEP 1: salinity, Tremosa et al. 2023's own viability bounds ==")
+    println("   mesocosm condition (P_CO2 1.0 atm), 12700 yr, cold-start biomass")
+    let t_k = 313.15
+    let so4_total = 0.008269
+    let m_pco2 = 1.0
+    let m_h2i = h2_from_gas(40.0, 0.10)
+    f1_condition("NaCl = 0.40 M (SRB/acetogen upper bound)", t_k, m_pco2, so4_total, m_h2i, 1.0e-6, 0.40, 12700.0, 1.0e7)
+    f1_condition("NaCl = 0.77 M (methanogen upper bound)   ", t_k, m_pco2, so4_total, m_h2i, 1.0e-6, 0.77, 12700.0, 1.0e7)
+    println("   field condition (P_CO2 0.148 atm), 12700 yr, cold-start biomass")
+    let f_pco2 = 0.0019 * 78.0
+    let f_h2i = h2_from_gas(78.0, 0.0989)
+    f1_condition("NaCl = 0.40 M (SRB/acetogen upper bound)", t_k, f_pco2, so4_total, f_h2i, 1.0e-6, 0.40, 12700.0, 1.0e7)
+    f1_condition("NaCl = 0.77 M (methanogen upper bound)   ", t_k, f_pco2, so4_total, f_h2i, 1.0e-6, 0.77, 12700.0, 1.0e7)
+}
+
+fn sweep_lobodice() with IO, Mut, Div, Panic {
+    println("== SWEEP 2: Lobodice's actual injected composition ==")
+    println("   54% H2, 22% CH4, 12% CO2, 9% CO, 2.5% N2, 4 MPa, 25-45 C")
+    println("   (Tremosa et al. 2023 sec 2.2). T taken at 40 C, mid-range.")
+    let t_k = 313.15
+    let so4_total = 0.008269
+    let p_total = 40.0
+    let p_co2 = 0.12 * p_total
+    let h2i = h2_from_gas(p_total, 0.54)
+    println("   12700 yr horizon, cold-start biomass, NaCl = 0 (unreported)")
+    f1_condition("Lobodice composition", t_k, p_co2, so4_total, h2i, 1.0e-6, 0.0, 12700.0, 1.0e7)
+    println("   7-month horizon (the field's own storage duration), cold-start biomass")
+    let month7 = 7.0 * 30.436875 * 86400.0 / 3.1557600e7
+    f1_condition("Lobodice composition", t_k, p_co2, so4_total, h2i, 1.0e-6, 0.0, month7, 3600.0)
+}
+
+fn sweep_biomass() with IO, Mut, Div, Panic {
+    println("== SWEEP 3: established (not cold-start) biomass ==")
+    println("   1e-4 mg/kg -- the Aux Vases archive's own upper sensitivity")
+    println("   bound, 100x the cold start used elsewhere in this study.")
+    let t_k = 313.15
+    let so4_total = 0.008269
+    println("   mesocosm condition, 285 d (operational horizon)")
+    let m_pco2 = 0.025 * 40.0
+    let m_h2i = h2_from_gas(40.0, 0.10)
+    let day = 86400.0
+    let horizon_285d = 285.0 * day / 3.1557600e7
+    f1_condition("biomass_init = 1e-4 mg/kg", t_k, m_pco2, so4_total, m_h2i, 1.0e-4, 0.0, horizon_285d, 3600.0)
+    println("   field condition, 285 d")
+    let f_pco2 = 0.0019 * 78.0
+    let f_h2i = h2_from_gas(78.0, 0.0989)
+    f1_condition("biomass_init = 1e-4 mg/kg", t_k, f_pco2, so4_total, f_h2i, 1.0e-4, 0.0, horizon_285d, 3600.0)
+    println("   mesocosm condition, 12700 yr (for completeness)")
+    f1_condition("biomass_init = 1e-4 mg/kg", t_k, m_pco2, so4_total, m_h2i, 1.0e-4, 0.0, 12700.0, 1.0e7)
 }
 
 fn main() -> i32 with IO, Mut, Div, Panic {
@@ -291,5 +385,14 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     println("   ceiling even bite on a timescale storage actually runs at?")
     let day = 86400.0
     f1_at_horizon("", 285.0 * day / 3.1557600e7, 3600.0)
+
+    println("")
+    println("###############################################################")
+    println("# TARGETED SWEEP: the three conditions PHASE4_GATE.md left open #")
+    println("###############################################################")
+    println("")
+    sweep_salinity()
+    sweep_lobodice()
+    sweep_biomass()
     0
 }

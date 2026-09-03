@@ -695,3 +695,105 @@ calcite-dissolution contribution, and no such contribution is quoted from it.
 The CO₂ term is a lower bound, since CO₂ also speciates at the brine's pH 8.7
 and the calculation uses Henry's law alone — which makes the agreement
 conservative rather than tuned.
+
+## `microbial.sio` — the USGS model reproduced, and a first blow to H1a
+
+**Oracle status.** Geochemist's Workbench is not available here, so React was
+**not run**. Parity is against the **archived output files** only
+(DOI 10.5066/P13GJC6Y, CC0-1.0). Nothing here claims agreement with GWB.
+
+### The rate law, reverse-engineered and verified before any code was written
+
+GWB's microbial form, recovered from the archive's own reported rates:
+
+```
+r = k * X * [mD/(KD + mD)] * [mA/(KA + mA)] * f_T        [molal/s]
+```
+
+Checked by hand against step 0 of the 365-day run, then in code:
+
+| | computed | archived | relative difference |
+|---|---|---|---|
+| methanogenesis | 2.879679732732e-20 | 2.880e-20 | **−1.11e-04** |
+| sulfate reduction | 4.219654871041e-20 | 4.220e-20 | **−8.18e-05** |
+
+Both land within the rounding of the four significant figures the archive
+prints, which is what fixes the form. `f_T` is 1 to that precision here: the
+affinities are log Q/K = −34.73 and −43.11, so both reactions sit enormously far
+from equilibrium.
+
+`ATP_energy` units are still undeclared by the source, so `f_T` is an **input**
+rather than something computed from a guessed unit. At these conditions it does
+not matter; where it would, the guess would have been silently load-bearing.
+
+### KA = 0 is not a rounding
+
+| term | value |
+|---|---|
+| MET donor (H₂, KD 4.7e-6) | 0.9998888 |
+| **MET acceptor (HCO₃⁻, KA 0)** | **1.000000000000** |
+| SRB donor (H₂, KD 1.1e-6) | 0.9999740 |
+| SRB acceptor (SO₄²⁻, KA 3.9e-5) | 0.9882353 |
+
+The archived model imposes **no bicarbonate limitation on methanogenesis at
+all**, while giving the sulfate reducer a real acceptor constant. H1a asserts
+that calcite-derived CO₂ *limits* methanogenesis. The reference model contains
+no such term.
+
+### What H1a would add, measured
+
+Strobel et al. give K_CO2 = 0.011 mol/m³ = **1.1e-5 molal** — and state it was
+taken from the literature rather than fitted, and that its influence is minimal.
+Applying it at the Aux Vases bicarbonate level of 5.818e-4 molal:
+
+| acceptor term | value |
+|---|---|
+| as archived (KA = 0) | 1.000000 |
+| with Strobel K_CO2 | **0.981444** |
+
+**A 1.9 % effect.** The limitation H1a proposes is, at this site's chemistry,
+worth under two percent of the methanogenesis rate.
+
+That is not a refutation of H1a, and it is not being presented as one. It is a
+statement about **where** the mechanism can matter: for the Monod term to fall to
+one half, bicarbonate would have to reach K_CO2 = 1.1e-5 molal, roughly **53×
+below** the Aux Vases value. H1a therefore requires a carbon-poor regime, and
+the reference site is not one. Whether the field sites are is a separate
+question, and the Lehen brine's carbonate chemistry is among the things its
+paper does not report.
+
+### The archived trajectory, for the record
+
+The 365-day run is effectively static: pH moves 6.100 → 6.101 and methanogen
+biomass 1.000e-06 → 1.001e-06 mg/kg over a full year. The dynamics live in the
+12 700-year run:
+
+| step | pH | biomass MET | biomass SRB | CH₄(aq) | H₂(aq) |
+|---|---|---|---|---|---|
+| 0 | 6.100 | 1.000e-06 | 1.000e-06 | 9.005e-10 | 0.04226 |
+| 166 | 6.548 | 1.039e-05 | 1.411 | 8.381e-09 | 0.04115 |
+| 325 | 9.139 | 1.614e-05 | 19.24 | 1.296e-08 | 0.02700 |
+| 698 | 9.145 | 7.916e-05 | 41.56 | 6.249e-08 | 0.009173 |
+| 915 | 9.149 | **2.720** | 41.56 | **2.156e-03** | **5.470e-04** |
+
+Sulfate reduction runs first and drives pH from 6.1 to 9.15; it stalls at 41.56
+mg/kg when sulfate is exhausted (SO₄²⁻ disappears from the species list, HS⁻
+reaching 8.229e-03 molal); only then does methanogenesis take off, consuming
+**98.7 %** of the hydrogen.
+
+### The mineral feedback is dolomite and brucite, not calcite
+
+The archive's later steps do precipitate minerals — at the end,
+**antigorite 1.375e-05 mol, brucite 4.398e-03 mol, dolomite 4.561e-05 mol**, all
+sitting at saturation. Calcite never forms; dolomite takes the carbonate.
+
+This matters for H2 as well as H1a. The self-limiting loop the pre-registration
+describes — pH up, carbonate precipitates, CO₂ supply cut — **is present in the
+reference system**, but it runs through dolomite and brucite. And it lines up
+with an earlier finding from a different direction: the Hellerschmied cores are
+**20 % dolomite against 8 % calcite**, and Palandri–Kharaka's two dolomite
+variants differ by about 12× in the neutral mechanism.
+
+Dolomite is emerging as the operative carbonate phase on both the model side and
+the field side, while H1a is framed around calcite. That is recorded now, as a
+finding, not resolved.

@@ -1,0 +1,156 @@
+// Microbial kinetics — the USGS Aux Vases model, reproduced.
+//
+// ORACLE STATUS, STATED FIRST. Geochemist's Workbench is not available here, so
+// React CANNOT be run. Parity is claimed against the ARCHIVED OUTPUT FILES only
+// (DOI 10.5066/P13GJC6Y, CC0-1.0), never against GWB itself. No statement in
+// this file should be read as "agrees with GWB".
+//
+// THE RATE LAW, reverse-engineered from the archived output and verified by hand
+// before any code was written. GWB's microbial form is
+//
+//   r = k * X * [mD/(KD + mD)] * [mA/(KA + mA)] * f_T      [molal/s]
+//
+// with k the rate constant (mol mg^-1 s^-1), X the biomass (mg/kg), mD and mA
+// the DONOR and ACCEPTOR species molalities, and f_T a thermodynamic factor
+// that goes to 1 far from equilibrium.
+//
+// Verified against step 0 of the 365-day archive, which reports its own rates:
+//
+//   SRB: KD 1.1e-6, mD(H2) 0.04226 -> 0.999974
+//        KA 3.9e-5,  mA(SO4--) 0.003276 -> 0.98824
+//        4.270e-14 * 1e-6 * 0.98822 = 4.2197e-20   archive says 4.220e-20
+//   MET: KD 4.7e-6, mD(H2) 0.04226 -> 0.999889
+//        KA 0       -> acceptor term identically 1
+//        2.880e-14 * 1e-6 * 0.999889 = 2.8797e-20  archive says 2.880e-20
+//
+// Both reproduce to the four figures the archive prints, which is what fixes the
+// form. f_T is 1 to that precision here: the affinities are log Q/K = -34.73 and
+// -43.11, so both reactions are enormously far from equilibrium.
+//
+// KA = 0 FOR METHANOGENESIS IS NOT A ROUNDING. It makes the acceptor Monod term
+// identically 1, so the archived model imposes NO bicarbonate limitation on
+// methanogenesis at all, while the sulfate reducer carries KA = 3.9e-5. H1a
+// asserts that calcite-derived CO2 limits methanogenesis. The reference model
+// contains no such limitation, so a coupled model that adds one is adding a term
+// its oracle does not have -- recorded here, in code, so the difference can
+// never be mistaken for a porting error.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+// ── the archived parameters, verbatim from the React input script ───────────
+// microbe-MET:  HCO3- + 4 H2(aq) + H+ -> CH4(aq) + 3 H2O
+var MET_K: f64 = 2.88e-14        // mol mg^-1 s^-1
+var MET_KD: f64 = 4.7e-6         // donor half-saturation, H2(aq)
+var MET_KA: f64 = 0.0            // acceptor half-saturation, HCO3- -- ZERO
+var MET_YIELD: f64 = 1250.0      // growth_yield
+var MET_ATP_N: f64 = 0.25
+var MET_ATP_E: f64 = 0.0 - 45.0  // units NOT declared by the source
+var MET_ORDER1: f64 = 0.5
+
+// microbe-SRB:  4 H2(aq) + H+ + SO4-- -> HS- + 4 H2O
+var SRB_K: f64 = 4.27e-14
+var SRB_KD: f64 = 1.1e-6
+var SRB_KA: f64 = 3.9e-5
+var SRB_YIELD: f64 = 5000.0
+var SRB_ATP_N: f64 = 1.0
+var SRB_ATP_E: f64 = 0.0 - 46.75
+var SRB_ORDER1: f64 = 0.1666666666667
+
+// Monod factor. Written so that K = 0 gives exactly 1 rather than 0/0: that
+// case is not an edge to be tidied away, it is how the archived model switches
+// the carbon limitation off.
+fn monod(m: f64, k: f64) -> f64 with Mut, Div, Panic {
+    if m <= 0.0 { return 0.0 }
+    if k <= 0.0 { return 1.0 }
+    m / (k + m)
+}
+
+// Rate, molal/s. `which`: 0 = methanogenesis, 1 = sulfate reduction.
+// f_T is passed in rather than computed, because the ATP_energy units are not
+// declared by the source and guessing them would put an unstated assumption
+// inside a number. At the archived conditions f_T is 1 to four figures.
+fn microbial_rate(which: i64, biomass_mg_kg: f64, m_donor: f64, m_acceptor: f64,
+                  f_t: f64) -> f64 with Mut, Div, Panic {
+    if biomass_mg_kg < 0.0 { return 0.0 - 1.0 }
+    var k = MET_K
+    var kd = MET_KD
+    var ka = MET_KA
+    if which != 0 { k = SRB_K  kd = SRB_KD  ka = SRB_KA }
+    k * biomass_mg_kg * monod(m_donor, kd) * monod(m_acceptor, ka) * f_t
+}
+
+// Biomass growth: dX/dt = yield * r - decay * X. The archived scripts give a
+// growth_yield but no decay coefficient, so decay is an INPUT here and defaults
+// to zero rather than being invented.
+fn biomass_growth(which: i64, rate_molal_s: f64, biomass: f64,
+                  decay_per_s: f64) -> f64 with Mut, Div, Panic {
+    var y = MET_YIELD
+    if which != 0 { y = SRB_YIELD }
+    y * rate_molal_s - decay_per_s * biomass
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("MICROBIAL KINETICS -- USGS Aux Vases model, reproduced")
+    println("Parity is against the ARCHIVED OUTPUTS. GWB is not available here,")
+    println("so React was NOT run and no parity with GWB is claimed.")
+    println("")
+
+    // Step 0 of the archived 365-day run, as reported in that file
+    let x0 = 1.0e-6            // mg/kg, both organisms
+    let m_h2 = 0.04226         // molal, H2(aq)
+    let m_so4 = 0.003276       // molal, SO4--
+    let m_hco3 = 0.0005818     // molal, HCO3-
+    let f_t = 1.0              // affinity -34.7 and -43.1 log units: f_T -> 1
+
+    println("== step 0 parity against the archived rates ==")
+    let r_met = microbial_rate(0, x0, m_h2, m_hco3, f_t)
+    let r_srb = microbial_rate(1, x0, m_h2, m_so4, f_t)
+    print("   MET  computed ") emit("", r_met)
+    println("        archived 2.880e-20")
+    print("   SRB  computed ") emit("", r_srb)
+    println("        archived 4.220e-20")
+    print("   MET relative difference ") emit("", (r_met - 2.880e-20) / 2.880e-20)
+    print("   SRB relative difference ") emit("", (r_srb - 4.220e-20) / 4.220e-20)
+    println("")
+
+    println("== the Monod factors, shown separately ==")
+    print("   MET donor  (H2, KD 4.7e-6)   ") emit("", monod(m_h2, MET_KD))
+    print("   MET acceptor (HCO3-, KA 0)   ") emit("", monod(m_hco3, MET_KA))
+    println("        ^ identically 1: NO carbon limitation in the reference model")
+    print("   SRB donor  (H2, KD 1.1e-6)   ") emit("", monod(m_h2, SRB_KD))
+    print("   SRB acceptor (SO4--, KA 3.9e-5) ") emit("", monod(m_so4, SRB_KA))
+    println("")
+
+    println("== what H1a would add: a carbon limitation that is not there ==")
+    println("   Strobel et al. give K_CO2 = 0.011 mol/m3 = 1.1e-5 molal.")
+    println("   Applying it to the same state:")
+    let k_co2_strobel = 1.1e-5
+    print("   acceptor term with KA = 0        ") emit("", monod(m_hco3, 0.0))
+    print("   acceptor term with Strobel K_CO2 ") emit("", monod(m_hco3, k_co2_strobel))
+    print("   ratio (how much H1a would slow it) ") emit("", monod(m_hco3, k_co2_strobel) / monod(m_hco3, 0.0))
+    println("   At this bicarbonate level the Strobel constant barely bites --")
+    println("   the limitation H1a proposes is weak where HCO3- is plentiful.")
+    0
+}

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="430" viewBox="0 0 960 430">
+<rect width="960" height="430" fill="#ffffff"/>
+<text x="30.00" y="32.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="15.00" fill="#111111">Calcite controls biotic H2 loss only where the stored gas is CO2-poor</text>
+<text x="30.00" y="50.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11.00" fill="#555555">Extent limits, 40 C. Stoichiometric: no rate constant, surface area or half-saturation constant enters.</text>
+<text x="78.00" y="64.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="12.50" fill="#111111">A   F1: biotic H2 loss, with calcite / without</text>
+<line x1="78.00" y1="300.00" x2="430.00" y2="300.00" stroke="#333333" stroke-width="1.20" stroke-dasharray=""/>
+<line x1="78.00" y1="300.00" x2="78.00" y2="72.00" stroke="#333333" stroke-width="1.20" stroke-dasharray=""/>
+<text x="254.00" y="336.00" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="11.00" fill="#333333">H2 : CO2 in the stored gas</text>
+<text x="32" y="186" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#333333" transform="rotate(-90 32 186)">F1 ratio</text>
+<line x1="78.00" y1="300.00" x2="78.00" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="78.00" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">2</text>
+<line x1="130.98" y1="300.00" x2="130.98" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="130.98" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">4</text>
+<line x1="201.02" y1="300.00" x2="201.02" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="201.02" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">10</text>
+<line x1="327.04" y1="300.00" x2="327.04" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="327.04" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">52</text>
+<line x1="430.00" y1="300.00" x2="430.00" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="430.00" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">200</text>
+<line x1="73.00" y1="288.22" x2="78.00" y2="288.22" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="69.00" y="291.72" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">1</text>
+<line x1="73.00" y1="251.61" x2="78.00" y2="251.61" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="69.00" y="255.11" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">2</text>
+<line x1="73.00" y1="203.22" x2="78.00" y2="203.22" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="69.00" y="206.72" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">5</text>
+<line x1="73.00" y1="166.62" x2="78.00" y2="166.62" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="69.00" y="170.12" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">10</text>
+<line x1="73.00" y1="81.63" x2="78.00" y2="81.63" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="69.00" y="85.13" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">50</text>
+<line x1="78.00" y1="251.61" x2="430.00" y2="251.61" stroke="#c0392b" stroke-width="1.30" stroke-dasharray="6,4"/>
+<text x="426.00" y="245.61" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#c0392b">F1 = 2: below this H1a dies</text>
+<polyline fill="none" stroke="#7f8c8d" stroke-width="1.4" stroke-dasharray="5,4" points="78.00,300.00 86.66,300.00 95.32,300.00 103.99,300.00 112.65,300.00 121.31,294.90 129.97,288.91 138.64,282.93 147.30,276.94 155.96,270.96 164.62,264.97 173.29,258.99 181.95,253.00 190.61,247.02 199.27,241.03 207.94,235.05 216.60,229.06 225.26,223.08 233.92,217.10 242.59,211.11 251.25,205.13 259.91,199.14 268.57,193.16 277.23,187.17 285.90,181.19 294.56,175.20 303.22,169.22 311.88,163.23 320.55,157.25 329.21,151.26 337.87,145.28 346.53,139.29 355.20,133.31 363.86,127.32 372.52,121.34 381.18,115.36 389.85,109.37 398.51,103.39 407.17,97.40 415.83,91.42 424.49,85.43 "/>
+<text x="408.01" y="83.78" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#7f8c8d">asymptote  y(H2) / 4 y(CO2)</text>
+<polyline fill="none" stroke="#1f4e79" stroke-width="2.4" points="78.00,288.22 82.45,288.22 86.91,288.22 91.36,288.22 95.82,288.22 100.27,288.22 104.72,288.22 109.18,288.22 113.63,288.22 118.08,288.22 122.54,288.22 126.99,288.22 131.45,288.22 135.90,288.22 140.35,288.22 144.81,288.22 149.26,288.22 153.72,288.22 158.17,288.22 162.62,288.22 167.08,288.22 171.53,288.22 175.98,287.55 180.44,284.82 184.89,282.12 189.35,279.43 193.80,276.77 198.25,274.12 202.71,271.50 207.16,268.90 211.61,266.32 216.07,263.77 220.52,261.24 224.98,258.74 229.43,256.27 233.88,253.83 238.34,251.42 242.79,249.04 247.25,246.69 251.70,244.37 256.15,242.09 260.61,239.84 265.06,237.62 269.51,235.45 273.97,233.31 278.42,231.21 282.88,229.14 287.33,227.12 291.78,225.14 296.24,223.20 300.69,221.30 305.15,219.45 309.60,217.64 314.05,215.87 318.51,214.14 322.96,212.46 327.41,210.82 331.87,209.23 336.32,207.69 340.78,206.18 345.23,204.73 349.68,203.31 354.14,201.94 358.59,200.62 363.05,199.34 367.50,198.10 371.95,196.91 376.41,195.75 380.86,194.64 385.31,193.57 389.77,192.54 394.22,191.55 398.68,190.60 403.13,189.68 407.58,188.81 412.04,187.96 416.49,187.16 420.95,186.38 425.40,185.65 429.85,184.94 "/>
+<text x="108.99" y="272.37" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#1f4e79">computed, gas saturation 50 %</text>
+<circle cx="130.98" cy="288.22" r="4.50" fill="#ffffff" stroke="#111111" stroke-width="1.5"/>
+<text x="130.98" y="306.22" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9.50" fill="#111111">mesocosm 4:1</text>
+<circle cx="139.98" cy="288.22" r="4.50" fill="#ffffff" stroke="#111111" stroke-width="1.5"/>
+<text x="192.97" y="279.22" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9.50" fill="#111111">Lobodice 4.5:1</text>
+<circle cx="327.11" cy="210.93" r="5.50" fill="#c0392b" stroke="#7b241c" stroke-width="1.5"/>
+<text x="319.11" y="214.93" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#c0392b">field 52:1</text>
+<text x="548.00" y="64.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="12.50" fill="#111111">B   F2: H2 recovery the model can reach</text>
+<line x1="548.00" y1="300.00" x2="900.00" y2="300.00" stroke="#333333" stroke-width="1.20" stroke-dasharray=""/>
+<line x1="548.00" y1="300.00" x2="548.00" y2="72.00" stroke="#333333" stroke-width="1.20" stroke-dasharray=""/>
+<text x="724.00" y="336.00" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="11.00" fill="#333333">gas saturation Sg = V / (1 + V)</text>
+<text x="506" y="186" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#333333" transform="rotate(-90 506 186)">H2 recovery, %</text>
+<line x1="548.00" y1="300.00" x2="548.00" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="548.00" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">9.09 %</text>
+<line x1="665.33" y1="300.00" x2="665.33" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="665.33" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">50.00 %</text>
+<line x1="782.67" y1="300.00" x2="782.67" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="782.67" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">90.91 %</text>
+<line x1="900.00" y1="300.00" x2="900.00" y2="305.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="900.00" y="318" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">99.01 %</text>
+<line x1="543.00" y1="300.00" x2="548.00" y2="300.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="539.00" y="303.50" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">0</text>
+<line x1="543.00" y1="243.00" x2="548.00" y2="243.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="539.00" y="246.50" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">25</text>
+<line x1="543.00" y1="186.00" x2="548.00" y2="186.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="539.00" y="189.50" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">50</text>
+<line x1="543.00" y1="129.00" x2="548.00" y2="129.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="539.00" y="132.50" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">75</text>
+<line x1="543.00" y1="72.00" x2="548.00" y2="72.00" stroke="#333333" stroke-width="1.00" stroke-dasharray=""/>
+<text x="539.00" y="75.50" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10" fill="#333333">100</text>
+<rect x="548.00" y="107.57" width="352.00" height="1.87" fill="#f39c12" fill-opacity="0.85"/>
+<text x="896.00" y="100.57" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#a04000">Sun Storage observed, 83.6-84.4 %</text>
+<polyline fill="none" stroke="#1f4e79" stroke-width="2.4" points="548.00,300.00 552.39,300.00 556.78,300.00 561.17,300.00 565.57,300.00 569.96,297.15 574.35,281.76 578.74,267.39 583.13,254.00 587.52,241.52 591.91,229.90 596.31,219.11 600.70,209.10 605.09,199.80 609.48,191.19 613.87,183.22 618.26,175.84 622.65,169.01 627.04,162.70 631.44,156.88 635.83,151.50 640.22,146.54 644.61,141.96 649.00,137.74 653.39,133.86 657.78,130.27 662.18,126.98 666.57,123.94 670.96,121.15 675.35,118.58 679.74,116.21 684.13,114.04 688.52,112.04 692.92,110.20 697.31,108.51 701.70,106.95 706.09,105.53 710.48,104.22 714.87,103.01 719.26,101.90 723.66,100.89 728.05,99.95 732.44,99.10 736.83,98.31 741.22,97.59 745.61,96.92 750.00,96.32 754.39,95.76 758.79,95.24 763.18,94.77 767.57,94.34 771.96,93.94 776.35,93.58 780.74,93.24 785.13,92.94 789.53,92.66 793.92,92.40 798.31,92.16 802.70,91.94 807.09,91.74 811.48,91.56 815.87,91.39 820.27,91.24 824.66,91.10 829.05,90.97 833.44,90.85 837.83,90.74 842.22,90.64 846.61,90.54 851.00,90.46 855.40,90.38 859.79,90.31 864.18,90.25 868.57,90.19 872.96,90.13 877.35,90.08 881.74,90.03 886.14,89.99 890.53,89.95 894.92,89.92 899.31,89.88 "/>
+<text x="838.65" y="108.48" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#1f4e79">without calcite</text>
+<text x="838.65" y="126.72" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9.00" fill="#1f4e79">(hard cap; no kinetics exceed it)</text>
+<line x1="548.00" y1="300.00" x2="900.00" y2="300.00" stroke="#c0392b" stroke-width="2.40" stroke-dasharray=""/>
+<text x="674.62" y="286.32" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#c0392b">with calcite: all H2 goes, given time</text>
+<text x="30.00" y="366.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#555555">A: at 4:1 the co-injected CO2 covers the hydrogen it arrives with,</text>
+<text x="392.00" y="366.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#555555">so calcite changes nothing. At the field's 52:1 it is worth 4.3x.</text>
+<text x="30.00" y="382.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#555555">B: the observation falls inside the no-calcite range, nothing tuned.</text>
+<text x="420.00" y="382.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="10.00" fill="#555555">Lobodice is not plotted: its data fail four checks (C13).</text>
+<text x="30.00" y="404.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="9.50" fill="#888888">Emitted by sio/figure.sio. Not plotted against temperature:</text>
+<text x="360.00" y="404.00" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="9.50" fill="#888888">the limit is stoichiometric, and T is not the controlling variable.</text>
+</svg>

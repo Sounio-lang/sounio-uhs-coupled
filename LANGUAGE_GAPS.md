@@ -700,3 +700,52 @@ named above as the trigger for IN PROGRESS is still untouched — this closes
 the *language* gap, not a *study* phase). If a future phase of this study
 actually needs a catalytic mechanism, the tool now exists to reach for
 rather than a further estimate to make.
+
+## G11 — A string literal of 127 to 199 characters, passed as a function argument, segfaults
+
+**Status: OPEN. Found by the deliverable figure, not by a test suite.**
+
+`sio/figure.sio` emits the study's figure as SVG from the engine itself. It
+crashed at runtime after writing 71 correct lines, on the caption calls. The
+first diagnosis — a string-length limit — **was wrong**, and is recorded as wrong
+because the correct one is stranger.
+
+**Reproduction**, against `gen3.elf` md5 `0f3aa2c9dd3be4e407ce546130f7614c`:
+
+```sio
+fn txt(x: f64, y: f64, anchor: string, size: f64, col: string, t: string) with IO, Mut, Div, Panic {
+    print(anchor) print(col) print(t)
+}
+fn main() -> i32 with IO, Mut, Div, Panic {
+    txt(30.0, 366.0, "start", 10.0, "#555555", "<N characters>")
+    0
+}
+```
+
+| literal length | result |
+|---|---|
+| ≤ 126 | compiles, runs, exit 0 |
+| **127 – 199** | compiles, **SIGSEGV at runtime (exit 139)**, no output |
+| ≥ 200 | compiles, runs, exit 0 |
+
+**It is a window, not a threshold.** 126 works, 127 through 199 crash, 200 works
+again. That rules out a simple buffer bound and points at a length-dependent
+branch in argument passing or literal placement — something takes a different
+code path at 200 that is correct, and the middle range takes one that is not.
+
+**It is specific to passing the literal as an argument.** `println` with a
+literal of any length tested (up to 257) is fine. The crash needs the literal to
+travel through a function parameter.
+
+**Not a compile error.** The compiler accepts it silently and emits a binary that
+segfaults. That is the worst of the three available failure modes — worse than
+rejecting it, and worse than miscomputing, because nothing in the build warns.
+
+**What it cost here.** One debugging cycle and a wrong first diagnosis, which was
+committed to a source comment before being corrected. The figure's captions are
+split into sub-126-character literals: a cosmetic workaround with no effect on
+any number in the figure.
+
+**What would close it.** A codegen fix. Until then the practical rule for this
+lane is: **keep string literals passed as arguments under 126 characters**, now
+noted at the point of use in `sio/figure.sio`.

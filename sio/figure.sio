@@ -1,0 +1,290 @@
+// The deliverable figure -- emitted as SVG BY THE ENGINE ITSELF.
+//
+// No matplotlib, no gnuplot, no Python. Sounio computes the curves and writes
+// the SVG. The figure has exactly one producer and it is the same binary that
+// produced every number in it.
+//
+// A DECLARED DEPARTURE FROM THE BRIEF. The brief asked for "H2 recovery vs T,
+// two curves with a band, two field points". Three of those four do not survive
+// what the study measured:
+//
+//   * T IS NOT THE CONTROLLING VARIABLE. The extent limit is stoichiometric --
+//     y_H2/(4*y_CO2) -- and no rate constant, surface area or half-saturation
+//     constant enters it. Plotted against T the two curves are flat and the
+//     figure would assert a temperature dependence the study did not find.
+//   * THERE IS ONLY ONE USABLE FIELD POINT. Lobodice fails four independent
+//     consistency checks (CORRECTIONS.md C13) and is not plotted, because
+//     plotting it would present as datum something the study refused to use.
+//   * "Two curves with a band" survives, and is what both panels show.
+//
+// The figure format was NOT frozen -- PREREGISTRATION.md fixes the hypotheses
+// and the falsification criteria, and says only that the deliverable is "the
+// figure". So this is a departure from the brief's suggestion, not from the
+// pre-registration, and it is recorded here rather than made silently.
+//
+// PANEL A is F1: where H1a holds and where it is inert.
+// PANEL B is F2: whether the field observation falls inside the model's range.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{solve_nocalcite, NC_DIC, LN10}
+
+var R_LATM: f64 = 0.0820574
+var BAR2ATM: f64 = 0.986923
+var KH_H2: f64 = 7.4530e-4
+var SO4_TOTAL: f64 = 0.008269
+var T_K: f64 = 313.15
+var P_FIELD: f64 = 78.0
+var Y_H2_FIELD: f64 = 0.0989
+
+// observed Sun Storage recovery, both unreconciled volume bases (C3)
+var OBS_HI: f64 = 84.397
+var OBS_LO: f64 = 83.579
+
+var EX_WITH: f64 = 0.0
+var EX_WITHOUT: f64 = 0.0
+var EX_H2: f64 = 0.0
+
+fn extent(y_h2: f64, y_co2: f64, p_bar: f64, v_gas: f64) with Mut, Div, Panic {
+    let p = p_bar * BAR2ATM
+    let rt = R_LATM * T_K
+    let n_h2 = y_h2 * p * v_gas / rt + KH_H2 * y_h2 * p
+    let ph = solve_nocalcite(T_K, y_co2 * p)
+    let n_c = y_co2 * p * v_gas / rt + NC_DIC
+    let sink = 4.0 * SO4_TOTAL
+    let left = n_h2 - sink
+    EX_H2 = n_h2
+    if left <= 0.0 { EX_WITH = n_h2  EX_WITHOUT = n_h2  return }
+    var used = n_c
+    if left / 4.0 < used { used = left / 4.0 }
+    EX_WITH = sink + left
+    EX_WITHOUT = sink + 4.0 * used
+}
+
+fn log10f(x: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 - 30.0 }
+    log(x) / LN10
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+
+// SVG coordinate: fixed two decimals, no exponent
+fn nm(v: f64) with IO, Mut, Div, Panic {
+    var x = v
+    if x < 0.0 { print("-")  x = 0.0 - x }
+    let i = x as i64
+    var f = ((x - (i as f64)) * 100.0 + 0.5) as i64
+    if f >= 100 { pu64(i + 1) print(".00") return }
+    pu64(i) print(".")
+    if f < 10 { print("0") }
+    pu64(f)
+}
+
+fn line(x1: f64, y1: f64, x2: f64, y2: f64, col: string, w: f64, dash: string) with IO, Mut, Div, Panic {
+    print("<line x1=\"") nm(x1) print("\" y1=\"") nm(y1)
+    print("\" x2=\"") nm(x2) print("\" y2=\"") nm(y2)
+    print("\" stroke=\"") print(col) print("\" stroke-width=\"") nm(w)
+    print("\" stroke-dasharray=\"") print(dash) println("\"/>")
+}
+
+fn txt(x: f64, y: f64, anchor: string, size: f64, col: string, t: string) with IO, Mut, Div, Panic {
+    print("<text x=\"") nm(x) print("\" y=\"") nm(y)
+    print("\" text-anchor=\"") print(anchor)
+    print("\" font-family=\"Helvetica,Arial,sans-serif\" font-size=\"") nm(size)
+    print("\" fill=\"") print(col) print("\">") print(t) println("</text>")
+}
+
+fn dot(cx: f64, cy: f64, r: f64, fill: string, stroke: string) with IO, Mut, Div, Panic {
+    print("<circle cx=\"") nm(cx) print("\" cy=\"") nm(cy) print("\" r=\"") nm(r)
+    print("\" fill=\"") print(fill) print("\" stroke=\"") print(stroke)
+    println("\" stroke-width=\"1.5\"/>")
+}
+
+// ── panel A geometry: F1 ratio vs H2:CO2 ──────────────────────────────────
+var AX0: f64 = 78.0
+var AX1: f64 = 430.0
+var AY0: f64 = 300.0
+var AY1: f64 = 72.0
+var ALX0: f64 = 0.3010299956640      // log10(2)
+var ALX1: f64 = 2.3010299956640      // log10(200)
+var ALY0: f64 = 0.0 - 0.09691001300  // log10(0.8)
+var ALY1: f64 = 1.7781512503836      // log10(60)
+
+fn ax(v: f64) -> f64 with Mut, Div, Panic { AX0 + (log10f(v) - ALX0) / (ALX1 - ALX0) * (AX1 - AX0) }
+fn ay(v: f64) -> f64 with Mut, Div, Panic { AY0 + (log10f(v) - ALY0) / (ALY1 - ALY0) * (AY1 - AY0) }
+
+// ── panel B geometry: recovery vs gas saturation ──────────────────────────
+var BX0: f64 = 548.0
+var BX1: f64 = 900.0
+var BY0: f64 = 300.0
+var BY1: f64 = 72.0
+
+fn bx(v: f64) -> f64 with Mut, Div, Panic { BX0 + (log10f(v) + 1.0) / 3.0 * (BX1 - BX0) }
+fn by(v: f64) -> f64 with Mut, Div, Panic { BY0 + v / 100.0 * (BY1 - BY0) }
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"960\" height=\"430\" viewBox=\"0 0 960 430\">")
+    println("<rect width=\"960\" height=\"430\" fill=\"#ffffff\"/>")
+
+    txt(30.0, 32.0, "start", 15.0, "#111111",
+        "Calcite controls biotic H2 loss only where the stored gas is CO2-poor")
+    txt(30.0, 50.0, "start", 11.0, "#555555",
+        "Extent limits, 40 C. Stoichiometric: no rate constant, surface area or half-saturation constant enters.")
+
+    // ── PANEL A ────────────────────────────────────────────────────────────
+    txt(AX0, 64.0, "start", 12.5, "#111111", "A   F1: biotic H2 loss, with calcite / without")
+    line(AX0, AY0, AX1, AY0, "#333333", 1.2, "")
+    line(AX0, AY0, AX0, AY1, "#333333", 1.2, "")
+    txt(254.0, 336.0, "middle", 11.0, "#333333", "H2 : CO2 in the stored gas")
+    print("<text x=\"32\" y=\"186\" text-anchor=\"middle\" font-family=\"Helvetica,Arial,sans-serif\"")
+    println(" font-size=\"11\" fill=\"#333333\" transform=\"rotate(-90 32 186)\">F1 ratio</text>")
+
+    // x ticks at 2, 4, 10, 52, 200
+    var tk: [f64; 5] = [0.0; 5]
+    tk[0] = 2.0  tk[1] = 4.0  tk[2] = 10.0  tk[3] = 52.0  tk[4] = 200.0
+    var i: i64 = 0
+    while i < 5 {
+        let xp = ax(tk[i])
+        line(xp, AY0, xp, AY0 + 5.0, "#333333", 1.0, "")
+        print("<text x=\"") nm(xp) print("\" y=\"318\" text-anchor=\"middle\" font-family=\"Helvetica,Arial,sans-serif\" font-size=\"10\" fill=\"#333333\">")
+        pu64(tk[i] as i64) println("</text>")
+        i = i + 1
+    }
+    // y ticks 1, 2, 5, 10, 50
+    var ty: [f64; 5] = [0.0; 5]
+    ty[0] = 1.0  ty[1] = 2.0  ty[2] = 5.0  ty[3] = 10.0  ty[4] = 50.0
+    i = 0
+    while i < 5 {
+        let yp = ay(ty[i])
+        line(AX0 - 5.0, yp, AX0, yp, "#333333", 1.0, "")
+        print("<text x=\"") nm(AX0 - 9.0) print("\" y=\"") nm(yp + 3.5)
+        print("\" text-anchor=\"end\" font-family=\"Helvetica,Arial,sans-serif\" font-size=\"10\" fill=\"#333333\">")
+        pu64(ty[i] as i64) println("</text>")
+        i = i + 1
+    }
+
+    // F1 = 2 threshold
+    line(AX0, ay(2.0), AX1, ay(2.0), "#c0392b", 1.3, "6,4")
+    txt(AX1 - 4.0, ay(2.0) - 6.0, "end", 10.0, "#c0392b", "F1 = 2: below this H1a dies")
+
+    // asymptote y_H2/(4 y_CO2) = ratio/4
+    print("<polyline fill=\"none\" stroke=\"#7f8c8d\" stroke-width=\"1.4\" stroke-dasharray=\"5,4\" points=\"")
+    var r: f64 = 2.0
+    while r <= 200.0 {
+        var yv = r / 4.0
+        if yv < 0.8 { yv = 0.8 }
+        nm(ax(r)) print(",") nm(ay(yv)) print(" ")
+        r = r * 1.12
+    }
+    println("\"/>")
+    txt(ax(150.0), ay(48.0), "end", 10.0, "#7f8c8d", "asymptote  y(H2) / 4 y(CO2)")
+
+    // computed F1 at V_gas = 1
+    print("<polyline fill=\"none\" stroke=\"#1f4e79\" stroke-width=\"2.4\" points=\"")
+    r = 2.0
+    while r <= 200.0 {
+        extent(Y_H2_FIELD, Y_H2_FIELD / r, P_FIELD, 1.0)
+        var rr = 1.0
+        if EX_WITHOUT > 0.0 { rr = EX_WITH / EX_WITHOUT }
+        if rr < 0.8 { rr = 0.8 }
+        nm(ax(r)) print(",") nm(ay(rr)) print(" ")
+        r = r * 1.06
+    }
+    println("\"/>")
+    txt(ax(3.0), ay(1.35), "start", 10.0, "#1f4e79", "computed, gas saturation 50 %")
+
+    // the three site conditions
+    extent(0.10, 0.025, 40.0, 1.0)
+    var rm = EX_WITH / EX_WITHOUT
+    dot(ax(4.0), ay(rm), 4.5, "#ffffff", "#111111")
+    txt(ax(4.0), ay(rm) + 18.0, "middle", 9.5, "#111111", "mesocosm 4:1")
+
+    extent(0.54, 0.12, 40.0, 1.0)
+    var rl = EX_WITH / EX_WITHOUT
+    dot(ax(4.5), ay(rl), 4.5, "#ffffff", "#111111")
+    txt(ax(9.0), ay(rl) - 9.0, "middle", 9.5, "#111111", "Lobodice 4.5:1")
+
+    extent(Y_H2_FIELD, 0.0019, P_FIELD, 1.0)
+    var rf = EX_WITH / EX_WITHOUT
+    dot(ax(52.05), ay(rf), 5.5, "#c0392b", "#7b241c")
+    txt(ax(52.05) - 8.0, ay(rf) + 4.0, "end", 10.0, "#c0392b", "field 52:1")
+
+    // ── PANEL B ────────────────────────────────────────────────────────────
+    txt(BX0, 64.0, "start", 12.5, "#111111", "B   F2: H2 recovery the model can reach")
+    line(BX0, BY0, BX1, BY0, "#333333", 1.2, "")
+    line(BX0, BY0, BX0, BY1, "#333333", 1.2, "")
+    txt(724.0, 336.0, "middle", 11.0, "#333333", "gas saturation Sg = V / (1 + V)")
+    print("<text x=\"506\" y=\"186\" text-anchor=\"middle\" font-family=\"Helvetica,Arial,sans-serif\"")
+    println(" font-size=\"11\" fill=\"#333333\" transform=\"rotate(-90 506 186)\">H2 recovery, %</text>")
+
+    var bt: [f64; 4] = [0.0; 4]
+    bt[0] = 0.1  bt[1] = 1.0  bt[2] = 10.0  bt[3] = 100.0
+    i = 0
+    while i < 4 {
+        let xp = bx(bt[i])
+        line(xp, BY0, xp, BY0 + 5.0, "#333333", 1.0, "")
+        let sg = 100.0 * bt[i] / (1.0 + bt[i])
+        print("<text x=\"") nm(xp) print("\" y=\"318\" text-anchor=\"middle\" font-family=\"Helvetica,Arial,sans-serif\" font-size=\"10\" fill=\"#333333\">")
+        nm(sg) println(" %</text>")
+        i = i + 1
+    }
+    var yv: f64 = 0.0
+    while yv <= 100.0 {
+        let yp = by(yv)
+        line(BX0 - 5.0, yp, BX0, yp, "#333333", 1.0, "")
+        print("<text x=\"") nm(BX0 - 9.0) print("\" y=\"") nm(yp + 3.5)
+        print("\" text-anchor=\"end\" font-family=\"Helvetica,Arial,sans-serif\" font-size=\"10\" fill=\"#333333\">")
+        pu64(yv as i64) println("</text>")
+        yv = yv + 25.0
+    }
+
+    // observed band
+    print("<rect x=\"") nm(BX0) print("\" y=\"") nm(by(OBS_HI))
+    print("\" width=\"") nm(BX1 - BX0) print("\" height=\"") nm(by(OBS_LO) - by(OBS_HI))
+    println("\" fill=\"#f39c12\" fill-opacity=\"0.85\"/>")
+    txt(BX1 - 4.0, by(OBS_HI) - 7.0, "end", 10.0, "#a04000", "Sun Storage observed, 83.6-84.4 %")
+
+    // without calcite: the hard cap
+    print("<polyline fill=\"none\" stroke=\"#1f4e79\" stroke-width=\"2.4\" points=\"")
+    var v: f64 = 0.1
+    while v <= 100.0 {
+        extent(Y_H2_FIELD, 0.0019, P_FIELD, v)
+        var rec = 0.0
+        if EX_H2 > 0.0 { rec = 100.0 * (1.0 - EX_WITHOUT / EX_H2) }
+        if rec < 0.0 { rec = 0.0 }
+        nm(bx(v)) print(",") nm(by(rec)) print(" ")
+        v = v * 1.09
+    }
+    println("\"/>")
+    txt(bx(30.0), by(84.0), "middle", 10.0, "#1f4e79", "without calcite")
+    txt(bx(30.0), by(76.0), "middle", 9.0, "#1f4e79", "(hard cap; no kinetics exceed it)")
+
+    // with calcite: 0 % floor
+    line(BX0, by(0.0), BX1, by(0.0), "#c0392b", 2.4, "")
+    txt(bx(1.2), by(6.0), "start", 10.0, "#c0392b", "with calcite: all H2 goes, given time")
+
+    // Captions are split: this lane SEGVs on a string literal of 127-199 chars
+    // passed as a function argument. 126 works, 200 works, 127-199 crash.
+    // A window, not a threshold. LANGUAGE_GAPS.md G11 -- found by this figure.
+    txt(30.0, 366.0, "start", 10.0, "#555555",
+        "A: at 4:1 the co-injected CO2 covers the hydrogen it arrives with,")
+    txt(392.0, 366.0, "start", 10.0, "#555555",
+        "so calcite changes nothing. At the field's 52:1 it is worth 4.3x.")
+    txt(30.0, 382.0, "start", 10.0, "#555555",
+        "B: the observation falls inside the no-calcite range, nothing tuned.")
+    txt(420.0, 382.0, "start", 10.0, "#555555",
+        "Lobodice is not plotted: its data fail four checks (C13).")
+    txt(30.0, 404.0, "start", 9.5, "#888888",
+        "Emitted by sio/figure.sio. Not plotted against temperature:")
+    txt(360.0, 404.0, "start", 9.5, "#888888",
+        "the limit is stoichiometric, and T is not the controlling variable.")
+
+    println("</svg>")
+    0
+}

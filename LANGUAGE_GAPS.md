@@ -549,12 +549,26 @@ neither related.
 
 ## G10 — No rate-law composition or catalyst-cycle representation
 
-**Status: CLOSED, not yet merged.** Implemented on `Sounio-lang/sounio`
-branch `lane/cursor-1/20260826` @ `21900a1dfe` (pushed to `origin`, not on
-`main`) — see "Update, 2026-09-03: implemented" below for what actually
-landed, what it corrected in this entry's own original assumptions, and
-what is still not done. The paragraph immediately below is the entry as
-originally written and is kept for the record, not silently edited.
+**Status: CLOSED, merged.** Implemented and merged to `Sounio-lang/sounio`
+`main` via PR #2401 (merge commit `1d3eaa3f2f`, 2026-09-03) — see
+"Update, 2026-09-03: implemented" below for what actually landed, what it
+corrected in this entry's own original assumptions, and what is still not
+done. The paragraph immediately below is the entry as originally written
+and is kept for the record, not silently edited.
+
+The commit first landed on `lane/cursor-1/20260826`, a long-running
+integration lineage 7000+ commits diverged from `main` — too far diverged
+to merge directly (the same reason `Sounio-lang/sounio` PR #2346 was closed
+two days earlier for unrelated work on that same lineage). Cherry-picked
+onto a clean branch off `main` instead. CI on the resulting PR caught two
+real issues before merge, both fixed and pushed: a witness-census artifact
+drifted by the one new `tests/run-pass/*.sio` fixture this suite adds
+(resynced via the gate's own named fix command), and a dangling
+`lean_lib «SounioZDCollapse»` registration accidentally carried over from
+the source lineage's own lakefile — that file had been deliberately
+deleted elsewhere in the lineage's history, but the registration survived
+independently and broke `lake build` on `main`. Removed; unrelated to the
+catalysis suite itself.
 
 **Status, as originally written: OPEN (by decision) — anticipated, not yet model-forced.**
 
@@ -694,12 +708,12 @@ extraction (matches the Koka oracle exactly) but the full 10-function test
 suite cannot be linked as one binary. `test_catalysis_stdlib.sio` is
 `//@ check-only` for the same reason `test_kinetics_core.sio` already is.
 
-**Not done, stated plainly:** not merged to `main`; not applied back to
-this study's own models (the mineral-surface-catalyzed abiotic pathway
-named above as the trigger for IN PROGRESS is still untouched — this closes
-the *language* gap, not a *study* phase). If a future phase of this study
-actually needs a catalytic mechanism, the tool now exists to reach for
-rather than a further estimate to make.
+**Not done, stated plainly:** not applied back to this study's own models
+(the mineral-surface-catalyzed abiotic pathway named above as the trigger
+for IN PROGRESS is still untouched — this closes the *language* gap, not a
+*study* phase). If a future phase of this study actually needs a catalytic
+mechanism, the tool now exists to reach for rather than a further estimate
+to make.
 
 ## G11 — A string literal of 127 to 199 characters, passed as a function argument, segfaults
 

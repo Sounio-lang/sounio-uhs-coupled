@@ -401,3 +401,101 @@ At 120 °C, ±10 % in ΔH moves log₁₀ K by ∓0.855 — a factor of **7.2 in
 same order as the approximation error itself. Both belong in the band, and
 neither can be reduced by choosing more carefully; closing them needs the
 calibrated expression that is not available.
+
+## `abiotic_kinetics.sio` — time, and the step-bisection test
+
+The piece that turns point calculations into a trajectory. Until it existed there
+was no step bisection, hence no statement about truncation, hence no quotable
+number. It **imports** the verified modules rather than restating them —
+`calcite_rate` for the rate law and `carbonate_equilibria` for speciation,
+activity and ion pairs.
+
+Calcite is no longer held at equilibrium: total dissolved calcium is the state
+variable and Ω evolves toward 1.
+
+```
+d(Ca_total)/dt = rate(T, a_H, P_CO2, Omega) * A      [mol kg_w^-1 s^-1]
+```
+
+The calcium split closes analytically — every Ca species is proportional to the
+free-ion activity, so `a_Ca = Ca_total / bracket` with the bracket collecting the
+free ion and the three pairs. No second nested root-find is needed.
+
+**Reactive surface area A is not a datum.** No source in this study supplies one
+for these reservoirs, so it is a **swept input** and every trajectory is labelled
+with the value used. Choosing one and calling it the answer would be inventing
+the number that sets the entire timescale.
+
+### The system is stiff, and that is chemistry rather than a defect
+
+The first run used A = 1 m²/kgw with a one-day step and produced nonsense — Ca
+overshooting to 1.4 molal, then oscillating to zero. The step was not slightly
+too large; it was too large by a factor of about 1400.
+
+At A = 1 m²/kgw the initial rate is 1.624e-05 mol m⁻² s⁻¹ and equilibrium sits at
+1.234e-03 molal, so the characteristic time is
+
+```
+t_char ~ Ca_eq / (rate_0 * A) ~ 1.234e-3 / 1.624e-5 ~ 61 seconds
+```
+
+**Over any storage horizon, calcite at this surface area is simply at
+equilibrium**, and the kinetics only matter when A is orders of magnitude
+smaller. That is a property of the chemistry, and it is why the equilibrium
+closure was a reasonable thing to build first.
+
+### The kinetic model converges to the equilibrium model
+
+40 °C, P(CO₂) = 0.01 atm, A = 1 m²/kgw, dt = 1 s:
+
+| t (s) | Ca_total (molal) | pH | Ω |
+|---|---|---|---|
+| 10 | 1.0542e-04 | 6.238 | 0.0086 |
+| 30 | 2.8891e-04 | 6.668 | 0.0162 |
+| 60 | 5.4828e-04 | 6.940 | 0.1021 |
+| 120 | 9.4363e-04 | 7.168 | 0.4740 |
+| 300 | **1.2246e-03** | **7.277** | **0.9799** |
+
+At 300 s the trajectory has reached Ω = 0.98 and Ca = 1.2246e-03 against the
+**equilibrium closure's 1.2336e-03 at pH 7.2797**. Two independently written
+paths — a root-find on charge balance at calcite saturation, and a time
+integration that never mentions Ksp except through Ω — land on the same state.
+That check was not designed in; it fell out.
+
+pH rises from 6.24 to 7.28 as dissolution consumes H⁺, in the right direction.
+
+### Step bisection: first order, but only once the step is small enough
+
+Euler was chosen deliberately. Its truncation error is first order, so halving
+the step must halve the error and successive differences must fall by exactly 2 —
+an unambiguous expected result. A higher-order scheme would converge faster and
+say less.
+
+At t = 60 s, A = 1 m²/kgw:
+
+| dt (s) | Ca_total | successive difference | ratio |
+|---|---|---|---|
+| 4 | 5.646451137163e-04 | | |
+| 2 | 5.531512195925e-04 | 1.1494e-05 | |
+| 1 | 5.482767592896e-04 | 4.8745e-06 | **2.358** |
+| 0.5 | 5.463145346995e-04 | 1.9622e-06 | **2.484** |
+| 0.25 | 5.454876232470e-04 | 8.2691e-07 | **2.373** |
+| 0.125 | 5.451084218697e-04 | | |
+| 0.0625 | 5.449262510051e-04 | | **2.082** |
+| 0.03125 | 5.448368915090e-04 | | **2.039** |
+
+**The first three ratios are not 2.** They sit at 2.36–2.48, and they were not
+rounded to "about 2" and moved past. Pushing the bisection three levels further
+resolved it: the ratio falls to **2.082 and then 2.039**, converging on the
+first-order value as it must.
+
+So the answer is that the scheme is first order and behaves correctly, **but the
+larger steps were not in the asymptotic regime** — the region where the
+convergence claim is even meaningful begins somewhere below dt ≈ 0.1 s for this
+problem. A bisection stopped after three levels would have reported a ratio of
+2.4 and left it ambiguous whether the integrator or the chemistry was at fault.
+
+Richardson extrapolation on the last pair puts the converged value near
+**5.4475e-04**, so dt = 1 s carries about **0.65 % truncation error** at this
+horizon. That is now a measured quantity rather than an assumption, which is the
+whole point of the exercise.

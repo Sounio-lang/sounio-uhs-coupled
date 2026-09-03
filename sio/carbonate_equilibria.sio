@@ -82,7 +82,7 @@ var P2_A4: f64 = 485.818
 // temperature-independent here, and Davies for its activity coefficient.
 var P3_LOGK: f64 = 0.0 - 12.78
 
-var LN10: f64 = 2.302585092994046
+pub var LN10: f64 = 2.302585092994046
 
 fn log10_of(x: f64) -> f64 with Mut, Div, Panic {
     if x <= 0.0 { return 0.0 - 745.0 }
@@ -93,7 +93,7 @@ fn log10_of(x: f64) -> f64 with Mut, Div, Panic {
 // coefficients plus T would exceed the parameter count that compiles reliably
 // for imported calls on this lane.
 //   0 Henry   1 CO3+H   2 CO3+2H   3 water   4 calcite
-fn log_k(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
+pub fn log_k(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
     var a1 = 0.0
     var a2 = 0.0
     var a3 = 0.0
@@ -123,8 +123,8 @@ fn log_k(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
 // Derived dissociation constants, in the direction chemists write them.
 //   pK1 for  CO2 + H2O = H+ + HCO3-
 //   pK2 for  HCO3-     = H+ + CO3-2
-fn p_k1(t_k: f64) -> f64 with Mut, Div, Panic { log_k(2, t_k) - log_k(1, t_k) }
-fn p_k2(t_k: f64) -> f64 with Mut, Div, Panic { log_k(1, t_k) }
+pub fn p_k1(t_k: f64) -> f64 with Mut, Div, Panic { log_k(2, t_k) - log_k(1, t_k) }
+pub fn p_k2(t_k: f64) -> f64 with Mut, Div, Panic { log_k(1, t_k) }
 
 // Speciation at a GIVEN pH. This does not solve for pH: closing the system on
 // charge balance is a separate step, and pretending otherwise would hide which
@@ -184,12 +184,12 @@ var BP_U7: f64 = 0.0 - 8.0325e3
 var BP_U8: f64 = 4.2142e6
 var BP_U9: f64 = 2.1417
 
-fn powf(x: f64, y: f64) -> f64 with Mut, Div, Panic {
+pub fn powf(x: f64, y: f64) -> f64 with Mut, Div, Panic {
     if x <= 0.0 { return 0.0 }
     exp(y * log(x))
 }
 
-fn sqrtf(x: f64) -> f64 with Mut, Div, Panic {
+pub fn sqrtf(x: f64) -> f64 with Mut, Div, Panic {
     if x <= 0.0 { return 0.0 }
     exp(0.5 * log(x))
 }
@@ -240,7 +240,7 @@ fn eps_r(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
 }
 
 // Debye-Hückel B, in 1/Angstrom per (mol/kg)^0.5.
-fn dh_b(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
+pub fn dh_b(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
     let t = tc + 273.15
     let e = eps_r(tc, pa_atm)
     if e <= 0.0 { return 0.0 - 1.0 }
@@ -257,7 +257,7 @@ fn dh_b(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
 
 // Debye-Hückel A, in (mol/kg)^-0.5. Note DH_A is formed from DH_B BEFORE the
 // 1e8 division in PHREEQC, so the factor is restored here.
-fn dh_a(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
+pub fn dh_a(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
     let t = tc + 273.15
     let e = eps_r(tc, pa_atm)
     if e <= 0.0 { return 0.0 - 1.0 }
@@ -271,7 +271,7 @@ fn dh_a(tc: f64, pa_atm: f64) -> f64 with Mut, Div, Panic {
 //   a  ion-size parameter, Angstrom, from the database's -gamma line
 //   b  WATEQ extension term, from the same line
 // A neutral species (z = 0, a = 0) reduces to the Setchenow form log g = b mu.
-fn gamma_wateq(tc: f64, pa_atm: f64, z: f64, a: f64, b: f64, mu: f64) -> f64 with Mut, Div, Panic {
+pub fn gamma_wateq(tc: f64, pa_atm: f64, z: f64, a: f64, b: f64, mu: f64) -> f64 with Mut, Div, Panic {
     if mu < 0.0 { return 0.0 - 1.0 }
     if mu == 0.0 { return 1.0 }
     let sm = sqrtf(mu)
@@ -553,7 +553,7 @@ fn solve_ph(t_k: f64, p_co2_atm: f64, ph_lo: f64, ph_hi: f64, tol: f64) -> f64 w
 
 // Davies. PHREEQC uses this for a charged species with no -gamma line
 // (gflag 1): log g = -A z^2 (sqrt(mu)/(1+sqrt(mu)) - 0.3 mu).
-fn gamma_davies(tc: f64, z: f64, mu: f64) -> f64 with Mut, Div, Panic {
+pub fn gamma_davies(tc: f64, z: f64, mu: f64) -> f64 with Mut, Div, Panic {
     if mu <= 0.0 { return 1.0 }
     let sm = sqrtf(mu)
     let aa = dh_a(tc, 1.0)

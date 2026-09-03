@@ -1,0 +1,260 @@
+// Abiotic kinetics — calcite dissolution in time, and the step-bisection test.
+//
+// This is the piece that turns a set of point calculations into a trajectory.
+// Until it existed there was no step bisection, and therefore no statement about
+// whether truncation error was under control, and therefore no quotable number.
+//
+// It reuses the verified modules rather than restating them:
+//   calcite_rate           Palandri-Kharaka Table 33, k25 reproduced to 14-15 digits
+//   carbonate_equilibria   constants from the pinned phreeqc.dat, WATEQ activity,
+//                          ion pairs, agreeing with the oracle to 0.01-0.21 % in Ca
+//
+// THE SYSTEM. Calcite is no longer held at equilibrium: total dissolved calcium
+// is a state variable and Omega evolves toward 1 as the mineral dissolves.
+//
+//   d(Ca_total)/dt = rate(T, a_H, P_CO2, Omega) * A        [mol kg_w^-1 s^-1]
+//
+// with the rate law in mol m^-2 s^-1 and A the reactive surface area per kg of
+// water.
+//
+// A IS NOT A DATUM. No source in this study supplies a reactive surface area for
+// these reservoirs, so it is an INPUT that is swept, and every trajectory below
+// is labelled with the value used. Picking one and calling it the answer would
+// be inventing the number that sets the whole timescale.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use calcite_rate::{calcite_rate}
+use carbonate_equilibria::{log_k, p_k1, p_k2, gamma_wateq, gamma_davies, LN10}
+
+// state, exposed so a caller can read the trajectory without a return tuple
+var K_PH: f64 = 7.0
+var K_OMEGA: f64 = 0.0
+var K_RATE: f64 = 0.0
+var K_MU: f64 = 0.0
+var K_CA_FREE: f64 = 0.0
+var K_CHARGE: f64 = 0.0
+
+// Speciation with TOTAL calcium given, rather than calcite equilibrium fixing it.
+//
+// Every calcium species is proportional to the free-ion activity, so the split
+// closes analytically: a_Ca = Ca_total / bracket, with bracket collecting the
+// free ion and the three pairs. That avoids a second nested root-find.
+fn speciate_kin(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64, ca_total: f64) with Mut, Div, Panic {
+    let tc = t_k - 273.15
+    let g_h      = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0,   mu)
+    let g_oh     = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0,   mu)
+    let g_hco3   = gamma_wateq(tc, 1.0, 1.0, 5.4, 0.0,   mu)
+    let g_co3    = gamma_wateq(tc, 1.0, 2.0, 5.4, 0.0,   mu)
+    let g_ca     = gamma_wateq(tc, 1.0, 2.0, 5.0, 0.165, mu)
+    let g_cahco3 = gamma_wateq(tc, 1.0, 1.0, 6.0, 0.0,   mu)
+    let g_caoh   = gamma_davies(tc, 1.0, mu)
+
+    let a_h    = exp((0.0 - ph) * LN10)
+    let a_oh   = exp(log_k(3, t_k) * LN10) / a_h
+    let a_co2  = exp(log_k(0, t_k) * LN10) * p_co2_atm
+    let a_hco3 = a_co2 * exp((0.0 - p_k1(t_k)) * LN10) / a_h
+    let a_co3  = a_hco3 * exp((0.0 - p_k2(t_k)) * LN10) / a_h
+
+    let k_cahco3 = exp(log_k(5, t_k) * LN10)
+    let k_caco3  = exp(log_k(6, t_k) * LN10)
+    let k_caoh   = exp(log_k(7, t_k) * LN10)
+
+    // Ca_total = a_Ca * bracket, so the free-ion activity follows directly.
+    let bracket = 1.0 / g_ca
+                + k_cahco3 * a_co3 * a_h / g_cahco3
+                + k_caco3 * a_co3
+                + k_caoh / (a_h * g_caoh)
+    var a_ca = 0.0
+    if bracket > 0.0 { a_ca = ca_total / bracket }
+
+    let m_h      = a_h / g_h
+    let m_oh     = a_oh / g_oh
+    let m_hco3   = a_hco3 / g_hco3
+    let m_co3    = a_co3 / g_co3
+    let m_ca     = a_ca / g_ca
+    let m_cahco3 = a_ca * k_cahco3 * a_co3 * a_h / g_cahco3
+    let m_caoh   = a_ca * k_caoh / (a_h * g_caoh)
+
+    K_CA_FREE = m_ca
+    K_CHARGE  = 2.0 * m_ca + m_h + m_cahco3 + m_caoh - m_hco3 - 2.0 * m_co3 - m_oh
+    K_MU      = 0.5 * (4.0 * m_ca + m_h + m_hco3 + 4.0 * m_co3 + m_oh + m_cahco3 + m_caoh)
+    var ksp = exp(log_k(4, t_k) * LN10)
+    if ksp > 0.0 { K_OMEGA = a_ca * a_co3 / ksp } else { K_OMEGA = 0.0 }
+}
+
+// Solve pH and ionic strength at fixed total calcium. Inner bisection on pH,
+// outer fixed point on mu, same structure as the equilibrium closure.
+fn solve_state(t_k: f64, p_co2_atm: f64, ca_total: f64) with Mut, Div, Panic {
+    var mu = 0.0
+    var ph = 7.0
+    var n: i64 = 0
+    while n < 40 {
+        var lo = 2.0
+        var hi = 13.0
+        speciate_kin(t_k, p_co2_atm, lo, mu, ca_total)
+        let f_lo = K_CHARGE
+        var k: i64 = 0
+        while k < 60 {
+            let mid = 0.5 * (lo + hi)
+            speciate_kin(t_k, p_co2_atm, mid, mu, ca_total)
+            if (f_lo < 0.0 && K_CHARGE < 0.0) || (f_lo > 0.0 && K_CHARGE > 0.0) { lo = mid } else { hi = mid }
+            k = k + 1
+        }
+        ph = 0.5 * (lo + hi)
+        speciate_kin(t_k, p_co2_atm, ph, mu, ca_total)
+        let d = K_MU - mu
+        var ad = d
+        if ad < 0.0 { ad = 0.0 - ad }
+        mu = K_MU
+        n = n + 1
+        if ad < 1.0e-15 { n = 40 }
+    }
+    K_PH = ph
+    speciate_kin(t_k, p_co2_atm, ph, mu, ca_total)
+    let a_h = exp((0.0 - ph) * LN10)
+    K_RATE = calcite_rate(t_k, a_h, p_co2_atm, K_OMEGA)
+}
+
+// Explicit Euler to a target time. Returns total dissolved calcium, molal.
+//
+// Euler on purpose, for now: it is the simplest scheme whose truncation error
+// is first order in dt, so halving the step must halve the error, and the
+// bisection test below has an unambiguous expected result. A higher-order
+// integrator would converge faster and tell us less about whether the step is
+// small enough.
+fn integrate(t_k: f64, p_co2_atm: f64, area_m2_per_kgw: f64,
+             t_end_s: f64, dt_s: f64) -> f64 with Mut, Div, Panic {
+    var ca = 0.0
+    var t = 0.0
+    var guard: i64 = 0
+    while t < t_end_s && guard < 2000000 {
+        solve_state(t_k, p_co2_atm, ca)
+        var r = K_RATE
+        if r < 0.0 - 1.0e29 { return 0.0 - 1.0 }   // rate law refused
+        var step = dt_s
+        if t + step > t_end_s { step = t_end_s - t }
+        ca = ca + r * area_m2_per_kgw * step
+        if ca < 0.0 { ca = 0.0 }
+        t = t + step
+        guard = guard + 1
+    }
+    if guard >= 2000000 { return 0.0 - 2.0 }        // step too small for the horizon
+    ca
+}
+
+// ── printing ───────────────────────────────────────────────────────────────
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("ABIOTIC KINETICS -- calcite dissolution in time")
+    println("40 C, P(CO2) = 0.01 atm. Surface area is a SWEPT INPUT, not a datum:")
+    println("no source in this study supplies one for these reservoirs.")
+    println("")
+
+    let t_k = 313.15
+    let pco2 = 0.01
+    let day = 86400.0
+
+    println("== initial state, Ca_total = 0 (calcite has not yet dissolved) ==")
+    solve_state(t_k, pco2, 0.0)
+    emit("   pH   ", K_PH)
+    emit("   Omega", K_OMEGA)
+    emit("   rate ", K_RATE)
+    println("   (Omega ~ 0 far from equilibrium, so the rate is at its maximum)")
+    println("")
+
+    println("== characteristic time to saturation, by surface area ==")
+    println("   t_char ~ Ca_eq / (rate_0 * A). Ca_eq at these conditions is the")
+    println("   equilibrium closure's 1.234e-3 molal.")
+    let ca_eq = 1.233588252542e-3
+    let r0 = K_RATE
+    var a: f64 = 1.0
+    var n: i64 = 0
+    while n < 7 {
+        print("   A = ") emit("", a)
+        print("      t_char (s) ") emit("", ca_eq / (r0 * a))
+        print("      t_char (days) ") emit("", ca_eq / (r0 * a) / day)
+        a = a / 10.0
+        n = n + 1
+    }
+    println("")
+    println("   So at A = 1 m2/kgw the abiotic system saturates in about a")
+    println("   minute: over storage timescales calcite is at equilibrium, and")
+    println("   the kinetics only matter when A is very small. The system is")
+    println("   STIFF relative to a storage horizon, which is a property of the")
+    println("   chemistry, not a defect of the integrator.")
+    println("")
+
+    println("== trajectory in a regime the step can resolve: A = 1, dt = 1 s ==")
+    var i: i64 = 0
+    var ts: [f64; 5] = [0.0; 5]
+    ts[0] = 10.0
+    ts[1] = 30.0
+    ts[2] = 60.0
+    ts[3] = 120.0
+    ts[4] = 300.0
+    while i < 5 {
+        let ca = integrate(t_k, pco2, 1.0, ts[i], 1.0)
+        print("   t = ") emit("", ts[i])
+        print("      Ca_total ") emit("", ca)
+        solve_state(t_k, pco2, ca)
+        print("      pH ") emit("", K_PH)
+        print("      Omega ") emit("", K_OMEGA)
+        i = i + 1
+    }
+    println("")
+
+    println("== STEP BISECTION at t = 60 s, A = 1.0 m2/kgw ==")
+    println("   Euler is first order, so successive differences should fall by 2.")
+    println("   Reported whether or not they do.")
+    let c1 = integrate(t_k, pco2, 1.0, 60.0, 4.0)
+    let c2 = integrate(t_k, pco2, 1.0, 60.0, 2.0)
+    let c3 = integrate(t_k, pco2, 1.0, 60.0, 1.0)
+    let c4 = integrate(t_k, pco2, 1.0, 60.0, 0.5)
+    let c5 = integrate(t_k, pco2, 1.0, 60.0, 0.25)
+    emit("   dt=4s   ", c1)
+    emit("   dt=2s   ", c2)
+    emit("   dt=1s   ", c3)
+    emit("   dt=0.5s ", c4)
+    emit("   dt=0.25s", c5)
+    emit("   d(4,2)  ", c1 - c2)
+    emit("   d(2,1)  ", c2 - c3)
+    emit("   d(1,0.5)", c3 - c4)
+    emit("   d(0.5,0.25)", c4 - c5)
+    println("   ratios (first order predicts 2.0):")
+    if c2 - c3 != 0.0 { emit("   r1", (c1 - c2) / (c2 - c3)) }
+    if c3 - c4 != 0.0 { emit("   r2", (c2 - c3) / (c3 - c4)) }
+    if c4 - c5 != 0.0 { emit("   r3", (c3 - c4) / (c4 - c5)) }
+    println("")
+    println("   pushed further, to see whether the ratio approaches 2:")
+    let c6 = integrate(t_k, pco2, 1.0, 60.0, 0.125)
+    let c7 = integrate(t_k, pco2, 1.0, 60.0, 0.0625)
+    let c8 = integrate(t_k, pco2, 1.0, 60.0, 0.03125)
+    emit("   dt=0.125s  ", c6)
+    emit("   dt=0.0625s ", c7)
+    emit("   dt=0.03125s", c8)
+    if c6 - c7 != 0.0 { emit("   r4", (c5 - c6) / (c6 - c7)) }
+    if c7 - c8 != 0.0 { emit("   r5", (c6 - c7) / (c7 - c8)) }
+    0
+}

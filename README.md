@@ -4,16 +4,16 @@ A pre-registered attempt to **falsify** a hypothesis about what controls
 hydrogen loss in underground hydrogen storage — not to confirm it.
 
 **Status: Phases 0-4 complete. All three pre-registered criteria have
-verdicts.** They are recorded in `PHASE4_GATE.md`, which is written as a running
-log rather than a summary: it contains a wrong answer, the defect that produced
-it, and the correction, in that order. `RESULTS.md` does not exist yet — the
-final write-up is still to come, and until it does the log is the record.
+verdicts, in [`RESULTS.md`](RESULTS.md), which opens with them.**
+`PHASE4_GATE.md` is the running log behind it, written as a log rather than a
+summary: it contains a wrong answer, the defect that produced it, and the
+correction, in that order.
 
 | criterion | verdict | where |
 |---|---|---|
 | **F1** — remove calcite; under a factor 2 and H1a dies | **passes at a CO2-poor feed** (4.3x at ordinary gas saturation, approaching 13x), **but is inert at a stoichiometric or CO2-rich feed** (1.00 to 1.13) | `sio/coupled_gasphase.sio` |
 | **F2** — band must encompass both field points, nothing tuned | **not evaluable as pre-registered.** Lobodice's reported data fail four independent consistency checks (`CORRECTIONS.md` C13). **Satisfied against Sun Storage alone**, which falls inside the model's reachable range with nothing tuned | `sio/coupled_finite.sio`, `sio/lobodice_massbalance.sio` |
-| **F3** — if the abiotic band alone encompasses both points, the coupling is superfluous | **does not fire.** Dissolution accounts for 1.88 % against ~16 % observed, and the site's own sterile controls lose 5-10x less than the biotic ones | `sio/f3_abiotic_band.sio` |
+| **F3** — if the abiotic band alone encompasses both points, the coupling is superfluous | **not evaluable as pre-registered, and cannot be settled against Sun Storage alone.** A reaction-free simulation spans the observation; the dominant physical term is unmeasured in the field and spans a factor of 20 in the laboratory. But methanogenesis at the site is directly measured, and no physical process explains an isotopic signature | `sio/f3_abiotic_band.sio`, `sio/field_mass_balance.sio` |
 
 **H1a survives, in a sharper and more falsifiable form than it was
 pre-registered in.** The mechanism is not kinetic — the CO2 half-saturation term
@@ -68,7 +68,8 @@ work:
 | `data/` | manifest: origin, DOI, licence, sha256, convention axioms per file |
 | `abiotic/` `microbial/` `coupled/` | the models |
 | `oracles/` | IPhreeqc parity harness; archived USGS outputs |
-| `PHASE4_GATE.md` | the running log of Phase 4 and the three verdicts — including a retracted result and the defect that caused it |
+| `RESULTS.md` | **the verdicts**, on the first line, with the producer of every number |
+| `PHASE4_GATE.md` | the running log behind them — including a retracted result and the defect that caused it |
 | `CORRECTIONS.md` | 13 corrections to the brief's premises and to the sources, each with the measurement that exposed it |
 | `sio/` | the Sounio engine sources -- validation and gate probes live here too, not in a separate `probes/` directory, because imports resolve same-directory first and the self-hosted stdlib fallback does not see this repo |
 | `tools/` | data → `.sio` code generation (marshalling only, no numerics) |

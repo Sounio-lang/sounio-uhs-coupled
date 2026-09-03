@@ -969,3 +969,76 @@ That is not evidence for H1a: the replenishment is real chemistry, and removing
 it is a defect of this increment rather than a scenario. It does show the channel
 H1a needs is a live one, distinct from the Monod term whose constant Strobel
 measured and whose effect was 1.9 %.
+
+### Correction: the carbon pool, and what the residual really is
+
+**An earlier reading in this section was wrong and is corrected here.** The first
+integration ran the carbon mass balance on **free HCO₃⁻ alone** and fell short of
+the archive by 3.74×. That was attributed to the carbonate system "replenishing"
+bicarbonate — which implies an external source, and there is none in a closed
+system.
+
+The actual mechanism is the sulfate mechanism again. Total dissolved carbon at
+step 0 sums to **2.256521e-03 molal** across CO₂(aq) 8.281e-04, NaHCO₃
+7.171e-04, HCO₃⁻ 5.818e-04, MgHCO₃⁺, CaHCO₃⁺ and four minor species — **3.88×
+the free bicarbonate**, which is 25.8 % of it. CO₂(aq) and the complexed
+bicarbonates *are* the pool; speciation makes them available as the free species
+is drawn down. The archive consumed **96.4 % of total dissolved carbon**.
+
+So: **Monod on the free species, mass balance on the total pool** — for carbon
+exactly as for sulfate. Using free HCO₃⁻ for the mass balance was the error, and
+the 3.74× shortfall matched the 3.88× pool ratio.
+
+With that corrected:
+
+| | integrated | archived | difference |
+|---|---|---|---|
+| X_SRB | 41.345 | 41.56 | **−0.52 %** |
+| HS⁻ | 8.269e-03 | 8.229e-03 | **+0.48 %** |
+| X_MET | 1.8287 | 2.720 | **−32.8 %** |
+| CH₄ | 1.463e-03 | 2.156e-03 | **−32.2 %** |
+
+The shortfall fell from 3.74× to 1.49×. The sulfate half remains exact.
+
+### The remaining 32 % is a 2.7 % difference in growth rate
+
+Step 915 is at **4.00782e+11 s, which is 12 700.0 years exactly** — that was
+checked rather than assumed.
+
+| | |
+|---|---|
+| μ from yield × k | 3.6000e-11 /s |
+| X_MET this predicts analytically | 1.8453 mg/kg |
+| what the integrator gives | 1.8287 mg/kg (Euler, 0.9 % below the analytic) |
+| archived | 2.7200 mg/kg |
+| **μ implied by the archive** | **3.6968e-11 /s — 2.7 % higher** |
+
+**The integrator is correct for the model as understood.** It reproduces its own
+analytic solution. The gap is that the archive's effective growth rate is 2.7 %
+above yield × k, and over 12 700 years of exponential growth that compounds into
+a factor of **1.47** in biomass.
+
+Where the extra 2.7 % comes from is **not** established. It is not the carbon
+ceiling: that ceiling is yield × total C = **2.821 mg/kg**, and the archive at
+2.720 sits at 96.4 % of it, so if anything proximity to the ceiling should slow
+the archive rather than speed it. Candidates not yet tested include GWB's
+thermodynamic factor being formulated differently from the f_T ≡ 1 assumed here,
+and the biomass ODE being advanced implicitly rather than explicitly. Neither is
+claimed.
+
+### The lesson, which is larger than this discrepancy
+
+**A 2.7 % error in a growth rate became a 47 % error in the endpoint** over the
+storage horizon, purely because the growth is exponential.
+
+That dwarfs almost every parameter uncertainty quantified elsewhere in this
+study: the affinity-exponent band is a factor of 1.9 to 3.9, the Van't Hoff error
+reaches 12.7 in K only at 120 °C, and the Strobel CO₂ constant is worth 1.9 %.
+A few percent on μ_max sits alongside those in magnitude — and μ_max is the one
+parameter for which Strobel provides a central value with **no stated
+uncertainty at all**.
+
+For the coupled model this reorders the priorities: biomass growth rate is the
+dominant sensitivity on any timescale where growth is exponential, and no band
+built without u(μ_max) can be honest about the width. That is now a measured
+claim rather than an intuition.

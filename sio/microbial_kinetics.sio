@@ -46,6 +46,20 @@ var DECAY: f64 = 0.0
 // the endpoint is set by the total pool, but it shifts the timing slightly.
 var SO4_FREE_FRAC: f64 = 0.3962
 
+// Total dissolved CARBON is likewise 3.88x the free bicarbonate: the step-0
+// species list sums CO2(aq) 8.281e-4, NaHCO3 7.171e-4, HCO3- 5.818e-4,
+// MgHCO3+ 6.897e-5, CaHCO3+ 5.974e-5 and four minor carbonate species to
+// 2.256521e-3 molal, of which free HCO3- is 25.8 %.
+//
+// THIS CORRECTS AN EARLIER READING IN THIS FILE'S OWN HISTORY. The first
+// version ran the carbon mass balance on free HCO3- alone and fell short of the
+// archive by 3.74x; the total/free ratio is 3.88x. The shortfall was not the
+// carbonate system "replenishing" bicarbonate from somewhere -- there is no
+// external source in a closed system. It is that CO2(aq) and the complexed
+// bicarbonates ARE the pool, and speciation makes them available as the free
+// species is drawn down. The archive consumed 96.4 % of total dissolved carbon.
+var HCO3_FREE_FRAC: f64 = 0.2578
+
 var ST_XMET: f64 = 0.0
 var ST_XSRB: f64 = 0.0
 var ST_H2: f64 = 0.0
@@ -59,7 +73,7 @@ fn init_state() with Mut {
     ST_XSRB = 1.0e-6
     ST_H2 = 0.04226
     ST_SO4T = 0.008269
-    ST_HCO3 = 0.0005818
+    ST_HCO3 = 0.002256521      // TOTAL dissolved carbon, not free HCO3-
     ST_CH4 = 9.005e-10
     ST_HS = 0.0
 }
@@ -67,7 +81,8 @@ fn init_state() with Mut {
 // One explicit Euler step of dt seconds.
 fn step(dt: f64) with Mut, Div, Panic {
     let so4_free = ST_SO4T * SO4_FREE_FRAC
-    let r_met = microbial_rate(0, ST_XMET, ST_H2, ST_HCO3, 1.0)
+    let hco3_free = ST_HCO3 * HCO3_FREE_FRAC
+    let r_met = microbial_rate(0, ST_XMET, ST_H2, hco3_free, 1.0)
     let r_srb = microbial_rate(1, ST_XSRB, ST_H2, so4_free, 1.0)
     if r_met < 0.0 { return }
     if r_srb < 0.0 { return }
@@ -146,7 +161,8 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     println("GWB not available; React not run; parity is against the archive.")
     println("")
     println("archived endpoints at 12700 yr:")
-    println("   X_SRB 41.56   X_MET 2.720   H2 5.470e-4   CH4 2.156e-3   HS 8.229e-3")
+    println("   X_SRB 41.56   X_MET 2.720   H2 5.470e-4   CH4 2.156e-3   HS 8.229e-3
+   carbon-limited ceiling on X_MET = yield 1250 x total C 2.2565e-3 = 2.82")
     println("")
     println("== integrated, dt = 1e7 s (~0.32 yr) ==")
     run(12700.0, 1.0e7)

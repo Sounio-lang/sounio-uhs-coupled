@@ -683,3 +683,80 @@ a deleted Python script's rounded stdout is precisely the failure the provenance
 discipline is meant to catch — and it was caught by a reader's question, not by
 `audit_provenance.py`. **That the mechanical check did not flag it is itself a
 finding**, and closing that gap belongs on the tooling list.
+
+## C19 — The cells-to-mass conversion the UHS literature lacks, and one paper's assumed value
+
+Every prior phase of this study reported the same blocker: no microbial kinetic
+parameter set fits a 285-day reservoir observation, because the USGS archive is
+~10 orders of magnitude too slow and Strobel et al. 2023 states biomass in
+**cells** and yield in **cells/mol**, which cannot be converted without a mass
+per cell the paper does not supply. Inventing one was barred.
+
+**The UHS literature does not contain that conversion.** Thaysen et al. 2021,
+Trémosa et al. 2023, Hogeweg et al. 2024 and Vasile et al. 2025 all carry biomass
+as cells, cell numbers, gene copies or mol-C with *assumed* conversion constants.
+Hogeweg et al. state outright that lab-to-field transfer "remains a critical
+step" and give no in-situ rate anywhere.
+
+**It exists outside that literature, measured.**
+
+| source | quantity | value | status |
+|---|---|---|---|
+| Khachikyan et al. 2019, AEM 85(14):e00493-19, PMC6606879, OA | dry mass per cell, 12 cultured prokaryotes | **24.6–266.5 fg/cell** | directly measured |
+| same | regressions | m_dry = 322·V^0.43, m_C = 197·V^0.46, R² = 0.95 | measured |
+| Braun et al. 2016, Front Microbiol 7:1375, PMC5005352, CC BY | cell carbon, sub-seafloor sediment | **14–31 fg C/cell** | measured |
+
+**Carried as a band, never a point.** Neither source measured a hydrogenotrophic
+methanogen, a sulfate reducer, or anything in a reservoir at 25–80 °C, so
+applying them here is a declared extrapolation. Khachikyan's own data show mass
+per cell is strongly non-linear in volume (ρ = 540·V^−0.38) and disagrees with an
+earlier compilation by up to 5× at small volumes. `sio/kinetic_gap.sio` reports
+every derived figure across the full measured range.
+
+### The assumed value in the literature is high
+
+Trémosa et al. 2023 take a **measured** field cell density — 10⁴ cells/mL at
+Lobodice, from Smigan et al. 1990 pore-water enumeration — and convert it by
+**assuming** 1e-14 mol C per cell, uncited, and self-labelled *"for the sake of
+simplicity"*.
+
+| | fg C/cell |
+|---|---|
+| Trémosa's assumption | **120.11** |
+| Braun, measured, deep subsurface | **14 – 31** |
+| **assumption ÷ measured** | **3.87× to 8.58×** |
+
+The assumed value sits **above the entire measured range** for deep-subsurface
+cells. Any biomass, and therefore any rate, derived from it is overstated by
+roughly four to nine times.
+
+### What the conversion reveals: the gap is not where it looks
+
+| | value |
+|---|---|
+| Strobel reactor inoculum | 10⁷ cells/mL = **0.246 – 2.665 mg/kg** |
+| Lobodice measured field density | 10⁴ cells/mL = **2.46e-4 – 2.665e-3 mg/kg** |
+| reactor ÷ field | **1 000×** |
+| archive cold start | 1e-6 mg/kg — field is **246–2 665×** larger |
+| **archive's own upper sensitivity bound** | 1e-4 mg/kg — field is only **2.5–27×** larger |
+| **Strobel ÷ USGS, per cell** | **1.30e7 – 1.41e8×** |
+
+**The archive's biomass was never the problem** — its own upper sensitivity bound
+sits within about one order of magnitude of the real field density. The ~10-order
+gap is 10³ from inoculum size and **10⁷–10⁸ from the rate constant per cell.**
+
+### And the field observation is feasible after all
+
+To produce the Sun Storage biotic upper bound (3 842 m³ H₂ over 285 days, from
+`sio/field_mass_balance.sio`), the required rate is 1.740e-10 molal/s:
+
+| parameter set | biomass required | verdict |
+|---|---|---|
+| USGS archive | 1 511 mg/kg ≈ **6.14e10 cells/mL** | **impossible** — 6 million times the measured field density |
+| Strobel | **435 cells/mL** | **feasible** — the field measured 10⁴ cells/mL, **23× more than needed** |
+
+**The kinetic blocker is removed.** The observation is impossible under the
+archive's parameterisation and comfortably feasible under Strobel's, at a cell
+density *below* the one actually measured in a town-gas storage. The archive's
+rate constant was fitted to a 12 700-year trajectory; it is not wrong, it is
+answering a different question.

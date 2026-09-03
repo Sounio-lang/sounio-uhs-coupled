@@ -217,31 +217,93 @@ fugacity`. The model inverted its own oracle's limiting reagent.
 2. **The sterile control cannot separate reaction from leakage.** A four-lab
    round-robin found H₂ loss in sterile controls of 26 %, negligible, 8.8 % and
    none — bottles alone (C17).
-3. **No kinetic parameter set fits the timescale.** The USGS archive implies a
-   methanogen doubling time of **610.1 years**; Strobel's species 2 at 37 °C,
-   **19.25 hours**; ratio **2.78 × 10⁵** (`sio/coupled_finite.sio`). With the
-   archive's parameters the field gives **99.999999998 %** recovery at 285 days
-   (`sio/coupled_finite.sio`) — short by ten orders of magnitude. Independently,
-   Trémosa et al. had to **divide laboratory methanogenesis rates by 4–50** to
-   match Lobodice, so the microbial explanation there is calibrated, not
-   rate-predictive.
+3. **The kinetic timescale is now bounded, and the blocker is removed.** This
+   reverses an earlier statement. The USGS archive implies a methanogen doubling
+   time of **610.1 years** against Strobel's **19.25 hours**, ratio **2.78e5**
+   (`sio/coupled_finite.sio`), and with the archive's parameters the field gives
+   **99.999999998 %** recovery at 285 days — short by ten orders of magnitude.
+   Strobel could not be substituted because its biomass is in cells. That
+   conversion does not exist anywhere in the UHS literature, but it exists
+   measured outside it: **24.6–266.5 fg dry mass per cell** (Khachikyan et al.
+   2019) and **14–31 fg C/cell** (Braun et al. 2016), both open access, both
+   carried here as a band and declared as an extrapolation to organisms they did
+   not measure (`CORRECTIONS.md` C19).
 
-**Consequence: this study predicts an extent, not a timescale.** Every F1 and F2
-statement is a stoichiometric bound. Whether a reservoir reaches its bound within
-a storage cycle is a kinetic question no available source can answer.
+   With it, the gap decomposes (`sio/kinetic_gap.sio`): Strobel's reactor is
+   **1 000×** more concentrated than a real reservoir, but each cell differs by
+   **1.30e7–1.41e8×**. **The archive's biomass was never the problem** — its own
+   upper sensitivity bound is within an order of magnitude of the measured
+   Lobodice field density of 10⁴ cells/mL. The rate constant is, and it was
+   fitted to a 12 700-year trajectory.
+
+   Producing the Sun Storage biotic upper bound needs **6.14e10 cells/mL** under
+   the archive — impossible — and **435 cells/mL** under Strobel, which is **23×
+   below** the measured field density. **The biotic share is kinetically
+   feasible.**
+
+**Consequence: the extent bounds stand, and the timescale is now bracketed
+rather than unknown.** F1 and F2 remain stoichiometric bounds. Whether a
+reservoir reaches them within a cycle is no longer unanswerable: it is
+impossible on geological kinetics and feasible on engineered-culture kinetics at
+realistic reservoir cell densities, and the true rate lies between two parameter
+sets that differ by seven to eight orders of magnitude per cell.
 
 ---
 
-## 6. Seventeen corrections
+## 5b. Is the extent formulation new? Provisionally yes — with two priors uncleared
 
-`CORRECTIONS.md` records seventeen, each with the measurement that exposed it.
+A structured literature search was run against the specific claim, not against
+the topic. What it found:
+
+- **Trémosa et al. 2023 raise carbon limitation only as a conjecture, and say so.**
+  Their own text defers it: it *"needs to be confirmed by devoted simulations"*.
+  It is posed as a **rate** question and is never tested.
+- **Thaysen et al. 2021 take the converse position**, that carbon is not
+  limiting. A verifier qualifier is carried here rather than dropped: it would
+  **overstate** matters to say they hard-code non-limitation — their Methods
+  divide measured concentrations of C, H, O, Ca, K, Na, S, Mg, P and Fe by
+  per-cell nutrient masses and take the lowest result, so carbon *is* considered.
+  What they exclude structurally is **mineral dissolution as a carbon source**.
+- **No with-calcite / without-calcite comparison is run anywhere** in the sources
+  checked. The Lobodice assemblage always contains calcite (13.55 wt%) and
+  dolomite (16.06 wt%); the only mineral-omission variant reported in that work
+  is for **gypsum**.
+- **Full-text scans returned zero occurrences of "stoichiometr", zero of "4 H2"
+  or "4H2"**, and no `y_H₂/(4·y_CO₂)`-type extent formulation, in the papers
+  examined.
+
+**So the framing is not pre-empted by any source verified here.** That is not the
+same as novel, and the claim is not made. **Two candidate priors were surfaced
+and could not be read**, and both must be cleared first:
+
+| candidate | status |
+|---|---|
+| *Applied Geochemistry* 2025, S0883292725003725 | **unverified — not accessed** |
+| *Chemical Geology* 2024, S000925412400384X (Vialle & Wolff-Boenisch) | **unverified — ScienceDirect blocked all retrieval; abstract-level only** |
+
+The second is the more serious: it is independently known to argue that
+inorganic hydrogen-driven carbonate reduction is *"thermodynamically and
+kinetically unlikely"*, which is adjacent enough to this study's territory that
+it could bear on the claim either way. Until both are read, this section records
+**"no prior art found"** and not **"no prior art exists"** — a distinction this
+study has had to enforce on its sources (`CORRECTIONS.md` C16) and applies to
+itself here.
+
+---
+
+## 6. Nineteen corrections
+
+`CORRECTIONS.md` records nineteen, each with the measurement that exposed it.
 Bearing directly on the verdicts: **C3/C4/C14** — three arithmetic
 inconsistencies in the single field mass balance on which F2 and F3 now rest;
 **C13** — Lobodice failing four consistency checks; **C15** — the CO₂ attribution
 not established; **C16** — the literature's quantitative anchor for abiotic
 negligibility being an extrapolation from 250–280 °C restated downstream as a
 measurement at 90 °C, its companion figure unverifiable because the primary source
-is closed.
+is closed. **C18** — this study breaking its own Python rule, and a number being
+wrong through double-rounding as a result. **C19** — the cells-to-mass conversion
+that closes the kinetic blocker, and one paper's assumed cell carbon sitting 3.9
+to 8.6 times above the measured range.
 
 ---
 

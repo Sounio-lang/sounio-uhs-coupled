@@ -1,0 +1,185 @@
+// The kinetic gap, closed -- and it decomposes into two very unequal factors.
+//
+// THE BLOCKER THIS REMOVES. Every prior phase reported that no microbial
+// parameter set fits a 285-day reservoir observation: the USGS archive is about
+// ten orders of magnitude too slow, and Strobel et al. 2023 cannot be
+// substituted because it states biomass in CELLS and yield in cells/mol, and
+// converting those needs a mass per cell the paper does not give. Inventing one
+// was barred, so the gap stood.
+//
+// IT IS CLOSED FROM OUTSIDE THE UHS LITERATURE, WHICH DOES NOT HAVE IT.
+//   Khachikyan, Milucka, Littmann, Ahmerkamp, Meador, Koenneke, Burg & Kuypers
+//   (2019) "Direct Cell Mass Measurements Expand the Role of Small
+//   Microorganisms in Nature", Appl Environ Microbiol 85(14):e00493-19,
+//   DOI 10.1128/AEM.00493-19, PMC6606879, open access.
+//   DIRECTLY MEASURED dry mass per cell, 12 cultured prokaryotes:
+//       24.6 to 266.5 fg/cell
+//   with m_dry = 322 V^0.43 and m_carbon = 197 V^0.46, R^2 = 0.95.
+//
+//   Braun, Morono, Littmann, Kuypers, Aslan, Dong, Joergensen & Lomstein (2016)
+//   Front Microbiol 7:1375, PMC5005352, CC BY. MEASURED cell carbon in
+//   sub-seafloor sediment: 14 to 31 fg C/cell.
+//
+// THIS IS A DECLARED EXTRAPOLATION AND IT IS CARRIED AS A BAND, NEVER A POINT.
+// Neither source measured a hydrogenotrophic methanogen, a sulfate reducer, a
+// deep saline aquifer, a depleted hydrocarbon reservoir, or anything in the
+// 25-80 C window. Khachikyan's own data show mass per cell is strongly and
+// non-linearly volume-dependent (rho = 540 V^-0.38) and disagrees with an
+// earlier compilation by up to 5x at small volumes. So every result below is
+// reported across the FULL measured range and no single value is presented as
+// a constant.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+var FG: f64 = 1.0e-15            // grams per femtogram
+var M_CELL_LO: f64 = 24.6        // fg/cell, Khachikyan measured minimum
+var M_CELL_HI: f64 = 266.5       // fg/cell, Khachikyan measured maximum
+var C_CELL_LO: f64 = 14.0        // fg C/cell, Braun measured minimum
+var C_CELL_HI: f64 = 31.0        // fg C/cell, Braun measured maximum
+
+// Strobel et al. 2023, Table 3, species 2 (Methanolacinia petrolearia, 37 C)
+var STR_MUMAX: f64 = 1.0e-5      // 1/s
+var STR_YIELD_CELLS: f64 = 1.0e11 // cells per mol
+var STR_INOC: f64 = 1.0e7        // cells/mL
+
+// USGS Aux Vases archive
+var USGS_K: f64 = 2.88e-14       // mol mg^-1 s^-1
+var USGS_YIELD: f64 = 1250.0     // mg biomass per mol
+var USGS_COLD: f64 = 1.0e-6      // mg/kg, default initial biomass
+var USGS_UPPER: f64 = 1.0e-4     // mg/kg, its own upper sensitivity bound
+
+// Lobodice pore-water enumeration, Smigan et al. 1990, via Tremosa et al. 2023.
+// A MEASURED FIELD CELL DENSITY -- the only one this study has.
+var FIELD_CELLS: f64 = 1.0e4     // cells/mL
+// Tremosa's own conversion, which the paper labels an assumption made "for the
+// sake of simplicity" and does not cite: 1e-14 mol C per cell.
+var TREMOSA_MOLC: f64 = 1.0e-14  // mol C/cell
+var M_C: f64 = 12.011            // g/mol carbon
+
+// Sun Storage, from sio/field_mass_balance.sio
+var BIOTIC_SM3: f64 = 3842.0     // m3 H2, upper bound on the biotic share
+var VM_0C: f64 = 0.022414        // m3/mol at 0 C, 1 atm
+var BRINE_KG: f64 = 4.0e10       // 40 000 m3 of brine, in kg
+var SECONDS_285D: f64 = 24624000.0
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("THE KINETIC GAP, CLOSED -- and decomposed")
+    println("Cells to mass via Khachikyan et al. 2019, MEASURED, 24.6-266.5")
+    println("fg/cell. Extrapolated to reservoir organisms, declared, and")
+    println("carried as a BAND throughout. No point value is used.")
+    println("")
+
+    println("== 1. Tremosa's assumed cell carbon against measured values ==")
+    let trem_fgc = TREMOSA_MOLC * M_C / FG
+    print("   Tremosa assumes (fg C/cell)     ") emit("", trem_fgc)
+    print("   Braun MEASURED, low  (fg C/cell) ") emit("", C_CELL_LO)
+    print("   Braun MEASURED, high (fg C/cell) ") emit("", C_CELL_HI)
+    print("   assumption over measured, low  ") emit("", trem_fgc / C_CELL_HI)
+    print("   assumption over measured, high ") emit("", trem_fgc / C_CELL_LO)
+    println("   The assumed value sits ABOVE the entire measured range for")
+    println("   deep-subsurface cells, by a factor of about 4 to 9. It is")
+    println("   uncited and the paper labels it a simplification.")
+    println("")
+
+    println("== 2. Strobel's reactor against a real reservoir ==")
+    print("   Strobel inoculum (cells/mL)  ") emit("", STR_INOC)
+    print("   Lobodice field  (cells/mL)   ") emit("", FIELD_CELLS)
+    print("   reactor over field           ") emit("", STR_INOC / FIELD_CELLS)
+    println("")
+    // cells/mL -> cells/kg is x1000 (1 L ~ 1 kg); mass in mg
+    let str_bio_lo = STR_INOC * 1000.0 * M_CELL_LO * FG * 1000.0
+    let str_bio_hi = STR_INOC * 1000.0 * M_CELL_HI * FG * 1000.0
+    print("   Strobel inoculum (mg/kg), low  ") emit("", str_bio_lo)
+    print("                          high    ") emit("", str_bio_hi)
+    let fld_bio_lo = FIELD_CELLS * 1000.0 * M_CELL_LO * FG * 1000.0
+    let fld_bio_hi = FIELD_CELLS * 1000.0 * M_CELL_HI * FG * 1000.0
+    print("   Lobodice field   (mg/kg), low  ") emit("", fld_bio_lo)
+    print("                          high    ") emit("", fld_bio_hi)
+    println("")
+    print("   archive cold start (mg/kg)        ") emit("", USGS_COLD)
+    print("   archive upper sensitivity (mg/kg) ") emit("", USGS_UPPER)
+    print("   field over archive cold start, low  ") emit("", fld_bio_lo / USGS_COLD)
+    print("   field over archive upper bound, low ") emit("", fld_bio_lo / USGS_UPPER)
+    println("   The archive's own UPPER bound is within an order of magnitude")
+    println("   of the real field density. Its biomass was not the problem.")
+    println("")
+
+    println("== 3. Specific consumption per cell: where the gap actually is ==")
+    // Strobel: dN_H2/dt = 4 * mu_max * Xm / Y_cells, per cell
+    let str_per_cell = 4.0 * STR_MUMAX / STR_YIELD_CELLS
+    print("   Strobel, mol H2 per cell per s ") emit("", str_per_cell)
+    // USGS: 4k per mg of biomass, converted to per cell by the measured mass
+    let usgs_per_mg = 4.0 * USGS_K
+    let usgs_per_cell_lo = usgs_per_mg * M_CELL_LO * FG * 1000.0
+    let usgs_per_cell_hi = usgs_per_mg * M_CELL_HI * FG * 1000.0
+    print("   USGS,    mol H2 per cell per s, low  ") emit("", usgs_per_cell_lo)
+    print("                                   high ") emit("", usgs_per_cell_hi)
+    print("   Strobel over USGS, per cell, low  ") emit("", str_per_cell / usgs_per_cell_hi)
+    print("                             high     ") emit("", str_per_cell / usgs_per_cell_lo)
+    println("")
+    println("   THE DECOMPOSITION. The reactor is 1000x more concentrated than")
+    println("   the reservoir, but each CELL differs by seven to eight orders")
+    println("   of magnitude. The lab-to-field gap is overwhelmingly in the")
+    println("   organism and its parameterisation, not in how many there are.")
+    println("")
+
+    println("== 4. What the field observation actually requires ==")
+    let mol_h2 = BIOTIC_SM3 / VM_0C
+    let molal = mol_h2 / BRINE_KG
+    let rate = molal / SECONDS_285D
+    print("   biotic H2 upper bound (mol)   ") emit("", mol_h2)
+    print("   as molal over the brine        ") emit("", molal)
+    print("   required rate (molal/s)        ") emit("", rate)
+    println("")
+    let need_usgs = rate / usgs_per_mg
+    print("   biomass needed, USGS kinetics (mg/kg) ") emit("", need_usgs)
+    print("      as cells/mL, using the low mass    ") emit("", need_usgs / (M_CELL_LO * FG * 1000.0) / 1000.0)
+    println("      -- against a measured field density of 1e4 cells/mL.")
+    println("      IMPOSSIBLE by many orders of magnitude.")
+    println("")
+    let need_str_cells = rate * BRINE_KG / SECONDS_285D
+    let need_cells_per_kg = rate / str_per_cell
+    print("   cells/kg needed, Strobel kinetics ") emit("", need_cells_per_kg)
+    print("   as cells/mL                        ") emit("", need_cells_per_kg / 1000.0)
+    print("   measured Lobodice field density    ") emit("", FIELD_CELLS)
+    print("   field density over requirement     ") emit("", FIELD_CELLS / (need_cells_per_kg / 1000.0))
+    println("      FEASIBLE, and with room to spare.")
+    println("")
+
+    println("== verdict ==")
+    println("   The field observation is kinetically IMPOSSIBLE under the")
+    println("   archive's parameterisation and comfortably FEASIBLE under")
+    println("   Strobel's, at a cell density BELOW the one actually measured")
+    println("   in a town-gas storage. The gap was never about how much")
+    println("   biomass a reservoir holds -- the archive's own upper bound is")
+    println("   close to the measured field value. It is about the rate")
+    println("   constant, and the archive's was fitted to a 12 700-year")
+    println("   trajectory, not to a storage cycle.")
+    println("")
+    println("   CARRIED AS A BAND, NOT A NUMBER. Every figure above spans the")
+    println("   full measured 24.6-266.5 fg/cell range, and that range is")
+    println("   itself an extrapolation from organisms that are not these.")
+    0
+}

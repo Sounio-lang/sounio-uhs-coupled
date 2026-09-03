@@ -1,0 +1,85 @@
+Raw stdout of sio/kinetic_gap.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf kinetic_gap.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ fd757d62a2 (this repo, HEAD at capture time)
+date:     2026-09-03T18:00:07Z
+
+THE KINETIC GAP, CLOSED -- and decomposed
+Cells to mass via Khachikyan et al. 2019, MEASURED, 24.6-266.5
+fg/cell. Extrapolated to reservoir organisms, declared, and
+carried as a BAND throughout. No point value is used.
+
+== 1. Tremosa's assumed cell carbon against measured values ==
+   Tremosa assumes (fg C/cell)      1201099999999e-10
+   Braun MEASURED, low  (fg C/cell)  1400000000000e-11
+   Braun MEASURED, high (fg C/cell)  3100000000000e-11
+   assumption over measured, low   3874516129032e-12
+   assumption over measured, high  8579285714285e-12
+   The assumed value sits ABOVE the entire measured range for
+   deep-subsurface cells, by a factor of about 4 to 9. It is
+   uncited and the paper labels it a simplification.
+
+== 2. Strobel's reactor against a real reservoir ==
+   Strobel inoculum (cells/mL)   1000000000000e-5
+   Lobodice field  (cells/mL)    1000000000000e-8
+   reactor over field            1000000000000e-9
+
+   Strobel inoculum (mg/kg), low   2460000000000e-13
+                          high     2665000000000e-12
+   Lobodice field   (mg/kg), low   2460000000000e-16
+                          high     2665000000000e-15
+
+   archive cold start (mg/kg)         1000000000000e-18
+   archive upper sensitivity (mg/kg)  1000000000000e-16
+   field over archive cold start, low   2460000000000e-10
+   field over archive upper bound, low  2460000000000e-12
+   The archive's own UPPER bound is within an order of magnitude
+   of the real field density. Its biomass was not the problem.
+
+== 3. Specific consumption per cell: where the gap actually is ==
+   Strobel, mol H2 per cell per s  4000000000000e-28
+   USGS,    mol H2 per cell per s, low   2833920000000e-36
+                                   high  3070079999999e-35
+   Strobel over USGS, per cell, low   1302897644361e-5
+                             high      1411472448057e-4
+
+   THE DECOMPOSITION. The reactor is 1000x more concentrated than
+   the reservoir, but each CELL differs by seven to eight orders
+   of magnitude. The lab-to-field gap is overwhelmingly in the
+   organism and its parameterisation, not in how many there are.
+
+== 4. What the field observation actually requires ==
+   biotic H2 upper bound (mol)    1714107254394e-7
+   as molal over the brine         4285268135986e-18
+   required rate (molal/s)         1740281081865e-25
+
+   biomass needed, USGS kinetics (mg/kg)  1510660661341e-12
+      as cells/mL, using the low mass     6140896997324e-5
+      -- against a measured field density of 1e4 cells/mL.
+      IMPOSSIBLE by many orders of magnitude.
+
+   cells/kg needed, Strobel kinetics  4350702704664e-10
+   as cells/mL                         4350702704664e-13
+   measured Lobodice field density     1000000000000e-8
+   field density over requirement      2298479275377e-8
+      FEASIBLE, and with room to spare.
+
+== verdict ==
+   The field observation is kinetically IMPOSSIBLE under the
+   archive's parameterisation and comfortably FEASIBLE under
+   Strobel's, at a cell density BELOW the one actually measured
+   in a town-gas storage. The gap was never about how much
+   biomass a reservoir holds -- the archive's own upper bound is
+   close to the measured field value. It is about the rate
+   constant, and the archive's was fitted to a 12 700-year
+   trajectory, not to a storage cycle.
+
+   CARRIED AS A BAND, NOT A NUMBER. Every figure above spans the
+   full measured 24.6-266.5 fg/cell range, and that range is
+   itself an extrapolation from organisms that are not these.

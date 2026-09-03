@@ -1,0 +1,207 @@
+// Carbonate equilibria — the pH <-> CO2 loop, which is H2.
+//
+// H2 says the loop pH -> calcite precipitation -> CO2 cut makes the system
+// self-limiting over part of the parameter space. This module is that loop's
+// thermodynamics; nothing here asserts the hypothesis, it only makes it
+// computable.
+//
+// PROVENANCE, AND A TRADEOFF THAT IS DECLARED RATHER THAN HIDDEN.
+// Every constant below is read from `phreeqc.dat`, sha256
+// 59373961d648dfbf68a40744060c1d64f57ecbec98f4f5fb89f3a1b4213ccd10 -- the same
+// database the IPhreeqc oracle is pinned to. That is deliberate: sharing the
+// thermodynamic data means a parity test against that oracle isolates the
+// SOLVER, not the data. It also means such a test says nothing about whether
+// the data are right. Swapping in `llnl.dat` measures the data contribution
+// separately, and that is a distinct experiment, not a variation of this one.
+//
+// PHREEQC's analytic form, all five of them:
+//   log10 K(T) = A1 + A2*T + A3/T + A4*log10(T) + A5/T^2 + A6*T^2   (T in K)
+//
+// NEGATIVE CONSTANTS ARE `var`. A module-level `let` of type f64 holding a
+// negative value is silently wrong on this compiler (LANGUAGE_GAPS.md G9), and
+// most coefficients below are negative.
+
+// ── CO2(g) = CO2(aq), Henry ────────────────────────────────────────────────
+var KH_A1: f64 = 10.5624
+var KH_A2: f64 = 0.0 - 2.3547e-2
+var KH_A3: f64 = 0.0 - 3972.8
+var KH_A4: f64 = 0.0
+var KH_A5: f64 = 5.8746e5
+var KH_A6: f64 = 1.9194e-5
+var KH_LOGK25: f64 = 0.0 - 1.468
+
+// ── CO3-2 + H+ = HCO3-   (the reciprocal of K2) ────────────────────────────
+var KB_A1: f64 = 107.8871
+var KB_A2: f64 = 0.03252849
+var KB_A3: f64 = 0.0 - 5151.79
+var KB_A4: f64 = 0.0 - 38.92561
+var KB_A5: f64 = 563713.9
+var KB_A6: f64 = 0.0
+var KB_LOGK25: f64 = 10.329
+
+// ── CO3-2 + 2 H+ = CO2 + H2O   (the reciprocal of K1*K2) ───────────────────
+var KC_A1: f64 = 464.1965
+var KC_A2: f64 = 0.09344813
+var KC_A3: f64 = 0.0 - 26986.16
+var KC_A4: f64 = 0.0 - 165.75951
+var KC_A5: f64 = 2248628.9
+var KC_A6: f64 = 0.0
+var KC_LOGK25: f64 = 16.681
+
+// ── H2O = OH- + H+ ─────────────────────────────────────────────────────────
+var KW_A1: f64 = 293.29227
+var KW_A2: f64 = 0.1360833
+var KW_A3: f64 = 0.0 - 10576.913
+var KW_A4: f64 = 0.0 - 123.73158
+var KW_A5: f64 = 0.0
+var KW_A6: f64 = 0.0 - 6.996455e-5
+var KW_LOGK25: f64 = 0.0 - 14.0
+
+// ── Calcite: CaCO3 = CO3-2 + Ca+2 ──────────────────────────────────────────
+// The database annotates this one "0 - 250 C, Ellis 1959, Plummer and
+// Busenberg 1982", and gives only three coefficients.
+var KSP_A1: f64 = 17.118
+var KSP_A2: f64 = 0.0 - 0.046528
+var KSP_A3: f64 = 0.0 - 3496.0
+var KSP_A4: f64 = 0.0
+var KSP_A5: f64 = 0.0
+var KSP_A6: f64 = 0.0
+var KSP_LOGK25: f64 = 0.0 - 8.48
+
+var LN10: f64 = 2.302585092994046
+
+fn log10_of(x: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 - 745.0 }
+    log(x) / LN10
+}
+
+// The analytic form. `which` selects the reaction, because passing six
+// coefficients plus T would exceed the parameter count that compiles reliably
+// for imported calls on this lane.
+//   0 Henry   1 CO3+H   2 CO3+2H   3 water   4 calcite
+fn log_k(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
+    var a1 = 0.0
+    var a2 = 0.0
+    var a3 = 0.0
+    var a4 = 0.0
+    var a5 = 0.0
+    var a6 = 0.0
+    if which == 0 {
+        a1 = KH_A1  a2 = KH_A2  a3 = KH_A3  a4 = KH_A4  a5 = KH_A5  a6 = KH_A6
+    } else if which == 1 {
+        a1 = KB_A1  a2 = KB_A2  a3 = KB_A3  a4 = KB_A4  a5 = KB_A5  a6 = KB_A6
+    } else if which == 2 {
+        a1 = KC_A1  a2 = KC_A2  a3 = KC_A3  a4 = KC_A4  a5 = KC_A5  a6 = KC_A6
+    } else if which == 3 {
+        a1 = KW_A1  a2 = KW_A2  a3 = KW_A3  a4 = KW_A4  a5 = KW_A5  a6 = KW_A6
+    } else {
+        a1 = KSP_A1 a2 = KSP_A2 a3 = KSP_A3 a4 = KSP_A4 a5 = KSP_A5 a6 = KSP_A6
+    }
+    a1 + a2 * t_k + a3 / t_k + a4 * log10_of(t_k) + a5 / (t_k * t_k) + a6 * t_k * t_k
+}
+
+// Derived dissociation constants, in the direction chemists write them.
+//   pK1 for  CO2 + H2O = H+ + HCO3-
+//   pK2 for  HCO3-     = H+ + CO3-2
+fn p_k1(t_k: f64) -> f64 with Mut, Div, Panic { log_k(2, t_k) - log_k(1, t_k) }
+fn p_k2(t_k: f64) -> f64 with Mut, Div, Panic { log_k(1, t_k) }
+
+// Speciation at a GIVEN pH. This does not solve for pH: closing the system on
+// charge balance is a separate step, and pretending otherwise would hide which
+// constraint produced a number.
+//
+//   [CO2(aq)]  = K_H * P_CO2
+//   [HCO3-]    = [CO2] * 10^(-pK1) / [H+]
+//   [CO3-2]    = [HCO3-] * 10^(-pK2) / [H+]
+fn co2_aq(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
+    if p_co2_atm < 0.0 { return 0.0 - 1.0 }
+    exp(log_k(0, t_k) * LN10) * p_co2_atm
+}
+
+fn hco3(t_k: f64, p_co2_atm: f64, ph: f64) -> f64 with Mut, Div, Panic {
+    let c = co2_aq(t_k, p_co2_atm)
+    if c < 0.0 { return 0.0 - 1.0 }
+    c * exp((0.0 - p_k1(t_k)) * LN10) / exp((0.0 - ph) * LN10)
+}
+
+fn co3(t_k: f64, p_co2_atm: f64, ph: f64) -> f64 with Mut, Div, Panic {
+    let b = hco3(t_k, p_co2_atm, ph)
+    if b < 0.0 { return 0.0 - 1.0 }
+    b * exp((0.0 - p_k2(t_k)) * LN10) / exp((0.0 - ph) * LN10)
+}
+
+// Calcite saturation ratio. This is the quantity the rate law's affinity term
+// consumes, so the two modules meet here.
+fn omega_calcite(t_k: f64, p_co2_atm: f64, ph: f64, ca_molal: f64) -> f64 with Mut, Div, Panic {
+    if ca_molal < 0.0 { return 0.0 - 1.0 }
+    let c3 = co3(t_k, p_co2_atm, ph)
+    if c3 < 0.0 { return 0.0 - 1.0 }
+    ca_molal * c3 / exp(log_k(4, t_k) * LN10)
+}
+
+// ── printing ───────────────────────────────────────────────────────────────
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var a = v
+    if a < 0.0 { neg = true  a = 0.0 - a }
+    if a == 0.0 { println("0") return }
+    var e: i64 = 0
+    while a >= 10.0 { a = a / 10.0  e = e + 1 }
+    while a < 1.0 { a = a * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((a * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+// Self-check: the analytic expression evaluated at 298.15 K must reproduce the
+// database's own -log_k line. If it does not, the form above was misread, and
+// every number downstream is wrong. Reported as a residual, not asserted.
+fn selfcheck(label: string, which: i64, tabulated: f64) with IO, Mut, Div, Panic {
+    let computed = log_k(which, 298.15)
+    print(label) print("  tabulated ") emit("", tabulated)
+    print("          computed  ") emit("", computed)
+    print("          residual  ") emit("", computed - tabulated)
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("CARBONATE EQUILIBRIA -- constants from the pinned phreeqc.dat")
+    println("")
+    println("== self-check: analytic form at 298.15 K vs the database's log_k ==")
+    selfcheck("Henry CO2(g)   ", 0, KH_LOGK25)
+    selfcheck("CO3-2 + H+     ", 1, KB_LOGK25)
+    selfcheck("CO3-2 + 2H+    ", 2, KC_LOGK25)
+    selfcheck("water Kw       ", 3, KW_LOGK25)
+    selfcheck("calcite Ksp    ", 4, KSP_LOGK25)
+    println("")
+
+    println("== derived dissociation constants (textbook: pK1 6.35, pK2 10.33) ==")
+    emit("pK1_25C", p_k1(298.15))
+    emit("pK2_25C", p_k2(298.15))
+    emit("pK1_40C", p_k1(313.15))
+    emit("pK2_40C", p_k2(313.15))
+    println("")
+
+    println("== speciation at 40 C, P(CO2) = 0.01 atm ==")
+    emit("CO2_aq_pH7 ", co2_aq(313.15, 0.01))
+    emit("HCO3_pH7   ", hco3(313.15, 0.01, 7.0))
+    emit("CO3_pH7    ", co3(313.15, 0.01, 7.0))
+    emit("HCO3_pH9   ", hco3(313.15, 0.01, 9.0))
+    emit("CO3_pH9    ", co3(313.15, 0.01, 9.0))
+    println("")
+
+    println("== calcite saturation, Ca = 1e-3 molal ==")
+    emit("omega_pH7 ", omega_calcite(313.15, 0.01, 7.0, 1.0e-3))
+    emit("omega_pH8 ", omega_calcite(313.15, 0.01, 8.0, 1.0e-3))
+    emit("omega_pH9 ", omega_calcite(313.15, 0.01, 9.0, 1.0e-3))
+    0
+}

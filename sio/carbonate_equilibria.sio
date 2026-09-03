@@ -82,6 +82,11 @@ var P2_A4: f64 = 485.818
 // temperature-independent here, and Davies for its activity coefficient.
 var P3_LOGK: f64 = 0.0 - 12.78
 
+// Background NaCl. It raises ionic strength -- and therefore every activity
+// coefficient -- without entering the carbonate charge balance, since Na+ and
+// Cl- balance each other. Set by the caller before solving.
+pub var BACKGROUND_NACL: f64 = 0.0
+
 pub var LN10: f64 = 2.302585092994046
 
 fn log10_of(x: f64) -> f64 with Mut, Div, Panic {
@@ -300,15 +305,15 @@ var SP_M_CA: f64 = 0.0        // free Ca2+
 var SP_M_CAHCO3: f64 = 0.0
 var SP_M_CACO3: f64 = 0.0
 var SP_M_CAOH: f64 = 0.0
-var SP_M_TOTAL_CA: f64 = 0.0  // what the oracle's `Ca` column reports
+pub var SP_M_TOTAL_CA: f64 = 0.0  // what the oracle's `Ca` column reports
 var SP_CHARGE: f64 = 0.0
-var SP_MU: f64 = 0.0
+pub var SP_MU: f64 = 0.0
 
 // Full speciation at a given pH and ionic strength, pairs included.
 // PHREEQC reports TOTAL calcium, so the comparison is only like-for-like once
 // the pairs are summed -- part of the residual this is testing was free Ca2+
 // being compared against a total.
-fn speciate(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic {
+pub fn speciate(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic {
     let tc = t_k - 273.15
     let g_h    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0,   mu)
     let g_oh   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0,   mu)
@@ -349,10 +354,10 @@ fn speciate(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic {
     SP_M_TOTAL_CA = m_ca + m_cahco3 + m_caco3 + m_caoh
     SP_CHARGE = 2.0 * m_ca + m_h + m_cahco3 + m_caoh - m_hco3 - 2.0 * m_co3 - m_oh
     SP_MU = 0.5 * (4.0 * m_ca + m_h + m_hco3 + 4.0 * m_co3 + m_oh
-                   + m_cahco3 + m_caoh)
+                   + m_cahco3 + m_caoh) + BACKGROUND_NACL
 }
 
-fn solve_ph_pairs(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
+pub fn solve_ph_pairs(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
     var mu = 0.0
     var ph = 7.0
     var n: i64 = 0
@@ -429,7 +434,7 @@ fn ionic_strength_at(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) -> f64 with Mut
     if a_co3 <= 0.0 { return 0.0 }
     let a_ca   = exp(log_k(4, t_k) * LN10) / a_co3
     0.5 * (4.0 * (a_ca / g_ca) + a_h / g_h + a_hco3 / g_hco3
-           + 4.0 * (a_co3 / g_co3) + a_oh / g_oh)
+           + 4.0 * (a_co3 / g_co3) + a_oh / g_oh) + BACKGROUND_NACL
 }
 
 fn solve_ph_at_mu(t_k: f64, p_co2_atm: f64, mu: f64) -> f64 with Mut, Div, Panic {

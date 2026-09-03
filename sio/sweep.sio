@@ -1,0 +1,174 @@
+// Temperature and salinity sweep, with forward sensitivities.
+//
+// WHAT THIS CAN AND CANNOT PRODUCE, STATED FIRST.
+//
+// The protocol asks for a band propagated from u(dH), u(log K) and u(k_calcite)
+// "from the literature". The literature this study actually has does NOT supply
+// them. Palandri & Kharaka Table 33 gives log k and Ea with no uncertainties;
+// phreeqc.dat gives log_k and delta_h with no uncertainties. Inventing values
+// would produce a band whose width is a decision of mine dressed as a datum.
+//
+// So this module reports two different things and does not confuse them:
+//
+//   SENSITIVITIES are computed. They are facts about the model and need no
+//   knowledge of u(parameter): S_i = dln(rate)/dln(x_i), by forward difference.
+//   Multiply by u_i/x_i and you have the band, the day someone supplies u_i.
+//
+//   A BAND is computed for exactly ONE parameter, because exactly one has a
+//   sourced range: the chemical-affinity exponent p. Table 33 gives none for
+//   calcite and the report says it defaults to unity while calling that default
+//   "likely incorrect"; magnesite, the nearest carbonate with a MEASURED value,
+//   has p = 4.00. So [1, 4] is a range the source supports.
+//
+// The rate is evaluated at a stated reference undersaturation, Omega = 0.5,
+// because at equilibrium the rate is identically zero by construction and a
+// sweep of zeros would say nothing.
+
+use calcite_rate::{calcite_rate, set_affinity, LOG_K25_ACID, LOG_K25_NEUT,
+                   LOG_K25_CARB, EA_ACID_KJ, EA_NEUT_KJ, EA_CARB_KJ}
+use carbonate_equilibria::{solve_ph_pairs, BACKGROUND_NACL, SP_M_TOTAL_CA, SP_MU, LN10}
+
+var OMEGA_REF: f64 = 0.5
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+// Rate at the reference undersaturation, at the pH the equilibrium closure
+// gives for this temperature and salinity.
+fn rate_at(t_k: f64, p_co2: f64, m_nacl: f64) -> f64 with Mut, Div, Panic {
+    BACKGROUND_NACL = m_nacl
+    let ph = solve_ph_pairs(t_k, p_co2)
+    let a_h = exp((0.0 - ph) * LN10)
+    calcite_rate(t_k, a_h, p_co2, OMEGA_REF)
+}
+
+// Forward log-sensitivity of the rate to one parameter, by relative
+// perturbation. `which` selects the parameter; the perturbation is applied and
+// undone so the sweep is not left in a modified state.
+fn sensitivity(which: i64, t_k: f64, p_co2: f64, m_nacl: f64) -> f64 with Mut, Div, Panic {
+    let eps = 1.0e-6
+    let base = rate_at(t_k, p_co2, m_nacl)
+    if base == 0.0 { return 0.0 }
+    var pert = 0.0
+    if which == 0 {
+        let old = LOG_K25_ACID
+        // log k is itself a logarithm, so perturb it additively by eps*|value|
+        LOG_K25_ACID = old * (1.0 + eps)
+        pert = rate_at(t_k, p_co2, m_nacl)
+        LOG_K25_ACID = old
+    } else if which == 1 {
+        let old = LOG_K25_NEUT
+        LOG_K25_NEUT = old * (1.0 + eps)
+        pert = rate_at(t_k, p_co2, m_nacl)
+        LOG_K25_NEUT = old
+    } else if which == 2 {
+        let old = LOG_K25_CARB
+        LOG_K25_CARB = old * (1.0 + eps)
+        pert = rate_at(t_k, p_co2, m_nacl)
+        LOG_K25_CARB = old
+    } else if which == 3 {
+        let old = EA_ACID_KJ
+        EA_ACID_KJ = old * (1.0 + eps)
+        pert = rate_at(t_k, p_co2, m_nacl)
+        EA_ACID_KJ = old
+    } else if which == 4 {
+        let old = EA_NEUT_KJ
+        EA_NEUT_KJ = old * (1.0 + eps)
+        pert = rate_at(t_k, p_co2, m_nacl)
+        EA_NEUT_KJ = old
+    } else {
+        let old = EA_CARB_KJ
+        EA_CARB_KJ = old * (1.0 + eps)
+        pert = rate_at(t_k, p_co2, m_nacl)
+        EA_CARB_KJ = old
+    }
+    ((pert - base) / base) / eps
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("TEMPERATURE AND SALINITY SWEEP")
+    println("P(CO2) = 0.01 atm; rate evaluated at Omega = 0.5, a stated reference")
+    println("undersaturation, since at equilibrium the rate is identically zero.")
+    println("")
+
+    let pco2 = 0.01
+    var ts: [f64; 5] = [0.0; 5]
+    ts[0] = 298.15
+    ts[1] = 313.15
+    ts[2] = 343.15
+    ts[3] = 373.15
+    ts[4] = 393.15
+    var ms: [f64; 4] = [0.0; 4]
+    ms[0] = 0.0
+    ms[1] = 1.0
+    ms[2] = 2.0
+    ms[3] = 3.0
+
+    println("== equilibrium state and rate across the grid ==")
+    var i: i64 = 0
+    while i < 5 {
+        var j: i64 = 0
+        while j < 4 {
+            BACKGROUND_NACL = ms[j]
+            let ph = solve_ph_pairs(ts[i], pco2)
+            let r = rate_at(ts[i], pco2, ms[j])
+            print("  T=") pi64((ts[i] - 273.15) as i64)
+            print("C  m_NaCl=") pi64(ms[j] as i64)
+            print("   pH ") emit("", ph)
+            print("       Ca_total ") emit("", SP_M_TOTAL_CA)
+            print("       mu ") emit("", SP_MU)
+            print("       rate ") emit("", r)
+            j = j + 1
+        }
+        i = i + 1
+    }
+    println("")
+
+    println("== forward log-sensitivities of the rate, dln(rate)/dln(param) ==")
+    println("   at 40 C, 1 molal NaCl. Dimensionless, so directly comparable.")
+    println("   These need NO knowledge of u(param): multiply by u/x for a band.")
+    emit("   log_k25_acid ", sensitivity(0, 313.15, pco2, 1.0))
+    emit("   log_k25_neut ", sensitivity(1, 313.15, pco2, 1.0))
+    emit("   log_k25_carb ", sensitivity(2, 313.15, pco2, 1.0))
+    emit("   Ea_acid      ", sensitivity(3, 313.15, pco2, 1.0))
+    emit("   Ea_neut      ", sensitivity(4, 313.15, pco2, 1.0))
+    emit("   Ea_carb      ", sensitivity(5, 313.15, pco2, 1.0))
+    println("")
+
+    println("== the ONE band the sources support: affinity exponent p in [1,4] ==")
+    println("   Table 33 gives no p for calcite; the report says it defaults to")
+    println("   unity and calls that likely incorrect; magnesite measures 4.00.")
+    var k: i64 = 0
+    while k < 5 {
+        set_affinity(1.0, 1.0)
+        let r_lo = rate_at(ts[k], pco2, 1.0)
+        set_affinity(4.0, 1.0)
+        let r_hi = rate_at(ts[k], pco2, 1.0)
+        set_affinity(1.0, 1.0)
+        print("  T=") pi64((ts[k] - 273.15) as i64)
+        print("C   rate(p=1) ") emit("", r_lo)
+        print("      rate(p=4) ") emit("", r_hi)
+        if r_lo != 0.0 { print("      band factor ") emit("", r_hi / r_lo) }
+        k = k + 1
+    }
+    0
+}

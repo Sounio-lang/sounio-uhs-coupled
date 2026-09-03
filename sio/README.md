@@ -499,3 +499,116 @@ Richardson extrapolation on the last pair puts the converged value near
 **5.4475e-04**, so dt = 1 s carries about **0.65 % truncation error** at this
 horizon. That is now a measured quantity rather than an assumption, which is the
 whole point of the exercise.
+
+## `sweep.sio` — temperature, salinity, and what a band can honestly be
+
+### The protocol asks for a band the sources cannot supply
+
+The protocol asks for u(ΔH), u(log K) and u(k_calcite) **"from the literature"**,
+propagated coherently. The literature this study actually holds does not supply
+them:
+
+| source | gives | states an uncertainty? |
+|---|---|---|
+| Palandri & Kharaka Table 33 | log k at 25 °C, Ea | **no** |
+| `phreeqc.dat` | `log_k`, `delta_h` | **no** |
+
+Assigning values would produce a band whose width is a decision of mine wearing
+the costume of a datum. So this module separates two things that are often
+conflated:
+
+**Sensitivities are computed.** They are facts about the model and require no
+knowledge of u(parameter): `S_i = ∂ln(rate)/∂ln(x_i)` by forward difference.
+Multiply by `u_i/x_i` and the band exists the day someone supplies `u_i`.
+
+**A band is computed for exactly one parameter** — the chemical-affinity exponent
+p — because exactly one has a range the source supports.
+
+### The sweep
+
+P(CO₂) = 0.01 atm. The rate is evaluated at a **stated reference undersaturation
+Ω = 0.5**, since at equilibrium it is identically zero and a sweep of zeros says
+nothing.
+
+| T | m_NaCl | pH | Ca_total (molal) | rate (mol m⁻² s⁻¹) |
+|---|---|---|---|---|
+| 25 °C | 0 | 7.2953 | 1.6228e-03 | 2.4428e-06 |
+| 25 °C | 1 | 7.4034 | **2.9660e-03** | 2.4400e-06 |
+| 25 °C | 2 | 7.3730 | 2.9095e-03 | 2.4407e-06 |
+| 25 °C | 3 | 7.3312 | 2.7140e-03 | 2.4418e-06 |
+| 40 °C | 0 | 7.2797 | 1.2336e-03 | 4.5181e-06 |
+| 40 °C | 1 | 7.3949 | 2.3296e-03 | 4.5141e-06 |
+| 120 °C | 1 | — | 5.6760e-04 | 5.9882e-05 |
+| 120 °C | 3 | 7.3128 | 5.3721e-04 | 5.9889e-05 |
+
+**Two things fall out that were not put in.**
+
+*Calcite solubility is non-monotonic in salinity.* It rises from 1.62e-3 at zero
+ionic strength to **2.97e-3 at 1 molal**, then falls to 2.91e-3 and 2.71e-3 at 2
+and 3 molal. That is the WATEQ form doing its job: the Debye–Hückel term lowers
+activity coefficients and raises solubility, until the `b·μ` term — +0.165 for
+Ca²⁺ — takes over and turns the curve around. Nothing in the code was told to
+produce a maximum.
+
+*At fixed undersaturation, salinity barely touches the rate.* Across 0 to 3
+molal the rate moves by **less than 0.12 %**. Salinity's influence is on *where
+equilibrium sits*, not on the rate at a given distance from it — a distinction
+that matters when reading any claim that brine composition slows or speeds
+dissolution.
+
+Rate rises by a factor of **24.5** from 25 °C to 120 °C.
+
+### Sensitivities, and a check that they are right
+
+At 40 °C, 1 molal, Ω = 0.5. Converting `∂ln(rate)/∂ln(log k)` into each
+mechanism's share of the rate — which must sum to one:
+
+| mechanism | ∂ln(rate)/∂(log₁₀k) | share of rate |
+|---|---|---|
+| acid | 0.0068 | **0.30 %** |
+| neutral | 0.6220 | **27.02 %** |
+| carbonate | 1.6737 | **72.69 %** |
+| | | **100.00 %** |
+
+The shares sum to 100.00 %, which is not something the finite differences were
+told to do — it is the check that they are correct.
+
+And the result matters for H1a: **the CO₂-dependent carbonate mechanism supplies
+roughly three quarters of the dissolution rate** at these conditions. The
+coupling between calcite and CO₂ is not a secondary path through the equilibria;
+it is most of the rate law.
+
+Activation-energy sensitivities at the same point: 8.2e-04 (acid), 0.123
+(neutral), 0.497 (carbonate).
+
+### The one band the sources support
+
+Table 33 gives no p for calcite. The report says p and q "default to unity if not
+specified", calls that default **"likely incorrect"**, and states that uncertainty
+in them is "the source of much uncertainty in the length of time computed in
+models of water–rock interaction". Magnesite, the nearest carbonate with a
+**measured** value, has p = 4.00. So [1, 4] is a range the source supports.
+
+| Ω | rate(p=4) / rate(p=1) |
+|---|---|
+| 0.5 | **1.875** |
+| 0.9 | **3.439** |
+| 0.99 | **3.940** |
+
+Measured at Ω = 0.5: 1.875 at every temperature in the sweep, matching the
+analytic `(1−0.5⁴)/(1−0.5)` exactly — the affinity term factorises out of the
+temperature dependence.
+
+**The band widens as equilibrium is approached**, toward the limiting ratio of 4.
+A storage reservoir sits near equilibrium, which is precisely where this single
+unsourced exponent is worth a factor approaching four in the rate — and therefore
+in every timescale computed from it.
+
+### What is still missing, plainly
+
+A Monte-Carlo verification of a first-order band cannot be run, because there is
+no band to verify: the inputs it would sample do not have stated distributions.
+The honest sequence is to obtain u(log k), u(Ea) and u(ΔH) — from the primary
+kinetics literature rather than from these compilations — and only then to
+propagate. The sensitivities above are the half of that job which does not
+depend on anyone supplying anything.

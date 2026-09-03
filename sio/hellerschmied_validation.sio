@@ -1,0 +1,149 @@
+// Validation against the Hellerschmied abiotic mesocosm series.
+//
+// THE MEASUREMENT. Source Data Fig. 5, sheet Fig5A_pabio (CC BY 4.0): ten
+// abiotic cycles, ten days each, 482 points per cycle, normalised total
+// pressure p_t/p_0. Reproduced independently by tools/abiotic_check.py:
+//   abiotic total-pressure loss at day 10 = 1.22 % .. 2.20 %, mean p_t/p0 0.9848
+//   biotic, for contrast                 = 10.54 % .. 11.62 %
+//
+// The controls are genuinely abiotic: mesocosms M4 and M5 received a biocide
+// and 35 kGy of gamma irradiation, so this is a sterility control and not
+// merely a gas-type control.
+//
+// THE PREDICTION. In a sealed vessel the abiotic pressure loss is gas
+// dissolving into the brine. For each component, at equilibrium,
+//
+//   P_i = P_i0 / (1 + K_H,i * M_w * R * T / V_g)
+//
+// so the fractional loss follows from Henry's law, the water mass and the gas
+// volume. Every Henry constant comes from the pinned phreeqc.dat.
+//
+// THE GAP, AND HOW IT IS HANDLED. The paper gives a mesocosm working volume of
+// 1.8 L and says the vessels hold drill cores plus reservoir brine -- but the
+// SPLIT between brine, core and headspace is not reported anywhere accessible.
+// Supplementary Note 3 is instrumentation only. Without that split a single
+// predicted number cannot be produced, so the brine fraction is SWEPT and the
+// question becomes: does the measured loss fall inside what dissolution can
+// produce for any plausible fraction? That has two possible answers and both
+// are informative.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{log_k, LN10}
+
+// Henry constants as phreeqc.dat gives them, in the same five-term analytic form
+//   log10 K(T) = A1 + A2 T + A3/T + A4 log10(T) + A5/T^2
+// H2(g):  H2 = H2    log_k -3.105
+var H2_A1: f64 = 0.0 - 9.3114
+var H2_A2: f64 = 4.6473e-3
+var H2_A3: f64 = 0.0 - 49.335
+var H2_A4: f64 = 1.4341
+var H2_A5: f64 = 1.2815e5
+// CH4(g): CH4 = CH4  log_k -2.8, annotated "CH4 solubilities 25 - 100 C"
+var CH4_A1: f64 = 10.44
+var CH4_A2: f64 = 0.0 - 7.65e-3
+var CH4_A3: f64 = 0.0 - 6669.0
+var CH4_A4: f64 = 0.0
+var CH4_A5: f64 = 1.014e6
+
+var R_LATM: f64 = 0.082057338    // L atm mol^-1 K^-1
+var RHO_BRINE: f64 = 1.0         // kg/L; the brine is dilute (Cl- 7487 mg/L)
+
+fn log10_v(x: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 - 745.0 }
+    log(x) / LN10
+}
+
+fn henry_logk(which: i64, t_k: f64) -> f64 with Mut, Div, Panic {
+    var a1 = 0.0
+    var a2 = 0.0
+    var a3 = 0.0
+    var a4 = 0.0
+    var a5 = 0.0
+    if which == 0 {
+        a1 = H2_A1  a2 = H2_A2  a3 = H2_A3  a4 = H2_A4  a5 = H2_A5
+    } else {
+        a1 = CH4_A1 a2 = CH4_A2 a3 = CH4_A3 a4 = CH4_A4 a5 = CH4_A5
+    }
+    a1 + a2 * t_k + a3 / t_k + a4 * log10_v(t_k) + a5 / (t_k * t_k)
+}
+
+// Fractional pressure loss of one component:  1 - 1/(1 + K_H M_w R T / V_g)
+fn loss_fraction(kh: f64, m_water_kg: f64, v_gas_l: f64, t_k: f64) -> f64 with Mut, Div, Panic {
+    if v_gas_l <= 0.0 { return 0.0 }
+    let ratio = kh * m_water_kg * R_LATM * t_k / v_gas_l
+    1.0 - 1.0 / (1.0 + ratio)
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("VALIDATION vs the Hellerschmied ABIOTIC mesocosm series")
+    println("measured loss at day 10: 1.22% .. 2.20% of total pressure")
+    println("gas: 10% H2 / 2.5% CO2 / 87.5% CH4, 40 C, ~40 bar, 1.8 L working volume")
+    println("")
+
+    let t_k = 313.15
+    let v_total = 1.8
+    let y_h2 = 0.10
+    let y_co2 = 0.025
+    let y_ch4 = 0.875
+
+    println("== Henry constants at 40 C, from the pinned database ==")
+    let kh_h2 = exp(henry_logk(0, t_k) * LN10)
+    let kh_ch4 = exp(henry_logk(1, t_k) * LN10)
+    let kh_co2 = exp(log_k(0, t_k) * LN10)
+    emit("   K_H(H2)  mol/kgw/atm", kh_h2)
+    emit("   K_H(CH4) mol/kgw/atm", kh_ch4)
+    emit("   K_H(CO2) mol/kgw/atm", kh_co2)
+    println("")
+
+    println("== predicted total-pressure loss vs brine fraction ==")
+    println("   (Henry only. CO2 also speciates at the brine's pH 8.7, so its")
+    println("   uptake here is a LOWER bound and the totals are conservative.)")
+    var i: i64 = 0
+    var fr: [f64; 6] = [0.0; 6]
+    fr[0] = 0.10
+    fr[1] = 0.20
+    fr[2] = 0.30
+    fr[3] = 0.40
+    fr[4] = 0.50
+    fr[5] = 0.60
+    while i < 6 {
+        let v_liq = v_total * fr[i]
+        let v_gas = v_total - v_liq
+        let mw = v_liq * RHO_BRINE
+        let l_h2  = loss_fraction(kh_h2,  mw, v_gas, t_k)
+        let l_ch4 = loss_fraction(kh_ch4, mw, v_gas, t_k)
+        let l_co2 = loss_fraction(kh_co2, mw, v_gas, t_k)
+        // total pressure loss is the mole-weighted sum of the component losses
+        let total = y_h2 * l_h2 + y_ch4 * l_ch4 + y_co2 * l_co2
+        print("   brine fraction ") emit("", fr[i])
+        print("      loss_H2 ") emit("", l_h2)
+        print("      loss_CH4 ") emit("", l_ch4)
+        print("      loss_CO2 ") emit("", l_co2)
+        print("      TOTAL pressure loss ") emit("", total)
+        i = i + 1
+    }
+    0
+}

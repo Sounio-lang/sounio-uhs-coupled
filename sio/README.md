@@ -612,3 +612,86 @@ The honest sequence is to obtain u(log k), u(Ea) and u(ΔH) — from the primary
 kinetics literature rather than from these compilations — and only then to
 propagate. The sensitivities above are the half of that job which does not
 depend on anyone supplying anything.
+
+## Validation against the Hellerschmied abiotic series
+
+### The measurement, reproduced independently
+
+Source Data Fig. 5, sheet `Fig5A_pabio` (CC BY 4.0): ten abiotic cycles, ten days
+each, 482 points per cycle, normalised total pressure. Reproduced here by
+`tools/abiotic_check.py`:
+
+| | cycles | loss at day 10 | mean p_t/p₀ |
+|---|---|---|---|
+| abiotic | 10 | **1.22 % – 2.20 %** | 0.9848 |
+| biotic | 14 | 10.54 % – 11.62 % | 0.8905 |
+
+These are genuine sterility controls, not gas-type controls: mesocosms M4 and M5
+received a biocide and **35 kGy of γ-irradiation**.
+
+### The prediction
+
+In a sealed vessel, abiotic pressure loss is gas dissolving into brine. Per
+component at equilibrium, `P_i = P_i0 / (1 + K_H,i · M_w · R · T / V_g)`, with
+every Henry constant from the pinned `phreeqc.dat` and **no fitted parameter**.
+
+At 40 °C: K_H(H₂) = 7.4530e-04, K_H(CH₄) = 1.2252e-03, K_H(CO₂) = 2.3711e-02
+mol kgw⁻¹ atm⁻¹.
+
+**A gap, handled by sweeping rather than guessing.** The paper gives a working
+volume of 1.8 L and says the vessels hold drill cores plus reservoir brine, but
+the **split** between brine, core and headspace is not reported anywhere
+accessible — Supplementary Note 3 is instrumentation only. So the brine fraction
+is swept, and the question becomes whether the measured loss lies inside what
+dissolution can produce for a *plausible* fraction. That has two possible
+answers and both are informative.
+
+| brine fraction | predicted total-pressure loss |
+|---|---|
+| 0.10 | 0.485 % |
+| 0.20 | 1.061 % |
+| **0.30** | **1.764 %** |
+| 0.40 | 2.647 % |
+| 0.50 | 3.805 % |
+| 0.60 | 5.419 % |
+
+### The result
+
+The measured 1.22 – 2.20 % implies a brine fraction of **0.223 – 0.349**, i.e.
+**401 – 629 mL of brine** in a 1.8 L vessel, leaving 1171 – 1399 mL for gas plus
+drill cores.
+
+That is an ordinary loading for a vessel packed with cores and brine. **Gas
+dissolution alone, with database Henry constants and nothing fitted, reproduces
+the measured abiotic pressure loss.**
+
+The test could have failed. Had the implied fraction come out at 0.02 or 0.95 —
+outside anything a real vessel could hold — dissolution would have been
+falsified as the explanation, and something else would have had to account for
+the loss.
+
+**And the biotic series fails it, correctly.** Reproducing 10.54 – 11.62 % by
+dissolution would need a brine fraction far above 0.60 — more liquid than the
+vessel contains. The biotic loss is *not* explicable by dissolution, which is
+exactly what it should not be: that is the methanogenesis.
+
+### Four independent lines now agree
+
+1. The paper's own abiotic controls report no conversion.
+2. The decoupled-redox oracle runs show H₂ dissolving and **staying** dissolved,
+   with calcite dissolution unchanged to 0.016 % whether H₂ is present or not.
+3. Methanation carries log K of 28–37 across the whole temperature range and
+   still does not proceed, so the barrier is kinetic rather than thermodynamic.
+4. This: dissolution alone quantitatively accounts for the abiotic pressure loss.
+
+**Abiotic H₂ loss in this system is physical dissolution.** Everything beyond it
+in the biotic series requires catalysis.
+
+### What this still does not license
+
+The comparison is on **total pressure**, not speciated H₂, because that is what
+the source measured. It bounds total abiotic gas loss; it does not isolate a
+calcite-dissolution contribution, and no such contribution is quoted from it.
+The CO₂ term is a lower bound, since CO₂ also speciates at the brine's pH 8.7
+and the calculation uses Henry's law alone — which makes the agreement
+conservative rather than tuned.

@@ -5,9 +5,9 @@ beside it, against `Sounio-lang/sounio` at `origin/main` @ `57f87da54f`, on
 2026-09-02, on Linux x86-64 with `SOUNIO_SOUC_ENGINE=lean_single`.
 
 The columns **"what it caught"**, **"false positives"** and **"what was
-missing"** are deliberately empty. They are filled by measurement at the end of
-the study, not by expectation at the start. A feature whose measured value turns
-out to be zero is reported with zero.
+missing"** were deliberately left empty until the end. They are now FILLED, by
+measurement rather than expectation -- see "The measured columns" below. A
+feature whose measured value turned out to be zero is reported with zero.
 
 ---
 
@@ -192,3 +192,85 @@ make build (boot → gen1 → gen2 → gen3 + fixed point): 6 s, ✓ FIXED POINT
 one self-compile of self-hosted/compiler/lean_single.sio (39,372 lines): 2 s
 test corpus: 1692 tests/run-pass + 289 tests/compile-fail; ~0.22 s/file
 ```
+
+---
+
+# The measured columns
+
+Filled at the end of the study, by running the compiler against errors a
+scientist would actually make — not by expectation. Every row below is a
+command that was run, against `gen3.elf` md5 `0f3aa2c9dd3be4e407ce546130f7614c`.
+**A feature whose measured value is zero is reported with zero.**
+
+## 3. What each feature caught, measured
+
+| feature | tier | what it caught **(measured)** | false positives | what was missing |
+|---|---|---|---|---|
+| **effects** (`with IO, Mut, …`) | stable | **Works.** Calling `println` from a function declared `with Mut` only → `error[E035]: effect not declared in function signature`. The one advertised guarantee that fired in a live test. | **0 observed** | nothing found |
+| **units — dimensional form** `unit molal = mol / kg;` | prototype / downgraded | **Works, and is stronger than the registry implies.** Passing a `molar` value to a `molal` parameter → `error: unit mismatch in call argument`. Mixing in arithmetic → `error: arithmetic operands must have matching numeric types`. | **0 observed** | **same-dimension, different-scale is NOT caught** at a call boundary: `mg` → `kg` passes silently (G4/G5). The `1.0<molal>` literal form does not parse — it is read as the comparison `1.0 < molal`, yielding `expected f64, got bool`. |
+| **units — nominal form** `unit molal;` | prototype / downgraded | **Weaker.** Catches arithmetic mixing, but a `molar` passed to a `molal` parameter **compiles**. | 0 observed | call-boundary dimension checking, which the dimensional form has |
+| **reaction literals** (`feat/w5-reaction-literals`, unmerged) | — | **Works.** `error[E188]: reaction 'obvious_imbalance' does not balance for element O`. | 0 observed | **not on `main`** — unavailable to this study |
+| **epistemic** (`Knowledge<T>`, GUM) | validated_research | **0.** Every compile printed `knowledge_subtype: 0 sites, 0 violations` and `knowledge_units: 0 sites with dimensional Knowledge<T>`. Nothing was expressed in it, so nothing was checked. | 0 | monomorphic (f64 only), so the study's `f64`-typed chemistry could not adopt it without rewriting |
+| **refinement types** | prototype / downgraded | **0 caught.** `refined: 29 in 2 passes` appears in every compile; no refinement rejected anything in this study. | 0 | — |
+| **qd128 / f128** | validated_research | **0.** Not used for any reported number. | 0 | **no native IEEE binary128 with source values** (G1). The instrument is quad-double, ~212-bit mantissa, which is *not* binary128 and is declared as such. |
+| **EL+ ontology** | validated_research | **0.** Not used in any computation. | 0 | no concrete domains (G2); silent truncation and a verified out-of-bounds write (G3) |
+| **closures** | stale_conflicting | **0.** None exist; every callback is a named `fn`. | 0 | cost readability throughout; caught nothing |
+
+## 4. The uncomfortable result, stated plainly
+
+**The type system caught nothing in this study — because the study did not use
+it.** Every module's signatures are bare `f64`. `sio/h2_solubility.sio` declares
+
+```sio
+unit molal = mol / kg;
+unit molar = mol / L;
+```
+
+— the **strong, dimensional** form, measured above to catch exactly the
+mg/L-of-solution versus mmol/kg-of-water confusion the module's own header warns
+about — and then annotates **no value with either**. Its own header claimed *"the
+checker refuses to substitute one for the other."* **Measured: it would have, and
+it was never asked to.** The declarations were decorative. That is recorded as
+`CORRECTIONS.md` C20, because it is the study overclaiming a feature, not the
+feature failing.
+
+## 5. What actually cost time: three compiler defects
+
+| defect | how it surfaced | cost |
+|---|---|---|
+| **G9** — module-level `let` of a negative `f64` evaluates to the wrong value | the Chabab port disagreed with its C++ replica as `exp(0.00947·m²)`; traced to `let ZETA: f64 = 0.0 - 0.00947` reading as **0** | one debugging cycle; forced every negative constant in the study to be `var`. **Re-confirmed present at the end of the study.** |
+| **G8** — `bin/souc` silently falls back to a committed seed binary that predates the source | a compiler change appeared to have no effect; it had, but was not being run | one false "feature is inert" conclusion, reported to the user and retracted |
+| **G11** — a string literal of **127–199** characters passed as a function argument segfaults; 126 works, 200 works | the deliverable figure crashed after writing 71 correct lines | one debugging cycle and one wrong first diagnosis, committed to a comment before being corrected |
+
+**None of the 19 corrections in `CORRECTIONS.md` could have been caught by a type
+system.** They are provenance failures, arithmetic inconsistencies inside
+published sources, and one rule violation of this study's own. What the type
+system is good at is not what went wrong.
+
+**The inverse did happen, twice.** G9 was found *by* the study's
+cross-validation discipline — a Sounio module disagreeing with an independent
+C++ implementation — not by any compiler check. The science caught the language's
+bug, not the other way round.
+
+## 6. The measured recommendation
+
+For the stated goal that everything be carried on units and ontologies, the
+measurement says the mechanism is closer than the registry's `prototype /
+downgraded` tier suggests, and the obstacles are specific:
+
+1. **Use the dimensional form.** `unit x = mol / kg;` catches call-boundary
+   mismatches; `unit x;` does not. The tier does not distinguish them; this
+   measurement does.
+2. **G4/G5 is the gap that matters most for chemistry** — `mg` and `kg` are
+   interchangeable at a call boundary, and casts do not convert scale. Dose
+   arithmetic is exactly where that bites.
+3. **The literal syntax is broken** (`1.0<molal>` parses as a comparison), so
+   values must be introduced by annotation, `let x: molal = 3.5`. That is
+   workable and was simply not known when this study's modules were written.
+4. **`Knowledge<T>` is monomorphic**, so uncertainty cannot ride on the same
+   values as units without the struct-generics work.
+
+None of that is a reason the study's modules are bare `f64`. They are bare `f64`
+because nobody checked what the feature could do before deciding not to use it —
+which is the same failure mode, in miniature, as inheriting a number without
+reading its source.

@@ -760,3 +760,54 @@ archive's parameterisation and comfortably feasible under Strobel's, at a cell
 density *below* the one actually measured in a town-gas storage. The archive's
 rate constant was fitted to a 12 700-year trajectory; it is not wrong, it is
 answering a different question.
+
+## C20 — This study declared units and then did not use them, while claiming it had
+
+`sio/h2_solubility.sio` opens with a paragraph on why units matter here — the
+reference data states aqueous concentrations two different ways, mg/L of
+**solution** in the GWB input script and mmol/kg of **water** in its own data
+dictionary, and at TDS 127 744 those differ by several percent through a density
+that is never stated. It then declares:
+
+```sio
+unit molal = mol / kg;
+unit molar = mol / L;
+```
+
+and asserts, verbatim: *"`molal` and `molar` below have different dimensions, so
+the checker refuses to substitute one for the other."*
+
+**Measured: it would have refused, and it was never asked to.** Every function in
+that module — `h2_molality(t_k: f64, p_bar: f64, m_nacl: f64, f_h2_bar: f64) ->
+f64` — is typed in bare `f64`. **No value anywhere in this study carries a unit
+type.** The two declarations are unreferenced after the line that introduces them.
+
+The claim was not wrong about the compiler. It was wrong about this module.
+
+**What the compiler actually does**, measured at the end of the study against
+`gen3.elf` md5 `0f3aa2c9dd3be4e407ce546130f7614c`:
+
+| test | result |
+|---|---|
+| `molar` value passed to a `molal` parameter, **dimensional** form `unit molal = mol / kg;` | **`error: unit mismatch in call argument`** |
+| same, **nominal** form `unit molal;` | **compiles — not caught** |
+| `molal + molar` in arithmetic, either form | **`error: arithmetic operands must have matching numeric types`** |
+| `mg` passed to a `kg` parameter (same dimension, different scale) | **compiles — not caught** (G4/G5) |
+| `let x: molal = 1.0<molal>` | **does not parse** — read as the comparison `1.0 < molal`, giving `expected f64, got bool` |
+
+So the study had the **strong** form available, declared it, and left it inert.
+Two things follow, and the second is the more useful:
+
+1. **The header's claim is corrected.** It described a guarantee the module did
+   not hold.
+2. **The reason it went unused is now known**: the literal syntax the module's
+   author reached for, `1.0<molal>`, does not parse, and the working form is a
+   plain annotation, `let x: molal = 3.5`. Nobody established that before
+   deciding to write `f64` everywhere.
+
+**Why this is a correction and not a note.** This study's whole discipline is
+that a claim must be checked against what it describes. A module asserting a
+compiler guarantee it never invoked is the same failure as inheriting a number
+without reading its source — smaller, and in our own file rather than someone
+else's. `FEATURES.md` §4 records the measured behaviour; this records that the
+claim preceded the measurement.

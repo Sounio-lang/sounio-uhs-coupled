@@ -385,3 +385,60 @@ assumed, and it is recorded now rather than discovered at the end.
 
 Reservoir parameters confirmed from the same passage: 500 m depth, 4 MPa,
 25–45 °C, sandstone, 7 months, 10–20 % of gas volume lost.
+
+## C13 — The Lobodice composition data do not close, on four independent checks
+
+C12 recorded that the Lobodice source itself calls the site not directly
+applicable to pure-H₂ storage. This is worse: **the reported composition data
+fail internal consistency before any model of ours touches them.** Measured by
+`sio/lobodice_massbalance.sio`, which does the arithmetic in the engine.
+
+The data, verbatim from Tremosa et al. (2023) §3:
+
+> *"The stored gas initially composed of 54% H2, 22% CH4, 12% CO2, 9% CO and 2.5%
+> N2 evolved after being stored during 7 months to 40% CH4, 37% H2, 9% CO2, 9% N2
+> and 3% CO."* … *"During 7 months of storage, 10%–20% of the gas volume was lost
+> … with an increase in methane."*
+
+**The instrument is N₂.** Nitrogen takes no part in methanation, sulfate
+reduction, acetogenesis or the water-gas shift, so its *moles* are conserved and
+its *mole fraction* measures nothing but the change in total moles:
+`total_final/total_initial = y_N₂(initial)/y_N₂(final)`. No model, no rate
+constant, no assumption about which reaction ran.
+
+| # | check | result |
+|---|---|---|
+| 0 | do the compositions sum to 100 %? | **99.5 % and 98.0 %**, and no normalisation convention is stated |
+| 1 | N₂ tracer vs the stated volume loss | tracer says **72.6 %** lost; source says **10–20 %** — off by **3.6× to 7.3×** |
+| 2 | did methane form? | CH₄ moles **fall 49.5 %**, yet formation of methane is a *measurement* there, carrying a microbial isotopic signature |
+| 3 | stoichiometric closure | extents from CO₂ and CO predict a final CH₄ mole fraction of **107.2 %** — impossible |
+
+Atom balances lose 66.4 % of carbon and 66.8 % of hydrogen from the gas. Carbon
+can leave as dissolved carbonate, so a deficit is not by itself impossible — but
+two thirds is a great deal, and it does not rescue checks 1–3.
+
+**Independent corroboration, from the source's own model.** Tremosa et al.
+simulate this site and report methane reaching 70 % against 40 % measured, CO₂
+falling to 5.9 % against 8.8 % measured, and *"a decrease to less than the half
+of the gas volume (46%)"*. **Their own model also produces a volume loss far
+above the stated 10–20 %**, and much nearer this probe's tracer inference. On two
+independent routes the 10–20 % figure is the outlier.
+
+**Not attributed, because it cannot be.** The primary sources — Smigan et al.
+(1990) and Buzek et al. (1994) — were never obtained. The failure may lie in the
+primary measurement, in transmission through the secondary, or in a
+normalisation convention nobody stated. Reported, not repaired.
+
+**Consequence for F2.** F2 is **not evaluable at Lobodice.** Selecting whichever
+subset of these numbers would permit a band to be drawn around 37 % is fitting to
+a target, which the protocol forbids, so the probe refuses to emit a verdict
+rather than choosing. Combined with C12, the study has **one** usable field
+constraint — Sun Storage — not two, and F2 is reported against that one with the
+Lobodice point declared unevaluable.
+
+**And it would not have discriminated anyway.** At Lobodice's composition the F1
+asymptote `y_H₂/(4·y_CO₂)` is **1.125** — the town gas carries very nearly its own
+stoichiometric CO₂, so calcite changes almost nothing there whatever the data
+say. 37 % H₂ is a value *both* model branches pass through on the way down. Even
+a clean Lobodice dataset could not have separated H1a; the site is CO₂-rich,
+which is exactly where the mechanism is inert.

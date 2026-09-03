@@ -625,3 +625,72 @@ of what H1a would have predicted for it.
    batch reactor with units that cannot be converted without inventing a
    number. That gap is now the single largest obstacle to a quantitative F2
    verdict, and it is a data gap, not a modelling one.
+
+---
+
+## F2, 2026-09-03: one field point survives, the other is not evaluable
+
+F2 requires the coupled band to encompass **both** field points, with no
+parameter tuned to fit. Both have now been tested.
+
+### Sun Storage — encompassed, nothing tuned
+
+Reported in the finite-horizon section above. The no-calcite branch carries a
+hard stoichiometric cap on H2 loss; minimum recovery runs 0 % at V_gas = 0.1
+L/kg, 76.86 % at 1, 90.74 % at 10, 92.16 % at 100. **The observed 84.3 % falls
+inside that range**, between V_gas = 1 and 10 L/kg, both ordinary gas
+saturations. The sweep was fixed before the comparison and V_gas remains a
+declared swept input.
+
+### Lobodice — the data do not close, and the probe refuses
+
+`sio/lobodice_massbalance.sio`, recorded in full as `CORRECTIONS.md` C13.
+
+Methanation consumes five moles of gas and returns one, so mole fractions move
+both because a species is consumed and because the denominator shrinks: a drop
+from 54 % to 37 % H2 is *not* a 31 % hydrogen loss and cannot be compared to a
+recovery fraction without closing the balance. Closing it requires an
+instrument, and **N2 is one** — it takes no part in any reaction here, so its
+mole fraction measures nothing but the change in total moles.
+
+Four checks fail on the reported set alone:
+
+| check | result |
+|---|---|
+| compositions sum to 100 %? | **99.5 %** and **98.0 %**, no convention stated |
+| N2 tracer vs stated volume loss | tracer **72.6 %**, source **10–20 %** — off **3.6× to 7.3×** |
+| did methane form? | CH4 moles **fall 49.5 %**, against a measured microbial isotopic signature for methane *formation* |
+| stoichiometric closure | predicts a final CH4 mole fraction of **107.2 %** — impossible |
+
+**The source's own model corroborates the discrepancy**: Tremosa et al. simulate
+Lobodice and get a volume decrease of 46 %, far above the stated 10–20 % and
+much nearer the tracer inference. On two independent routes the 10–20 % figure
+is the outlier.
+
+The primary sources (Smigan 1990, Buzek 1994) were never obtained, so the
+failure cannot be attributed to measurement, transmission, or an unstated
+convention. Selecting whichever subset of the numbers would let a band be drawn
+around 37 % is fitting to a target, which the protocol forbids. **The probe
+refuses rather than choosing, and F2 is declared not evaluable at Lobodice.**
+
+### F2 verdict, reported both ways as C12 requires
+
+- **Against both field points as pre-registered: F2 CANNOT BE EVALUATED.** One
+  of its two required points rests on data that fail internal consistency.
+- **Against Sun Storage alone: F2 is SATISFIED.** The observation lies inside
+  the model's reachable range with nothing tuned to place it there.
+
+This is a materially weaker validation base than the mission assumed — one clean
+field constraint, not two — and C12 recorded that risk before this measurement
+was made, rather than after.
+
+### Lobodice could not have discriminated H1a even with clean data
+
+At its composition the F1 asymptote `y_H2/(4·y_CO2)` is **1.125**: the town gas
+carries very nearly its own stoichiometric CO2, so calcite changes almost
+nothing there. 37 % H2 is a value **both** branches pass through on the way down.
+The site is CO2-rich, which is exactly where this study has now shown the
+mechanism to be inert — so the pre-registered choice of Lobodice as a
+discriminating field point was, in hindsight, poorly matched to H1a regardless
+of data quality. That is worth stating plainly: the criterion was not defeated
+only by bad data, it was also aimed at the wrong kind of site.

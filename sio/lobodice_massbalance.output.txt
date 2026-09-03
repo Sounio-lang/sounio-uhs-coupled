@@ -1,0 +1,101 @@
+Raw stdout of sio/lobodice_massbalance.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf lobodice_massbalance.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ 104837c738 (this repo, HEAD at capture time)
+date:     2026-09-03T16:46:18Z
+
+LOBODICE MASS BALANCE -- the second F2 field point
+Primary sources (Smigan 1990, Buzek 1994) were NOT obtained.
+Everything here is transmitted through Tremosa et al. 2023.
+
+== check 0: do the reported compositions sum to 100 %? ==
+   initial sum (%)  9950000000000e-11
+   final   sum (%)  9800000000000e-11
+   Neither does, and no normalisation convention is stated. Both
+   are normalised to their own sum below, which is a CHOICE.
+
+== check 1: N2 as a conserved tracer fixes the total-mole change ==
+   total_final / total_initial  2735901730876e-13
+   implied VOLUME LOSS (fraction)  7264098269123e-13
+   the source states a loss between  1000000000000e-13
+                                and  2000000000000e-13
+   discrepancy, against the HIGH end  3632049134561e-12
+   discrepancy, against the LOW  end  7264098269123e-12
+   N2 nearly quadruples in mole fraction. Nitrogen does not react,
+   so the only way its fraction rises is for everything else to
+   leave -- and that requires far more gas loss than is stated.
+
+== check 2: absolute moles, per 1 mol of initial gas ==
+   H2   initial  5427135678391e-13
+        final    1032942490228e-13
+   CH4  initial  2211055276381e-13
+        final    1116694584031e-13
+   CO2  initial  1206030150753e-13
+        final    2512562814070e-14
+   CO   initial  9045226130653e-14
+        final    8375209380234e-15
+
+== check 3: did methane form, as the source says it did? ==
+   CH4 absolute change (fraction)  -4949494949494e-13
+   The source states 'formation of methane' and reports an isotopic
+   signature typical of MICROBIALLY GENERATED methane, so methane
+   forming is a measurement, not an inference.
+   For CH4 moles to rise, total_final would have to exceed  5417085427135e-13
+   The N2 tracer says total_final is                        2735901730876e-13
+   Both cannot hold. This is the second independent failure.
+
+== check 4: atom balances ==
+   carbon atoms   initial  4321608040201e-13
+                  final    1451702959240e-13
+                  change   -6640826873385e-13
+   hydrogen atoms initial  1969849246231e-12
+                  final    6532663316582e-13
+                  change   -6683673469387e-13
+   Carbon can leave the gas as dissolved carbonate, so a deficit is
+   not by itself impossible -- but two thirds of it is a great deal.
+
+== check 5: stoichiometric closure, which is over-determined ==
+   Extents implied by the CO2 and CO changes, through
+     CO2 + 4 H2 -> CH4 + 2 H2O   and   CO + 3 H2 -> CH4 + H2O
+   extent from CO2  9547738693467e-14
+   extent from CO   8207705192629e-14
+   predicted final total moles      3718592964824e-13
+   predicted final CH4 mole FRACTION  1072072072072e-12
+   A MOLE FRACTION ABOVE 1 IS IMPOSSIBLE. The set does not close.
+
+== independent corroboration from the source's own model ==
+   Tremosa et al. simulate this site and report: methane reaching
+   70 % against 40 % measured, CO2 falling to 5.9 % against 8.8 %
+   measured, and a decrease 'to less than the half of the gas
+   volume (46 %)'.
+   Their own model therefore also produces a volume loss FAR above
+   the stated 10-20 %, and nearer this probe's tracer inference.
+   The 10-20 % figure is the outlier, on two independent routes.
+
+== VERDICT: F2 CANNOT BE EVALUATED AT LOBODICE ==
+   Four checks fail on the reported set alone, before any model of
+   ours is applied: the compositions do not sum to 100 with a
+   stated convention; the inert tracer contradicts the stated
+   volume loss by 3.6x to 7.3x; methane must both rise and fall;
+   and closure predicts an impossible mole fraction.
+
+   Choosing whichever subset of these numbers would let a band be
+   drawn around 37 % would be fitting to a target, which the
+   protocol forbids. THIS PROBE THEREFORE REFUSES.
+
+   Reported, not repaired: the primary sources are unobtained, so
+   the failure cannot be attributed to measurement, transmission,
+   or an unstated convention.
+
+== and even if the data were sound, Lobodice cannot separate H1a ==
+   F1 asymptote at this composition, y_H2/(4*y_CO2)  1125000000000e-12
+   Barely above 1: the gas carries nearly its own stoichiometric
+   CO2, so calcite changes almost nothing here whatever the data
+   say. 37 % H2 is a value BOTH branches pass through on the way
+   down, so the point could not have discriminated H1a regardless.

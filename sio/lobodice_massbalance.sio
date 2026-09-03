@@ -1,0 +1,215 @@
+// Lobodice mass balance -- the second F2 field point, and why it cannot serve
+// as one.
+//
+// F2 requires the coupled band to encompass BOTH the Sun Storage recovery and
+// the Lobodice 54 % -> 37 % H2 drop, with no parameter tuned to fit. The Sun
+// Storage half was tested in sio/coupled_finite.sio. This is the Lobodice half.
+//
+// PROVENANCE, WHICH IS THE FIRST PROBLEM. The primary sources for Lobodice are
+// Smigan et al. 1990 and Buzek et al. 1994, and NEITHER WAS OBTAINED -- that is
+// recorded in this study's own data notes, not discovered here. Everything
+// below is transmitted through Tremosa et al. 2023 (data/tremosa-lobodice),
+// a secondary account. A disagreement found here therefore cannot be
+// attributed: it may be in the primary measurement, in the transmission, or in
+// a normalisation convention that was never stated.
+//
+// THE REPORTED DATA, verbatim from Tremosa et al. 2023 section 3:
+//   "The stored gas initially composed of 54% H2, 22% CH4, 12% CO2, 9% CO and
+//    2.5% N2 evolved after being stored during 7 months to 40% CH4, 37% H2,
+//    9% CO2, 9% N2 and 3% CO."
+//   "During 7 months of storage, 10%-20% of the gas volume was lost and the
+//    composition of the gas changed, with an increase in methane and decreases
+//    in hydrogen, carbon dioxide and carbon monoxide."
+//
+// WHY A MOLE BALANCE IS NEEDED AT ALL. Methanation consumes five moles of gas
+// and returns one -- CO2 + 4 H2 -> CH4 + 2 H2O -- so mole FRACTIONS move both
+// because a species is consumed and because the denominator shrinks. A drop
+// from 54 % to 37 % is therefore not a 31 % loss of hydrogen, and cannot be
+// compared to a recovery fraction without closing the balance first.
+//
+// N2 IS THE INSTRUMENT. Nitrogen takes no part in methanation, sulfate
+// reduction, acetogenesis or the water-gas shift. Its MOLES are conserved, so
+// its mole FRACTION measures nothing but the change in total moles:
+//
+//     total_final / total_initial = y_N2(initial) / y_N2(final)
+//
+// That is one line of arithmetic, it needs no model, no rate constant and no
+// assumption about which reaction ran -- and it is enough to test the reported
+// set against itself.
+//
+// THIS PROBE FAILS CLOSED. If the reported data do not close, it refuses to
+// emit an F2 verdict for Lobodice rather than selecting whichever subset of the
+// numbers would produce one.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+// reported percentages, exactly as transmitted
+var I_H2: f64 = 54.0
+var I_CH4: f64 = 22.0
+var I_CO2: f64 = 12.0
+var I_CO: f64 = 9.0
+var I_N2: f64 = 2.5
+
+var F_H2: f64 = 37.0
+var F_CH4: f64 = 40.0
+var F_CO2: f64 = 9.0
+var F_CO: f64 = 3.0
+var F_N2: f64 = 9.0
+
+// the source's own statement about how much gas was lost
+var STATED_LOSS_LO: f64 = 0.10
+var STATED_LOSS_HI: f64 = 0.20
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("LOBODICE MASS BALANCE -- the second F2 field point")
+    println("Primary sources (Smigan 1990, Buzek 1994) were NOT obtained.")
+    println("Everything here is transmitted through Tremosa et al. 2023.")
+    println("")
+
+    let sum_i = I_H2 + I_CH4 + I_CO2 + I_CO + I_N2
+    let sum_f = F_H2 + F_CH4 + F_CO2 + F_CO + F_N2
+    println("== check 0: do the reported compositions sum to 100 %? ==")
+    print("   initial sum (%) ") emit("", sum_i)
+    print("   final   sum (%) ") emit("", sum_f)
+    println("   Neither does, and no normalisation convention is stated. Both")
+    println("   are normalised to their own sum below, which is a CHOICE.")
+    println("")
+
+    // normalise each to its own total
+    let yi_h2 = I_H2 / sum_i
+    let yi_ch4 = I_CH4 / sum_i
+    let yi_co2 = I_CO2 / sum_i
+    let yi_co = I_CO / sum_i
+    let yi_n2 = I_N2 / sum_i
+    let yf_h2 = F_H2 / sum_f
+    let yf_ch4 = F_CH4 / sum_f
+    let yf_co2 = F_CO2 / sum_f
+    let yf_co = F_CO / sum_f
+    let yf_n2 = F_N2 / sum_f
+
+    println("== check 1: N2 as a conserved tracer fixes the total-mole change ==")
+    let ratio = yi_n2 / yf_n2
+    print("   total_final / total_initial ") emit("", ratio)
+    print("   implied VOLUME LOSS (fraction) ") emit("", 1.0 - ratio)
+    print("   the source states a loss between ") emit("", STATED_LOSS_LO)
+    print("                                and ") emit("", STATED_LOSS_HI)
+    print("   discrepancy, against the HIGH end ") emit("", (1.0 - ratio) / STATED_LOSS_HI)
+    print("   discrepancy, against the LOW  end ") emit("", (1.0 - ratio) / STATED_LOSS_LO)
+    println("   N2 nearly quadruples in mole fraction. Nitrogen does not react,")
+    println("   so the only way its fraction rises is for everything else to")
+    println("   leave -- and that requires far more gas loss than is stated.")
+    println("")
+
+    println("== check 2: absolute moles, per 1 mol of initial gas ==")
+    let a_h2 = yf_h2 * ratio
+    let a_ch4 = yf_ch4 * ratio
+    let a_co2 = yf_co2 * ratio
+    let a_co = yf_co * ratio
+    print("   H2   initial ") emit("", yi_h2)
+    print("        final   ") emit("", a_h2)
+    print("   CH4  initial ") emit("", yi_ch4)
+    print("        final   ") emit("", a_ch4)
+    print("   CO2  initial ") emit("", yi_co2)
+    print("        final   ") emit("", a_co2)
+    print("   CO   initial ") emit("", yi_co)
+    print("        final   ") emit("", a_co)
+    println("")
+
+    println("== check 3: did methane form, as the source says it did? ==")
+    print("   CH4 absolute change (fraction) ") emit("", (a_ch4 - yi_ch4) / yi_ch4)
+    println("   The source states 'formation of methane' and reports an isotopic")
+    println("   signature typical of MICROBIALLY GENERATED methane, so methane")
+    println("   forming is a measurement, not an inference.")
+    print("   For CH4 moles to rise, total_final would have to exceed ") emit("", yi_ch4 / yf_ch4)
+    print("   The N2 tracer says total_final is                       ") emit("", ratio)
+    println("   Both cannot hold. This is the second independent failure.")
+    println("")
+
+    println("== check 4: atom balances ==")
+    let c_i = yi_ch4 + yi_co2 + yi_co
+    let c_f = a_ch4 + a_co2 + a_co
+    let h_i = 2.0 * yi_h2 + 4.0 * yi_ch4
+    let h_f = 2.0 * a_h2 + 4.0 * a_ch4
+    print("   carbon atoms   initial ") emit("", c_i)
+    print("                  final   ") emit("", c_f)
+    print("                  change  ") emit("", (c_f - c_i) / c_i)
+    print("   hydrogen atoms initial ") emit("", h_i)
+    print("                  final   ") emit("", h_f)
+    print("                  change  ") emit("", (h_f - h_i) / h_i)
+    println("   Carbon can leave the gas as dissolved carbonate, so a deficit is")
+    println("   not by itself impossible -- but two thirds of it is a great deal.")
+    println("")
+
+    println("== check 5: stoichiometric closure, which is over-determined ==")
+    println("   Extents implied by the CO2 and CO changes, through")
+    println("     CO2 + 4 H2 -> CH4 + 2 H2O   and   CO + 3 H2 -> CH4 + H2O")
+    let ext_co2 = yi_co2 - a_co2
+    let ext_co = yi_co - a_co
+    print("   extent from CO2 ") emit("", ext_co2)
+    print("   extent from CO  ") emit("", ext_co)
+    let ch4_pred = yi_ch4 + ext_co2 + ext_co
+    let tot_pred = 1.0 - 4.0 * ext_co2 - 3.0 * ext_co
+    print("   predicted final total moles     ") emit("", tot_pred)
+    print("   predicted final CH4 mole FRACTION ") emit("", ch4_pred / tot_pred)
+    if ch4_pred / tot_pred > 1.0 {
+        println("   A MOLE FRACTION ABOVE 1 IS IMPOSSIBLE. The set does not close.")
+    } else {
+        println("   Within range; closure does not fail on this check.")
+    }
+    println("")
+
+    println("== independent corroboration from the source's own model ==")
+    println("   Tremosa et al. simulate this site and report: methane reaching")
+    println("   70 % against 40 % measured, CO2 falling to 5.9 % against 8.8 %")
+    println("   measured, and a decrease 'to less than the half of the gas")
+    println("   volume (46 %)'.")
+    println("   Their own model therefore also produces a volume loss FAR above")
+    println("   the stated 10-20 %, and nearer this probe's tracer inference.")
+    println("   The 10-20 % figure is the outlier, on two independent routes.")
+    println("")
+
+    println("== VERDICT: F2 CANNOT BE EVALUATED AT LOBODICE ==")
+    println("   Four checks fail on the reported set alone, before any model of")
+    println("   ours is applied: the compositions do not sum to 100 with a")
+    println("   stated convention; the inert tracer contradicts the stated")
+    println("   volume loss by 3.6x to 7.3x; methane must both rise and fall;")
+    println("   and closure predicts an impossible mole fraction.")
+    println("")
+    println("   Choosing whichever subset of these numbers would let a band be")
+    println("   drawn around 37 % would be fitting to a target, which the")
+    println("   protocol forbids. THIS PROBE THEREFORE REFUSES.")
+    println("")
+    println("   Reported, not repaired: the primary sources are unobtained, so")
+    println("   the failure cannot be attributed to measurement, transmission,")
+    println("   or an unstated convention.")
+    println("")
+    println("== and even if the data were sound, Lobodice cannot separate H1a ==")
+    print("   F1 asymptote at this composition, y_H2/(4*y_CO2) ") emit("", yi_h2 / (4.0 * yi_co2))
+    println("   Barely above 1: the gas carries nearly its own stoichiometric")
+    println("   CO2, so calcite changes almost nothing here whatever the data")
+    println("   say. 37 % H2 is a value BOTH branches pass through on the way")
+    println("   down, so the point could not have discriminated H1a regardless.")
+    0
+}

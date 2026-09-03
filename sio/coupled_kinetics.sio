@@ -1,0 +1,295 @@
+// Coupled kinetics -- H1a as a mass-balance claim, tested against F1.
+//
+// PHASE4_GATE.md closed the kinetic channel: the CO2 Monod term is saturated
+// at every condition checked, so the H2:CO2 ratio cannot be the mechanism.
+// Directed explicitly to proceed on the surviving channel -- mass balance --
+// which is what this file builds and tests. Read the addendum in
+// PHASE4_GATE.md before this file; it states the design before any number
+// below was produced.
+//
+// THE MECHANISM UNDER TEST. `abiotic_kinetics.sio` already measured that
+// calcite reaches its equilibrium ceiling in minutes to at most a few years at
+// any swept surface area -- far faster than the microbial clock (its own
+// integrator steps at ~0.3 yr). That licenses treating calcite, WHEN PRESENT,
+// as continuously re-equilibrating: it holds total dissolved carbon near its
+// equilibrium value for as long as the mineral is not exhausted. The mineral
+// budget itself is NOT modelled here -- calcite is assumed in excess over the
+// run -- and that is a declared simplification, not a hidden one.
+//
+// TWO BRANCHES, ONE STATE MACHINE.
+//   WITH calcite    total carbon held at DIC_eq(T, P_CO2) every step -- an
+//                   open, buffered pool, because the mineral keeps resupplying it.
+//   WITHOUT calcite total carbon is a FIXED, FINITE pool sized by the SAME
+//                   P_CO2 through a charge balance with NO calcium term, and it
+//                   DEPLETES under methanogenesis exactly as
+//                   `microbial_kinetics.sio` already depletes the Aux Vases
+//                   pool -- reusing that mechanism, not inventing a new one.
+//
+// F1: with-calcite cumulative biotic H2 loss / without-calcite cumulative
+// biotic H2 loss. Under a factor of 2 (band included) and H1a dies, now
+// specifically as a mass-balance claim.
+//
+// CONDITIONS. T = 40 C (313.15 K), the same temperature already used
+// throughout the abiotic validation. P_CO2 and initial P_H2 reuse the
+// mesocosm and field gas compositions from PHASE4_GATE.md / gate_4to1_52to1.sio
+// verbatim, so this test is traceable to the same two labelled conditions
+// rather than a fresh invented pair. NaCl background = 0: Lehen salinity was
+// never reported (CORRECTIONS.md C6), and this is not yet the field-validation
+// phase -- it is a mechanism test, at a labelled synthetic condition.
+// SO4_total reuses the Aux Vases archive's own value (0.008269 molal), because
+// sulfate reduction competes with methanogenesis for H2 in the reference model
+// and dropping it would silently remove that competition, not model its absence.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{log_k, p_k1, p_k2, gamma_wateq, gamma_davies, LN10,
+                            solve_ph_pairs, SP_DIC, SP_M_HCO3, BACKGROUND_NACL}
+use microbial::{microbial_rate, biomass_growth}
+
+// ── no-calcite closure: pure carbonic-acid charge balance, no calcium ──────
+// H+ = HCO3- + 2 CO3-2 + OH-. Same structure as solve_ph_pairs, deliberately,
+// so the two closures differ only in the physics they include, not the method.
+
+var NC_CHARGE: f64 = 0.0
+var NC_MU: f64 = 0.0
+var NC_DIC: f64 = 0.0
+var NC_HCO3: f64 = 0.0
+
+fn speciate_nocalcite(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic {
+    let tc = t_k - 273.15
+    let g_h    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0, mu)
+    let g_oh   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0, mu)
+    let g_hco3 = gamma_wateq(tc, 1.0, 1.0, 5.4, 0.0, mu)
+    let g_co3  = gamma_wateq(tc, 1.0, 2.0, 5.4, 0.0, mu)
+
+    let a_h    = exp((0.0 - ph) * LN10)
+    let a_oh   = exp(log_k(3, t_k) * LN10) / a_h
+    let a_co2  = exp(log_k(0, t_k) * LN10) * p_co2_atm
+    let a_hco3 = a_co2 * exp((0.0 - p_k1(t_k)) * LN10) / a_h
+    let a_co3  = a_hco3 * exp((0.0 - p_k2(t_k)) * LN10) / a_h
+
+    let m_h    = a_h / g_h
+    let m_oh   = a_oh / g_oh
+    let m_hco3 = a_hco3 / g_hco3
+    let m_co3  = a_co3 / g_co3
+    // CO2(aq) uncharged: activity coefficient exactly 1, same convention used
+    // throughout carbonate_equilibria.sio.
+    let m_co2  = a_co2
+
+    NC_CHARGE = m_h - m_hco3 - 2.0 * m_co3 - m_oh
+    NC_MU     = 0.5 * (m_h + m_hco3 + 4.0 * m_co3 + m_oh) + BACKGROUND_NACL
+    NC_DIC    = m_co2 + m_hco3 + m_co3
+    NC_HCO3   = m_hco3
+}
+
+fn solve_nocalcite(t_k: f64, p_co2_atm: f64) -> f64 with Mut, Div, Panic {
+    var mu = 0.0
+    var ph = 5.0
+    var n: i64 = 0
+    while n < 200 {
+        var lo = 2.0
+        var hi = 10.0
+        speciate_nocalcite(t_k, p_co2_atm, lo, mu)
+        let f_lo = NC_CHARGE
+        var k: i64 = 0
+        while k < 60 {
+            let mid = 0.5 * (lo + hi)
+            speciate_nocalcite(t_k, p_co2_atm, mid, mu)
+            if (f_lo < 0.0 && NC_CHARGE < 0.0) || (f_lo > 0.0 && NC_CHARGE > 0.0) { lo = mid } else { hi = mid }
+            k = k + 1
+        }
+        ph = 0.5 * (lo + hi)
+        speciate_nocalcite(t_k, p_co2_atm, ph, mu)
+        let d = NC_MU - mu
+        var ad = d
+        if ad < 0.0 { ad = 0.0 - ad }
+        mu = NC_MU
+        n = n + 1
+        if ad < 1.0e-15 { n = 200 }
+    }
+    speciate_nocalcite(t_k, p_co2_atm, ph, mu)
+    ph
+}
+
+// ── coupled state ────────────────────────────────────────────────────────
+var CP_XMET: f64 = 0.0
+var CP_XSRB: f64 = 0.0
+var CP_H2: f64 = 0.0
+var CP_SO4T: f64 = 0.0
+var CP_DIC: f64 = 0.0
+var CP_CH4: f64 = 0.0
+var CP_HS: f64 = 0.0
+var CP_DIC_EQ: f64 = 0.0        // with-calcite ceiling, fixed for the run
+var CP_HCO3_FRAC: f64 = 0.0     // free HCO3- / total DIC, fixed for the run
+var CP_H2_CONSUMED: f64 = 0.0   // cumulative, molal: 4*(SRB+MET) integrated
+
+var YIELD_MET: f64 = 1250.0
+var YIELD_SRB: f64 = 5000.0
+var DECAY: f64 = 0.0            // no decay coefficient given by any source used here
+var SO4_FREE_FRAC: f64 = 0.3962 // reused from microbial_kinetics.sio, same background
+
+// calcite_on: 1 = with calcite (buffered), 0 = without (finite, depleting)
+fn init_coupled(calcite_on: i64, t_k: f64, p_co2_atm: f64, so4_total: f64, h2_init: f64) with Mut, Div, Panic {
+    CP_XMET = 1.0e-6
+    CP_XSRB = 1.0e-6
+    CP_H2 = h2_init
+    CP_SO4T = so4_total
+    CP_CH4 = 0.0
+    CP_HS = 0.0
+    CP_H2_CONSUMED = 0.0
+
+    if calcite_on == 1 {
+        let ph = solve_ph_pairs(t_k, p_co2_atm)
+        CP_DIC_EQ = SP_DIC
+        CP_HCO3_FRAC = SP_M_HCO3 / SP_DIC
+        CP_DIC = CP_DIC_EQ
+    } else {
+        let ph = solve_nocalcite(t_k, p_co2_atm)
+        CP_DIC_EQ = NC_DIC
+        CP_HCO3_FRAC = NC_HCO3 / NC_DIC
+        CP_DIC = NC_DIC
+    }
+}
+
+fn step_coupled(dt: f64, calcite_on: i64) with Mut, Div, Panic {
+    let so4_free = CP_SO4T * SO4_FREE_FRAC
+    let hco3_free = CP_DIC * CP_HCO3_FRAC
+    let r_met = microbial_rate(0, CP_XMET, CP_H2, hco3_free, 1.0)
+    let r_srb = microbial_rate(1, CP_XSRB, CP_H2, so4_free, 1.0)
+    if r_met < 0.0 { return }
+    if r_srb < 0.0 { return }
+
+    let d_h2 = 0.0 - 4.0 * (r_met + r_srb) * dt
+    let d_so4 = 0.0 - r_srb * dt
+    let d_dic = 0.0 - r_met * dt
+
+    CP_H2 = CP_H2 + d_h2
+    CP_SO4T = CP_SO4T + d_so4
+    CP_H2_CONSUMED = CP_H2_CONSUMED + 4.0 * (r_met + r_srb) * dt
+    if calcite_on == 1 {
+        CP_DIC = CP_DIC_EQ                 // held at the equilibrium ceiling
+    } else {
+        CP_DIC = CP_DIC + d_dic            // finite pool, depletes
+        if CP_DIC < 0.0 { CP_DIC = 0.0 }
+    }
+    CP_CH4 = CP_CH4 + r_met * dt
+    CP_HS = CP_HS + r_srb * dt
+    CP_XMET = CP_XMET + (YIELD_MET * r_met - DECAY * CP_XMET) * dt
+    CP_XSRB = CP_XSRB + (YIELD_SRB * r_srb - DECAY * CP_XSRB) * dt
+
+    if CP_H2 < 0.0 { CP_H2 = 0.0 }
+    if CP_SO4T < 0.0 { CP_SO4T = 0.0 }
+}
+
+// Returns cumulative biotic H2 consumed (molal) over t_end_yr, at dt_s steps.
+fn run_coupled(calcite_on: i64, t_k: f64, p_co2_atm: f64, so4_total: f64,
+              h2_init: f64, t_end_yr: f64, dt_s: f64) -> f64 with Mut, Div, Panic {
+    let yr = 3.1557600e7
+    init_coupled(calcite_on, t_k, p_co2_atm, so4_total, h2_init)
+    var t = 0.0
+    let t_end = t_end_yr * yr
+    var guard: i64 = 0
+    while t < t_end && guard < 4000000 {
+        step_coupled(dt_s, calcite_on)
+        t = t + dt_s
+        guard = guard + 1
+    }
+    CP_H2_CONSUMED
+}
+
+// ── printing ─────────────────────────────────────────────────────────────
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+var KH_H2: f64 = 7.4530e-4   // pinned phreeqc.dat, same as gate_4to1_52to1.sio
+
+fn h2_from_gas(p_total: f64, y_h2: f64) -> f64 with Mut { KH_H2 * y_h2 * p_total }
+
+fn f1_at_horizon(label: string, t_end_yr: f64, dt_s: f64) with IO, Mut, Div, Panic {
+    println(label)
+    let t_k = 313.15
+    let so4_total = 0.008269
+
+    // mesocosm: 10% H2 / 2.5% CO2 at 40 bar (H2:CO2 = 4:1)
+    let m_pco2 = 0.025 * 40.0
+    let m_h2i = h2_from_gas(40.0, 0.10)
+    let m_with = run_coupled(1, t_k, m_pco2, so4_total, m_h2i, t_end_yr, dt_s)
+    let m_without = run_coupled(0, t_k, m_pco2, so4_total, m_h2i, t_end_yr, dt_s)
+    print("   MESOCOSM condition (P_CO2 ") emit("", m_pco2) print("atm)")
+    print("      with calcite    H2 consumed ") emit("", m_with)
+    print("      without calcite H2 consumed ") emit("", m_without)
+    if m_without > 0.0 { print("      ratio ") emit("", m_with / m_without) }
+    print("      [diag] final H2(aq), no-calcite branch ") emit("", CP_H2)
+    print("      [diag] final DIC,    no-calcite branch ") emit("", CP_DIC)
+    print("      [diag] initial DIC,  no-calcite branch ") emit("", CP_DIC_EQ)
+    println("")
+
+    // field: 9.89% H2 / 0.19% CO2 at 78 bar (H2:CO2 = 52:1)
+    let f_pco2 = 0.0019 * 78.0
+    let f_h2i = h2_from_gas(78.0, 0.0989)
+    let f_with = run_coupled(1, t_k, f_pco2, so4_total, f_h2i, t_end_yr, dt_s)
+    let f_without = run_coupled(0, t_k, f_pco2, so4_total, f_h2i, t_end_yr, dt_s)
+    print("   FIELD condition (P_CO2 ") emit("", f_pco2) print("atm)")
+    print("      with calcite    H2 consumed ") emit("", f_with)
+    print("      without calcite H2 consumed ") emit("", f_without)
+    if f_without > 0.0 { print("      ratio ") emit("", f_with / f_without) }
+    print("      [diag] final H2(aq), no-calcite branch ") emit("", CP_H2)
+    print("      [diag] final DIC,    no-calcite branch ") emit("", CP_DIC)
+    print("      [diag] initial DIC,  no-calcite branch ") emit("", CP_DIC_EQ)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("COUPLED KINETICS -- F1, mass-balance version of H1a")
+    println("with calcite: DIC held at the equilibrium ceiling (buffered,")
+    println("mineral assumed in excess). without calcite: DIC is the same")
+    println("charge balance with no calcium term, fixed at t=0, depleting")
+    println("thereafter -- reusing microbial_kinetics.sio's own mechanism.")
+    println("T = 40 C. NaCl background = 0 (Lehen salinity unreported, C6).")
+    println("SO4_total = 0.008269 molal, reused from the Aux Vases archive.")
+    println("")
+
+    println("== sanity: DIC ceilings at the two conditions ==")
+    let t_k = 313.15
+    let ph_m = solve_ph_pairs(t_k, 0.025 * 40.0)
+    print("   mesocosm with-calcite DIC ") emit("", SP_DIC)
+    let ph_mn = solve_nocalcite(t_k, 0.025 * 40.0)
+    print("   mesocosm no-calcite   DIC ") emit("", NC_DIC)
+    let ph_f = solve_ph_pairs(t_k, 0.0019 * 78.0)
+    print("   field    with-calcite DIC ") emit("", SP_DIC)
+    let ph_fn = solve_nocalcite(t_k, 0.0019 * 78.0)
+    print("   field    no-calcite   DIC ") emit("", NC_DIC)
+    println("")
+
+    println("== F1 at the Aux Vases geological horizon, for continuity ==")
+    println("   (12700 yr, dt = 1e7 s -- same integrator settings already")
+    println("   verified against the archived USGS trajectory)")
+    f1_at_horizon("", 12700.0, 1.0e7)
+
+    println("== F1 at an OPERATIONAL storage horizon ==")
+    println("   285 days -- the Sun Storage field-validation duration this")
+    println("   study targets. dt = 3600 s (1 h): does the mass-balance")
+    println("   ceiling even bite on a timescale storage actually runs at?")
+    let day = 86400.0
+    f1_at_horizon("", 285.0 * day / 3.1557600e7, 3600.0)
+    0
+}

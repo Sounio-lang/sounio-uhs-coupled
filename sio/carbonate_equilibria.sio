@@ -309,6 +309,16 @@ pub var SP_M_TOTAL_CA: f64 = 0.0  // what the oracle's `Ca` column reports
 var SP_CHARGE: f64 = 0.0
 pub var SP_MU: f64 = 0.0
 
+// Carbon-bearing species, added alongside the calcium accounting above.
+// Additive only -- nothing here changes an existing SP_ value or the pH this
+// module already solves for. Exists so a caller can read total dissolved
+// inorganic carbon (DIC) at calcite equilibrium, for the coupled model's
+// with-calcite branch: DIC = CO2(aq) + HCO3- + CO3-2 + CaHCO3+ + CaCO3(aq).
+pub var SP_M_CO2: f64 = 0.0
+pub var SP_M_HCO3: f64 = 0.0
+pub var SP_M_CO3: f64 = 0.0
+pub var SP_DIC: f64 = 0.0
+
 // Full speciation at a given pH and ionic strength, pairs included.
 // PHREEQC reports TOTAL calcium, so the comparison is only like-for-like once
 // the pairs are summed -- part of the residual this is testing was free Ca2+
@@ -331,7 +341,11 @@ pub fn speciate(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic
     let a_co2  = exp(log_k(0, t_k) * LN10) * p_co2_atm
     let a_hco3 = a_co2 * exp((0.0 - p_k1(t_k)) * LN10) / a_h
     let a_co3  = a_hco3 * exp((0.0 - p_k2(t_k)) * LN10) / a_h
-    if a_co3 <= 0.0 { SP_M_TOTAL_CA = 0.0  SP_CHARGE = 0.0  SP_MU = mu  return }
+    if a_co3 <= 0.0 {
+        SP_M_TOTAL_CA = 0.0  SP_CHARGE = 0.0  SP_MU = mu
+        SP_M_CO2 = 0.0  SP_M_HCO3 = 0.0  SP_M_CO3 = 0.0  SP_DIC = 0.0
+        return
+    }
     let a_ca   = exp(log_k(4, t_k) * LN10) / a_co3
 
     let a_cahco3 = a_ca * a_co3 * a_h * exp(log_k(5, t_k) * LN10)
@@ -347,11 +361,19 @@ pub fn speciate(t_k: f64, p_co2_atm: f64, ph: f64, mu: f64) with Mut, Div, Panic
     let m_caco3  = a_caco3 / g_caco3
     let m_caoh   = a_caoh / g_caoh
 
+    // CO2(aq) is uncharged, no -gamma line: activity coefficient exactly 1,
+    // same convention as CaCO3(aq) above.
+    let m_co2 = a_co2
+
     SP_M_CA = m_ca
     SP_M_CAHCO3 = m_cahco3
     SP_M_CACO3 = m_caco3
     SP_M_CAOH = m_caoh
     SP_M_TOTAL_CA = m_ca + m_cahco3 + m_caco3 + m_caoh
+    SP_M_CO2 = m_co2
+    SP_M_HCO3 = m_hco3
+    SP_M_CO3 = m_co3
+    SP_DIC = m_co2 + m_hco3 + m_co3 + m_cahco3 + m_caco3
     SP_CHARGE = 2.0 * m_ca + m_h + m_cahco3 + m_caoh - m_hco3 - 2.0 * m_co3 - m_oh
     SP_MU = 0.5 * (4.0 * m_ca + m_h + m_hco3 + 4.0 * m_co3 + m_oh
                    + m_cahco3 + m_caoh) + BACKGROUND_NACL

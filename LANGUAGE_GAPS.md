@@ -8,7 +8,9 @@ Measured against `Sounio-lang/sounio` @ `origin/main` `57f87da54f`, 2026-09-02,
 engine `lean_single`.
 
 Status legend: **OPEN** — gap stands, fallback in use. **IN PROGRESS** — being
-implemented in this study. **CLOSED** — implemented and gated.
+implemented in this study. **CLOSED** — implemented and gated. **HALF CLOSED** —
+one of several named routes is implemented and gated, the rest still stand; the
+entry says which is which.
 
 ---
 
@@ -210,9 +212,12 @@ completeness because it shapes every file.
 
 ---
 
-## G8 — A compiler change is not verifiable through `bin/souc`
+## G8 — A `lean_single` change is not verifiable through `bin/souc`
 
-**Status: OPEN. Affects how every language-side claim in this study is checked.**
+**Status: HALF CLOSED. The harness half is done on `feat/w6-neg-f64-global`
+(`4e92710d20`), not yet merged; the wrapper half stays open by this study's own
+decision not to modify `bin/souc`. Affects how every language-side claim in this
+study is checked.**
 
 `bin/souc` resolves the engine with a fallback:
 
@@ -232,6 +237,30 @@ holds two different compilers:
 **`./bin/souc check` exercises the seed, not what was just built.** A new
 front-end feature is therefore invisible to it, and to the test harness, which
 invokes the same wrapper.
+
+Two corrections to the above, from measuring the wrapper rather than reading it:
+
+**It is the `lean_single` path only. Madaros — the default engine — already does
+the right thing and says so.** `bin/souc` resolves a local
+`artifacts/self-hosted/madaros` *ahead* of the committed ELF, and `--version`
+reports it:
+
+```
+provenance: elf=artifacts/self-hosted/madaros md5=e0c471f8 tree=cbafc5547d
+provenance: this ELF is a LOCAL BUILD (...), NOT the committed
+            bin/madaros-linux-x86_64 (md5=ff69dae4); it was resolved ahead of it.
+provenance: set SOUNIO_REQUIRE_COMMITTED_MADAROS=1 to refuse local builds
+```
+
+The `lean_single` path prints **no provenance at all** — it execs the raw ELF,
+which does not understand `--version` and answers with a usage line. That
+asymmetry is what made the hole invisible: the engine that reports is the one
+that did not need to.
+
+**There are two seeds, and the one named above is the second choice.**
+`LEAN_SINGLE` is `bin/souc-lean-single-x86_64`, and `bin/souc-linux-x86_64` is
+only its fallback. On `feat/w6-neg-f64-global` the first is present and is
+`0f3aa2c9…` — the fixed point of unmodified `main`.
 
 This was found the hard way. The reaction-literal feature (`docs/CHEMICAL_SYNTAX.md`,
 item 1) was measured through `bin/souc` and pronounced inert: three compile-fail
@@ -260,8 +289,45 @@ obtained through `bin/souc`, is not evidence.
 
 **What would close it.** `bin/souc` preferring a freshly built `gen3.elf` over the
 seed when one is present and newer, or the harness taking an explicit engine
-binary and refusing to guess. Neither is done here — this study does not modify
-the wrapper other projects depend on.
+binary and refusing to guess.
+
+### The second route, done
+
+`scripts/dev/run_sio_test_suite_v2.sh` now refuses to run when a locally built
+`gen3.elf` is newer than the `lean_single` binary the run would use. It prints
+both paths with their md5s and makes the caller say which one they mean:
+
+```
+harness: refusing to run -- a locally built gen3.elf is newer than the
+         lean_single binary this run would use, so the result would
+         describe the committed seed, not the tree.
+           would run:   bin/souc-lean-single-x86_64  (md5 0f3aa2c9)
+           local build: gen3.elf                     (md5 fe4d4915)
+```
+
+```sh
+SOUNIO_TEST_SOUC_BIN=$PWD/gen3.elf  ...   # test the build
+SOUNIO_TEST_ALLOW_STALE_ENGINE=1    ...   # test the seed, on purpose
+```
+
+The hole was live on that branch while G9 was being fixed: the seed was
+`0f3aa2c9` — unmodified `main` — and `gen3.elf` was `fe4d4915`, the tree with the
+fix. A suite run would have reported that the fix does nothing.
+
+Every run now opens with `harness: engine=… elf=… md5=…`, which is the
+**Practical consequence** above enforced rather than remembered.
+
+Verified on all four paths: the default run refuses with `rc=2`; the explicit
+build reports `engine=explicit md5=fe4d4915` and passes
+`tests/run-pass/module_let_negative_f64.sio`; the explicit seed reports
+`engine=lean_single md5=0f3aa2c9`; and with `artifacts/self-hosted/madaros`
+present the guard stays silent and reports `engine=madaros`. That last one is
+the test that mattered — the ordinary case must not start refusing.
+
+**Still open:** the first route. `bin/souc` is a wrapper other projects depend
+on, and this study does not modify it. Until that changes, a `lean_single`
+result obtained through `bin/souc` outside this harness still carries the
+original hazard, and must name its binary.
 
 ---
 

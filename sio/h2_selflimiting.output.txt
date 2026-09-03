@@ -7,8 +7,8 @@ compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
           built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
           -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
           binary named in sio/README.md's own header for this engine.
-model:    sounio-uhs-coupled @ 60c84eaa23 (this repo, HEAD at capture time)
-date:     2026-09-03T17:43:37Z
+model:    sounio-uhs-coupled @ d7037f4515 (this repo, HEAD at capture time)
+date:     2026-09-03T18:24:18Z
 
 H2 -- THE SELF-LIMITING LOOP, TESTED FOR THE FIRST TIME
 PREREGISTRATION.md line 43. Registered with H1a, never run until now.

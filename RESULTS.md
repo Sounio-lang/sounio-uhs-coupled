@@ -1,6 +1,6 @@
 # Results
 
-**F1 passes for a CO₂-poor feed and is inert otherwise. F2 and F3 are both not evaluable as pre-registered; against the one usable field point F2 is satisfied and F3 cannot be settled. H1a survives — as a stoichiometric claim, not the kinetic one it was pre-registered as.**
+**F1 is not settled: it passes at 4.3–13 for a CO₂-poor co-injected feed under a fixed-calcite-ceiling assumption this study has since shown false, and collapses to 1.015 — failing — in the unbuffered limit of pure hydrogen storage. F2 and F3 are both not evaluable as pre-registered; against the one usable field point F2 is satisfied and F3 cannot be settled. H2 is confirmed in form, and it is what caps H1a.**
 
 Every number carries its producer in parentheses. `PREREGISTRATION.md` is
 unaltered and its sha256 unchanged. `PHASE4_GATE.md` is the running log,
@@ -29,7 +29,11 @@ much H₂ can convert before the co-injected CO₂ runs out — not by rate.
 
 ## 2. F1 — remove calcite; under a factor of 2 and H1a dies
 
-**Verdict: passes for a CO₂-poor feed; inert for a stoichiometric or CO₂-rich one.**
+**Verdict: NOT SETTLED. Passes at 4.3–13 for a CO₂-poor co-injected feed under a
+fixed-calcite-ceiling assumption; inert for a stoichiometric or CO₂-rich feed;
+and fails at 1.015 in the unbuffered limit once that assumption is dropped
+(§2b, §2c).** The three sub-sections below are in the order the study produced
+them, and the later two revise the first.
 
 Biotic H₂ loss with calcite over without, 40 °C (`sio/coupled_gasphase.sio`).
 `V_gas` maps to gas saturation with porosity cancelling, `Sg = V/(1+V)`
@@ -56,10 +60,70 @@ hydrogen it arrives with, and calcite changes nothing (1.000 at every gas volume
 at Lobodice's CO₂-rich town gas, nearly nothing (1.000–1.118). H1a holds **only**
 for a CO₂-poor feed — which is what the field trial was.
 
-*Caveat carried:* the with-calcite branch assumes the mineral is in excess and does
-not model its mass. `sio/abiotic_kinetics.sio` measured calcite equilibration as
-fast relative to the microbial clock, which supports the assumption without
-establishing the inventory.
+### 2b. The ceiling those numbers rest on is not fixed — H2 caps H1a
+
+Every figure above holds dissolved carbon at a **fixed** calcite-equilibrium
+ceiling, i.e. assumes the mineral supplies carbon without limit. **That
+assumption is false, and H2 — the study's other pre-registered hypothesis, which
+had never been tested — is why** (`sio/h2_selflimiting.sio`).
+
+Methanogenesis removes one HCO₃⁻ and one H⁺ per turnover, so it is
+**alkalinity-neutral**: it strips carbon at constant alkalinity exactly as
+degassing does, and **pH rises**. Measured: pH climbs **6.10 → 10.17** as carbon
+is consumed, and Ω rises **0.52 → 551**. H2 predicted self-limitation over *part*
+of parameter space and there is indeed a calcium threshold — below ~1e-4 molal
+the loop never closes. **H2 is confirmed in form**, and its content is that
+threshold, which was not stated in advance.
+
+Solving for the calcite extent that holds Ω = 1 as methanogenesis proceeds:
+
+| | |
+|---|---|
+| calcite switches **source → sink** at | **24.85 %** of carbon methanated |
+| most calcite ever contributes | **6.90 %** of the water's own initial DIC |
+| the calcite-equilibrium DIC ceiling | **falls by a factor of 9.82**, not fixed |
+
+**H1a contains the seed of its own termination**: the reaction it enables drives
+the water to the state where the mineral stops enabling it.
+
+### 2c. Pure hydrogen storage — where H1a should matter most, and fails hardest
+
+Every site this study has data for is the wrong kind of site. Lobodice is town
+gas at 12 % CO₂, Sun Storage is hydrogen admixed into natural gas at 0.19 %, the
+mesocosms were fed 2.5 %. **Nobody is building those.** Planned UHS stores *pure*
+hydrogen with an inert cushion and no co-injected carbon at all
+(`sio/pure_h2.sio`).
+
+Set y_CO₂ = 0 and the asymptote y_H₂/(4·y_CO₂) does not converge — it **diverges**:
+
+| V_gas | F1, calcite unlimited | F1, H2's loop honoured |
+|---|---|---|
+| 0.1 | 8.48 | **1.015** |
+| 1.0 | **72.52** | **1.015** |
+| 10 | 712.9 | **1.015** |
+| 100 | 7 116.8 | **1.015** |
+
+Read naively, calcite is worth tens to thousands and the ratio is unbounded in
+gas volume. Honoured against H2, the mineral supplies **6.90 %** of the carbon
+the formation already held and **F1 = 1.015 — far below the factor-of-2 bar.**
+
+**H1a fails F1 for pure hydrogen storage, and fails hardest exactly where the
+naive reading makes it look strongest.** The reason is not a coincidence: the
+CO₂ that would buffer the pH rise is the same CO₂ whose absence made the
+mechanism look large. In the co-injected cases a CO₂-bearing gas phase opposes
+the loop; at y_CO₂ = 0 nothing does.
+
+**What this leaves unresolved, and it is the study's largest open item.** The
+field's 4.321 sits between two regimes: computed with a fixed ceiling, in a
+system that *does* have a CO₂ buffer (0.19 %). It is therefore an **upper
+bound**, and the true value lies somewhere between 4.321 and something nearer 1.
+**The partially-buffered case is not computed.** Until it is, F1's field value is
+bracketed, not known.
+
+*Two caveats carried:* the with-calcite branch does not model calcite mass
+(`sio/abiotic_kinetics.sio` measured equilibration as fast relative to the
+microbial clock, which supports excess without establishing inventory); and
+§2b–2c assume a closed system at fixed calcium.
 
 ---
 

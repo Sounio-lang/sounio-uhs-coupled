@@ -1,0 +1,182 @@
+// PURE HYDROGEN STORAGE -- where H1a should matter most, and where it dies.
+//
+// EVERY SITE THIS STUDY HAS DATA FOR IS THE WRONG KIND OF SITE. Lobodice is town
+// gas at 12 % CO2. Sun Storage is hydrogen admixed into natural gas carrying
+// 0.19 % CO2. The mesocosms were fed 2.5 % CO2. All three arrive with their own
+// carbon, and sio/coupled_gasphase.sio showed that is exactly what decides
+// whether calcite matters: the extent ratio approaches y_H2/(4*y_CO2), which is
+// 1.00 at a stoichiometric feed and 13.0 at the field's 52:1.
+//
+// BUT NOBODY IS BUILDING THOSE. Underground hydrogen storage as planned stores
+// PURE hydrogen, with an inert cushion gas and no co-injected carbon at all.
+// Set y_CO2 = 0 and the asymptote y_H2/(4*y_CO2) does not approach a number --
+// it DIVERGES. The only carbon left is what the formation itself holds, and
+// H1a stops being a modest correction and becomes the entire mechanism.
+//
+// So the interesting question is not the one the historical sites can answer.
+// This module asks it: at y_CO2 = 0, is calcite the difference between losing
+// almost no hydrogen and losing all of it?
+//
+// AND THE ANSWER TURNS ON H2, NOT H1a. sio/h2_selflimiting.sio measured that
+// methanogenesis is alkalinity-neutral, so it strips carbon at constant
+// alkalinity, pH rises, and calcite crosses from source to sink. In the
+// co-injected cases a CO2-bearing gas phase buffers that pH rise. IN PURE
+// HYDROGEN STORAGE THERE IS NO CO2 IN THE GAS AT ALL, so nothing buffers it and
+// the self-limiting loop runs at full strength.
+//
+// The two pre-registered hypotheses therefore collide precisely here: the regime
+// where H1a is largest is the regime where H2 is least opposed.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use h2_selflimiting::{closed_alk, solve_psi, IA_PSI, DIC0, MU}
+
+var R_LATM: f64 = 0.0820574
+var BAR2ATM: f64 = 0.986923
+var KH_H2: f64 = 7.4530e-4
+var SO4_TOTAL: f64 = 0.008269
+var TK: f64 = 313.15
+var PH0: f64 = 6.1
+var CA_REF: f64 = 0.0898        // Aux Vases calcium, the water this study knows
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+// Total H2 inventory per kg of water for a PURE hydrogen gas at pressure.
+fn h2_total(p_bar: f64, v_gas: f64) -> f64 with Mut, Div, Panic {
+    let p = p_bar * BAR2ATM
+    p * v_gas / (R_LATM * TK) + KH_H2 * p
+}
+
+// Largest net carbon the mineral can ever supply before the loop turns it into
+// a sink, found by walking the methanogenesis extent and watching the sign of
+// the calcite extent that holds saturation.
+fn calcite_max_supply(ca: f64, alk0: f64) -> f64 with Mut, Div, Panic {
+    var best = 0.0
+    var i: i64 = 0
+    while i < 60 {
+        let frac = (i as f64) / 60.0
+        let ok = solve_psi(DIC0 * frac, ca, alk0, MU)
+        if ok {
+            if IA_PSI > best { best = IA_PSI }
+        }
+        i = i + 1
+    }
+    best
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("PURE HYDROGEN STORAGE -- y_CO2 = 0")
+    println("Every site this study has data for carries its own CO2. Nobody is")
+    println("building those. This is the case that is actually planned.")
+    println("")
+
+    let alk0 = closed_alk(DIC0, PH0, MU)
+    let sink = 4.0 * SO4_TOTAL
+    print("   formation DIC (molal)      ") emit("", DIC0)
+    print("   sulfate sink, 4 x SO4      ") emit("", sink)
+    print("   calcium (molal)            ") emit("", CA_REF)
+    println("")
+
+    println("== 1. THE NAIVE H1a READING: calcite supplies without limit ==")
+    println("   This is what sio/coupled_gasphase.sio assumes, and it is what")
+    println("   the F1 = 4.3 to 13 figures rest on.")
+    println("")
+    var v: f64 = 0.1
+    var n: i64 = 0
+    while n < 4 {
+        let h2 = h2_total(78.0, v)
+        let left = h2 - sink
+        // without calcite: only the formation's own carbon is available
+        var used = DIC0
+        if left > 0.0 && left / 4.0 < used { used = left / 4.0 }
+        let without = sink + 4.0 * used
+        var with_c = h2
+        if left <= 0.0 { with_c = h2 }
+        print("   V_gas = ") emit("", v)
+        print("      H2 total (molal)        ") emit("", h2)
+        print("      loss without calcite    ") emit("", without)
+        print("      loss with calcite       ") emit("", with_c)
+        if without > 0.0 { print("      F1 ratio                ") emit("", with_c / without) }
+        v = v * 10.0
+        n = n + 1
+    }
+    println("   The ratio does NOT approach a limit. With no co-injected CO2")
+    println("   there is no y_H2/(4*y_CO2) to converge to: carbon is fixed at")
+    println("   the formation's own DIC while hydrogen scales with the gas")
+    println("   volume, so the ratio grows without bound. On this reading pure")
+    println("   hydrogen storage is where H1a matters most, by far.")
+    println("")
+
+    println("== 2. WHAT THE MINERAL CAN ACTUALLY SUPPLY ==")
+    println("   sio/h2_selflimiting.sio measured that methanogenesis raises pH")
+    println("   and drives calcite from source to sink. In pure H2 storage NO")
+    println("   CO2 exists in the gas to buffer that rise, so the loop runs")
+    println("   unopposed. Walking the extent and taking the largest net")
+    println("   dissolution the saturation constraint ever permits:")
+    println("")
+    let psi_max = calcite_max_supply(CA_REF, alk0)
+    print("   most calcite ever supplies (molal) ") emit("", psi_max)
+    print("   as a fraction of the formation DIC ") emit("", psi_max / DIC0)
+    print("   total carbon, formation + calcite  ") emit("", DIC0 + psi_max)
+    println("")
+
+    println("== 3. F1 FOR PURE HYDROGEN, WITH THE LOOP HONOURED ==")
+    v = 0.1
+    n = 0
+    while n < 4 {
+        let h2 = h2_total(78.0, v)
+        let left = h2 - sink
+        var used_no = DIC0
+        if left > 0.0 && left / 4.0 < used_no { used_no = left / 4.0 }
+        var used_yes = DIC0 + psi_max
+        if left > 0.0 && left / 4.0 < used_yes { used_yes = left / 4.0 }
+        let without = sink + 4.0 * used_no
+        let with_c = sink + 4.0 * used_yes
+        print("   V_gas = ") emit("", v)
+        print("      loss without calcite ") emit("", without)
+        print("      loss with calcite    ") emit("", with_c)
+        if without > 0.0 { print("      F1 RATIO             ") emit("", with_c / without) }
+        v = v * 10.0
+        n = n + 1
+    }
+    println("")
+
+    println("== VERDICT ==")
+    println("   Read naively, calcite is worth a factor of tens to hundreds in")
+    println("   pure hydrogen storage, and the ratio is unbounded in gas volume.")
+    println("   Honoured against H2, the mineral supplies a few per cent of the")
+    println("   carbon the formation already held, and F1 collapses to near 1.")
+    println("")
+    println("   H1a FAILS F1 FOR PURE HYDROGEN STORAGE -- and it fails hardest")
+    println("   in the regime where the naive reading makes it look strongest.")
+    println("   The mechanism is largest exactly where it is most completely")
+    println("   self-limiting, because the CO2 that would buffer the pH rise is")
+    println("   the same CO2 whose absence made the mechanism look large.")
+    println("")
+    println("   That is a claim about a closed system with calcite at")
+    println("   saturation and a fixed calcium. It is NOT a claim that biotic")
+    println("   H2 loss is small in pure hydrogen storage: the formation's own")
+    println("   DIC and its sulfate remain available, and by the numbers above")
+    println("   they alone consume a few per cent of the stored hydrogen.")
+    0
+}

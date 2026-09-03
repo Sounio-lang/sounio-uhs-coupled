@@ -1,0 +1,96 @@
+Raw stdout of sio/pure_h2.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf pure_h2.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ d7037f4515 (this repo, HEAD at capture time)
+date:     2026-09-03T18:24:18Z
+
+PURE HYDROGEN STORAGE -- y_CO2 = 0
+Every site this study has data for carries its own CO2. Nobody is
+building those. This is the case that is actually planned.
+
+   formation DIC (molal)       2256521000000e-15
+   sulfate sink, 4 x SO4       3307600000000e-14
+   calcium (molal)             8980000000000e-14
+
+== 1. THE NAIVE H1a READING: calcite supplies without limit ==
+   This is what sio/coupled_gasphase.sio assumes, and it is what
+   the F1 = 4.3 to 13 figures rest on.
+
+   V_gas =  1000000000000e-13
+      H2 total (molal)         3569496634303e-13
+      loss without calcite     4210208399999e-14
+      loss with calcite        3569496634303e-13
+      F1 ratio                 8478194652557e-12
+   V_gas =  1000000000000e-12
+      H2 total (molal)         3053137928549e-12
+      loss without calcite     4210208399999e-14
+      loss with calcite        3053137928549e-12
+      F1 ratio                 7251750123698e-11
+   V_gas =  1000000000000e-11
+      H2 total (molal)         3001502057974e-11
+      loss without calcite     4210208399999e-14
+      loss with calcite        3001502057974e-11
+      F1 ratio                 7129105670812e-10
+   V_gas =  1000000000000e-10
+      H2 total (molal)         2996338470916e-10
+      loss without calcite     4210208399999e-14
+      loss with calcite        2996338470916e-10
+      F1 ratio                 7116841225523e-9
+   The ratio does NOT approach a limit. With no co-injected CO2
+   there is no y_H2/(4*y_CO2) to converge to: carbon is fixed at
+   the formation's own DIC while hydrogen scales with the gas
+   volume, so the ratio grows without bound. On this reading pure
+   hydrogen storage is where H1a matters most, by far.
+
+== 2. WHAT THE MINERAL CAN ACTUALLY SUPPLY ==
+   sio/h2_selflimiting.sio measured that methanogenesis raises pH
+   and drives calcite from source to sink. In pure H2 storage NO
+   CO2 exists in the gas to buffer that rise, so the loop runs
+   unopposed. Walking the extent and taking the largest net
+   dissolution the saturation constraint ever permits:
+
+   most calcite ever supplies (molal)  1558040910364e-16
+   as a fraction of the formation DIC  6904615159196e-14
+   total carbon, formation + calcite   2412325091036e-15
+
+== 3. F1 FOR PURE HYDROGEN, WITH THE LOOP HONOURED ==
+   V_gas =  1000000000000e-13
+      loss without calcite  4210208399999e-14
+      loss with calcite     4272530036414e-14
+      F1 RATIO              1014802506311e-12
+   V_gas =  1000000000000e-12
+      loss without calcite  4210208399999e-14
+      loss with calcite     4272530036414e-14
+      F1 RATIO              1014802506311e-12
+   V_gas =  1000000000000e-11
+      loss without calcite  4210208399999e-14
+      loss with calcite     4272530036414e-14
+      F1 RATIO              1014802506311e-12
+   V_gas =  1000000000000e-10
+      loss without calcite  4210208399999e-14
+      loss with calcite     4272530036414e-14
+      F1 RATIO              1014802506311e-12
+
+== VERDICT ==
+   Read naively, calcite is worth a factor of tens to hundreds in
+   pure hydrogen storage, and the ratio is unbounded in gas volume.
+   Honoured against H2, the mineral supplies a few per cent of the
+   carbon the formation already held, and F1 collapses to near 1.
+
+   H1a FAILS F1 FOR PURE HYDROGEN STORAGE -- and it fails hardest
+   in the regime where the naive reading makes it look strongest.
+   The mechanism is largest exactly where it is most completely
+   self-limiting, because the CO2 that would buffer the pH rise is
+   the same CO2 whose absence made the mechanism look large.
+
+   That is a claim about a closed system with calcite at
+   saturation and a fixed calcium. It is NOT a claim that biotic
+   H2 loss is small in pure hydrogen storage: the formation's own
+   DIC and its sulfate remain available, and by the numbers above
+   they alone consume a few per cent of the stored hydrogen.

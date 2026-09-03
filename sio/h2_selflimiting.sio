@@ -36,12 +36,12 @@
 
 use carbonate_equilibria::{log_k, p_k1, p_k2, gamma_wateq, gamma_davies, LN10}
 
-var T_K: f64 = 313.15
-var MU: f64 = 0.5            // held; swept separately below
+pub var T_K: f64 = 313.15
+pub var MU: f64 = 0.5            // held; swept separately below
 
 // Aux Vases initial water, the one this study has a full analysis of:
 //   HCO3- 130 mg/L, pH 6.1, Ca++ 3600 mg/L
-var DIC0: f64 = 2.256521e-3  // total dissolved carbon, molal (verified earlier)
+pub var DIC0: f64 = 2.256521e-3  // total dissolved carbon, molal (verified earlier)
 var PH0: f64 = 6.1
 
 // results
@@ -53,7 +53,7 @@ var R_CO3: f64 = 0.0
 // Speciate a CLOSED carbonate system at given DIC and pH, and report the
 // alkalinity that combination implies. Activities throughout; molalities are
 // recovered by dividing by the activity coefficient.
-fn closed_alk(dic: f64, ph: f64, mu: f64) -> f64 with Mut, Div, Panic {
+pub fn closed_alk(dic: f64, ph: f64, mu: f64) -> f64 with Mut, Div, Panic {
     let tc = T_K - 273.15
     let g_h    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0, mu)
     let g_oh   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0, mu)
@@ -84,7 +84,7 @@ fn closed_alk(dic: f64, ph: f64, mu: f64) -> f64 with Mut, Div, Panic {
 
 // Invert: given DIC and alkalinity, find pH. Alkalinity falls monotonically
 // with pH here, so bisection is safe and its bracket is checked.
-fn solve_ph_closed(dic: f64, alk: f64, mu: f64) -> f64 with Mut, Div, Panic {
+pub fn solve_ph_closed(dic: f64, alk: f64, mu: f64) -> f64 with Mut, Div, Panic {
     var lo = 3.0
     var hi = 12.0
     let f_lo = closed_alk(dic, lo, mu) - alk
@@ -187,11 +187,11 @@ fn sweep_extent(alk: f64, ca: f64, mu: f64) with Mut, Div, Panic {
 // working; negative means the mineral is taking carbon out of the water, which
 // is H2 shutting H1a off.
 
-var IA_PSI: f64 = 0.0
-var IA_PH: f64 = 0.0
-var IA_DIC: f64 = 0.0
+pub var IA_PSI: f64 = 0.0
+pub var IA_PH: f64 = 0.0
+pub var IA_DIC: f64 = 0.0
 
-fn omega_at(xi: f64, psi: f64, ca0: f64, alk0: f64, mu: f64) -> f64 with Mut, Div, Panic {
+pub fn omega_at(xi: f64, psi: f64, ca0: f64, alk0: f64, mu: f64) -> f64 with Mut, Div, Panic {
     let dic = DIC0 - xi + psi
     let ca = ca0 + psi
     let alk = alk0 + 2.0 * psi
@@ -211,7 +211,7 @@ fn omega_at(xi: f64, psi: f64, ca0: f64, alk0: f64, mu: f64) -> f64 with Mut, Di
 
 // Find the calcite extent that holds the water at saturation. Bisection on psi;
 // refuses rather than returning an endpoint if the bracket has no sign change.
-fn solve_psi(xi: f64, ca0: f64, alk0: f64, mu: f64) -> bool with Mut, Div, Panic {
+pub fn solve_psi(xi: f64, ca0: f64, alk0: f64, mu: f64) -> bool with Mut, Div, Panic {
     var lo = 0.0 - 0.9 * ca0
     var hi = 1.0e-2
     let f_lo = omega_at(xi, lo, ca0, alk0, mu) - 1.0

@@ -302,8 +302,9 @@ Tremosa et al. 2023 — the Lobodice source already in `data/tremosa-lobodice`
 NaCl."* Both bounds were run, at both the mesocosm and field conditions, over
 12 700 years.
 
-**Ratio: 1.000000, all four runs.** Total dissolved carbon moves by under
-0.001% between the 0.40 M and 0.77 M cases (activity-coefficient effects at
+**Ratio: 1.000000, all four runs.** Total dissolved carbon moves by 0.03–0.07%
+between the 0.40 M and 0.77 M cases (0.026% mesocosm, 0.068% field, computed
+from the run's own initial-DIC diagnostics — activity-coefficient effects at
 these ionic strengths are real but second order) and H2 is still fully
 exhausted in the no-calcite branch in every case. Raising ionic strength
 toward the edge of what these organisms can survive at all does not touch the
@@ -314,15 +315,19 @@ mechanism: H2, not carbon, is still what runs out.
 Not a synthetic condition: 54% H2, 22% CH4, **12% CO2**, 9% CO, 2.5% N2 at 4
 MPa (40 bar), 25–45 °C, is what Tremosa et al. 2023 report was actually
 injected at Lobodice (CORRECTIONS.md C5; T taken at 40 °C, mid-range). At 12%,
-this is the most CO2-rich condition available anywhere in this study — six
-times the field gate condition's CO2 fraction.
+this is the most CO2-rich condition available anywhere in this study — about
+63 times the field gate condition's CO2 fraction (0.19%, from that
+condition's own P_CO2 = 0.1482 atm at 78 bar total).
 
 **Ratio: 1.000000**, at the 12 700-year horizon and, separately, at
 **Lobodice's own actual storage duration, seven months** — real, not
-extrapolated. At seven months the pattern is the same one already seen at 285
-days: aqueous H2 barely moves (2.9812e-3 → 2.9812e-3 to displayed precision),
-so this reading is time-limited, the same way the operational-horizon test
-above was, and says nothing about carbon either.
+extrapolated. At seven months aqueous H2 sits at 1.6098e-2 molal, close to its
+own initial charge under this richer H2 fraction (54% vs. mesocosm's 10%) —
+the same barely-moved pattern already seen at 285 days for the mesocosm
+condition (2.9812e-3 → 2.9812e-3 to displayed precision), just at a higher
+concentration because more H2 was dissolved to begin with. This reading is
+time-limited, the same way the operational-horizon test above was, and says
+nothing about carbon either.
 
 ### Sweep 3 — established rather than cold-start biomass
 
@@ -336,8 +341,9 @@ at both mesocosm and field conditions, and at the geological horizon for
 completeness.
 
 **Ratio: 1.000000**, all three. Even at 100x the starting population, aqueous
-H2 still moves by under 0.00001% over 285 days: the doubling times this study
-already established (103 yr SRB, 610 yr MET) put any starting population two
+H2 still moves by only 0.00001–0.00002% over 285 days (0.0000232% mesocosm,
+0.0000121% field): the doubling times this study already established (103 yr
+SRB, 610 yr MET) put any starting population two
 orders of magnitude above cold-start still deep in the early-exponential
 regime at under a year. This is not evidence that biomass never matters — it
 is evidence that the *specific* upper bound this study can point to, without

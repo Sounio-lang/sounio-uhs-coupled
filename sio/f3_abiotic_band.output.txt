@@ -1,0 +1,109 @@
+Raw stdout of sio/f3_abiotic_band.sio, unedited.
+
+command:
+  cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf f3_abiotic_band.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 0f3aa2c9dd3be4e407ce546130f7614c
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 865dd6db87
+          -- not through bin/souc, per LANGUAGE_GAPS.md G8; this is the
+          binary named in sio/README.md's own header for this engine.
+model:    sounio-uhs-coupled @ b4c29ae218 (this repo, HEAD at capture time)
+date:     2026-09-03T16:56:55Z
+
+F3 -- CAN THE ABIOTIC BAND ALONE EXPLAIN THE FIELD POINT?
+Lobodice is not evaluable (C13), so this turns on Sun Storage.
+
+   Henry constant for H2 at 40 C (molal/atm)  7452984653286e-16
+   from the pinned phreeqc.dat analytic form, not a literature
+   value re-entered by hand.
+
+== channel (a): H2 DISSOLUTION, computed exactly ==
+   The dissolved FRACTION is independent of pressure -- P cancels.
+   It is set by the gas/water ratio alone.
+   V_gas maps to gas saturation with porosity cancelling:
+     Sg = V_gas / (1 + V_gas)
+
+   V_gas =  1000000000000e-14
+      gas saturation Sg  9900990099009e-15
+      H2 dissolved (fraction of total)  6569630631772e-13
+      implied recovery if none exsolves (%)  3430369368227e-11
+   V_gas =  1000000000000e-13
+      gas saturation Sg  9090909090909e-14
+      H2 dissolved (fraction of total)  1607314976705e-13
+      implied recovery if none exsolves (%)  8392685023294e-11
+   V_gas =  1000000000000e-12
+      gas saturation Sg  5000000000000e-13
+      H2 dissolved (fraction of total)  1879149662320e-14
+      implied recovery if none exsolves (%)  9812085033767e-11
+   V_gas =  1000000000000e-11
+      gas saturation Sg  9090909090909e-13
+      H2 dissolved (fraction of total)  1911477228415e-15
+      implied recovery if none exsolves (%)  9980885227715e-11
+   V_gas =  1000000000000e-10
+      gas saturation Sg  9900990099009e-13
+      H2 dissolved (fraction of total)  1914771265920e-16
+      implied recovery if none exsolves (%)  9998085228734e-11
+
+== where does the observed recovery fall? ==
+   observed, volume basis 1 (%)  8439700000000e-11
+   observed, volume basis 2 (%)  8357899999999e-11
+   Solving dissolution alone for the observed loss:
+   V_gas needed, basis 1  1035902706797e-13
+      implied gas saturation Sg  9386660378575e-14
+   V_gas needed, basis 2  9747598592122e-14
+      implied gas saturation Sg  8881833149123e-14
+
+   So dissolution ALONE can reach the observed loss -- but only at
+   a gas saturation near 9 to 10 %. A gas storage operated at 9 %
+   gas saturation is not a gas storage: over 90 % of its pore space
+   would be water. At the saturation the rest of this study uses,
+   V_gas = 1 (Sg = 50 %), dissolution accounts for under 2 %.
+
+== the site's OWN abiotic control, which needs no model ==
+   Hellerschmied mesocosms M4 and M5: biocide plus 35 kGy gamma,
+   so sterile rather than merely gas-swapped.
+      abiotic total-pressure loss, day 10   1.22 % .. 2.20 %
+      biotic, same vessels, same 10 days   10.54 % .. 11.62 %
+   ratio, biotic over abiotic, low   4790909090909e-12
+   ratio, biotic over abiotic, high  9524590163934e-12
+   Same site, same brine, same cores, same duration; the only
+   difference is whether the microbes were alive. Killing them
+   removes roughly 5 to 10 times the loss.
+
+   Note this abiotic control loses 1.22-2.20 %, which is close to
+   the under-2 % that dissolution alone predicts at Sg = 50 %.
+   The sterile control is consistent with dissolution and little
+   else -- channels (b), (c) and (d) are not visibly present in it.
+
+== channels (b), (c), (d): REFUSED ==
+   (b) abiotic mineral redox  -- no measured rate in this study
+   (c) abiotic methanation    -- K is 1e28..1e37, barrier is purely
+       kinetic, and no rate is supplied by any source here
+   (d) caprock diffusion, capillary trapping -- no transport data
+
+   THIS MODULE REFUSES TO EMIT A TOTAL ABIOTIC BAND.
+   Summing (a) alone and calling it the abiotic band would assert
+   that (b), (c) and (d) are ZERO. That null has not been measured
+   here, and asserting an unmeasured null is the same error as
+   inventing a number, with the sign reversed.
+
+== F3 verdict, on what IS measured ==
+   At the gas saturation this study uses throughout (Sg = 50 %),
+   the one abiotic channel that can be computed exactly accounts
+   for under 2 % H2 loss, against roughly 16 % observed. It does
+   NOT encompass the field point.
+
+   The site's own sterile control agrees: abiotic loss is 1.22 to
+   2.20 %, and killing the microbes removes 5 to 10 times the loss.
+
+   F3 DOES NOT FIRE. The abiotic band does not encompass the field
+   point, so the coupling is NOT superfluous on this evidence.
+   This is a NEGATIVE result for F3 and therefore a positive one
+   for keeping the biotic model -- stated as such, since F3 was
+   pre-registered as a chance to discard the whole apparatus.
+
+   CAVEAT, stated rather than buried: dissolution is treated here
+   as unrecovered. On drawdown some dissolved H2 exsolves and IS
+   recovered, so channel (a) as computed is an UPPER bound on the
+   dissolution loss. That makes the F3 verdict STRONGER, not
+   weaker: the true abiotic dissolution loss is smaller still.

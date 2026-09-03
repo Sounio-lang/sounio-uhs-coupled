@@ -1,0 +1,219 @@
+// F3 -- does the ABIOTIC band alone encompass the field points?
+//
+// F3 as pre-registered: if the abiotic band alone encompasses both field
+// points, the coupling is unnecessary and H1 is superfluous. Lobodice is not
+// evaluable (CORRECTIONS.md C13), so F3, like F2, turns on Sun Storage alone.
+//
+// THE ABIOTIC BAND IS A SUM OF CHANNELS, AND THEY ARE NOT EQUALLY KNOWABLE:
+//
+//   (a) H2 DISSOLUTION into the formation brine. Pure thermodynamics -- Henry's
+//       law and a gas/water ratio. No kinetics, no rate constant, nothing to
+//       look up. COMPUTED EXACTLY HERE.
+//   (b) ABIOTIC MINERAL REDOX -- pyrite to pyrrhotite, Fe(III) reduction,
+//       abiotic sulfate reduction. Needs a measured rate. NOT SUPPLIED BY ANY
+//       SOURCE IN THIS STUDY.
+//   (c) ABIOTIC METHANATION. sio/methanation.sio already established that K(T)
+//       is 1e28 to 1e37 over this temperature range, so the reaction is
+//       enormously favourable and the barrier is ENTIRELY KINETIC. A rate is
+//       needed and NOT SUPPLIED BY ANY SOURCE IN THIS STUDY.
+//   (d) PHYSICAL LOSS -- caprock diffusion, capillary trapping. Needs field or
+//       laboratory transport data. NOT SUPPLIED BY ANY SOURCE IN THIS STUDY.
+//
+// This module therefore computes (a) exactly and REFUSES to emit a total
+// abiotic band, because three of its four channels have no measured rate here.
+// Emitting a total that silently treats (b), (c) and (d) as zero would be
+// asserting a null result that has not been measured -- the same error as
+// inventing a number, with the sign reversed.
+//
+// THE ONE DIRECT EMPIRICAL CONSTRAINT, and it is the strongest evidence for F3.
+// sio/hellerschmied_validation.sio records the study site's OWN abiotic
+// controls: mesocosms M4 and M5, dosed with biocide AND 35 kGy of gamma
+// irradiation, so genuinely sterile rather than merely gas-swapped.
+//
+//     abiotic total-pressure loss, day 10   1.22 % .. 2.20 %
+//     biotic,  same vessels, same 10 days  10.54 % .. 11.62 %
+//
+// Same site, same brine, same cores, same duration, differing only in whether
+// the microbes were killed. That is a controlled experiment, and this study did
+// not have to model anything to get it.
+//
+// GAS SATURATION, WHICH MAKES THE SWEEP READABLE. V_gas is litres of gas per kg
+// of water. For porosity phi and gas saturation Sg, gas volume is phi*Sg and
+// water mass is phi*(1-Sg)*rho, so with rho = 1 kg/L
+//
+//     V_gas = Sg / (1 - Sg)     and     Sg = V_gas / (1 + V_gas)
+//
+// POROSITY CANCELS. So every V_gas in this study's sweeps maps to a gas
+// saturation with no further assumption, which is worth knowing: it is the
+// difference between a swept abstraction and a reservoir property.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{LN10}
+
+// H2(g) = H2(aq) Henry, five-term analytic form, verbatim from the pinned
+// phreeqc.dat -- the same constants sio/hellerschmied_validation.sio uses.
+//   log10 K(T) = A1 + A2 T + A3/T + A4 log10(T) + A5/T^2
+var H2_A1: f64 = 0.0 - 9.3114
+var H2_A2: f64 = 4.6473e-3
+var H2_A3: f64 = 0.0 - 49.335
+var H2_A4: f64 = 1.4341
+var H2_A5: f64 = 1.2815e5
+
+var R_LATM: f64 = 0.082057338
+
+// Sun Storage, as recorded in CORRECTIONS.md C3: 84.397 % on one volume basis,
+// 83.579 % on the other, and the two bases are unreconciled. Both are carried.
+var OBS_RECOVERY_HI: f64 = 84.397
+var OBS_RECOVERY_LO: f64 = 83.579
+
+fn log10_v(x: f64) -> f64 with Mut, Div, Panic {
+    if x <= 0.0 { return 0.0 - 745.0 }
+    log(x) / LN10
+}
+
+fn henry_h2(t_k: f64) -> f64 with Mut, Div, Panic {
+    let lk = H2_A1 + H2_A2 * t_k + H2_A3 / t_k + H2_A4 * log10_v(t_k) + H2_A5 / (t_k * t_k)
+    exp(lk * LN10)
+}
+
+// Fraction of total H2 sitting in the water at equilibrium.
+//   n_gas = P V/(R T),  n_aq = KH P   ->   f = KH / (V/(R T) + KH)
+// Independent of pressure: P cancels. That is worth noticing -- the dissolved
+// FRACTION is set by the gas/water ratio alone, not by how hard the gas is
+// pushed.
+fn dissolved_fraction(t_k: f64, v_gas: f64) -> f64 with Mut, Div, Panic {
+    let kh = henry_h2(t_k)
+    let rt = R_LATM * t_k
+    let denom = v_gas / rt + kh
+    if denom <= 0.0 { return 0.0 - 1.0 }
+    kh / denom
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("F3 -- CAN THE ABIOTIC BAND ALONE EXPLAIN THE FIELD POINT?")
+    println("Lobodice is not evaluable (C13), so this turns on Sun Storage.")
+    println("")
+
+    let t_k = 313.15
+    print("   Henry constant for H2 at 40 C (molal/atm) ") emit("", henry_h2(t_k))
+    println("   from the pinned phreeqc.dat analytic form, not a literature")
+    println("   value re-entered by hand.")
+    println("")
+
+    println("== channel (a): H2 DISSOLUTION, computed exactly ==")
+    println("   The dissolved FRACTION is independent of pressure -- P cancels.")
+    println("   It is set by the gas/water ratio alone.")
+    println("   V_gas maps to gas saturation with porosity cancelling:")
+    println("     Sg = V_gas / (1 + V_gas)")
+    println("")
+    var v: f64 = 0.01
+    var n: i64 = 0
+    while n < 5 {
+        let f = dissolved_fraction(t_k, v)
+        print("   V_gas = ") emit("", v)
+        print("      gas saturation Sg ") emit("", v / (1.0 + v))
+        print("      H2 dissolved (fraction of total) ") emit("", f)
+        print("      implied recovery if none exsolves (%) ") emit("", 100.0 * (1.0 - f))
+        v = v * 10.0
+        n = n + 1
+    }
+    println("")
+
+    println("== where does the observed recovery fall? ==")
+    print("   observed, volume basis 1 (%) ") emit("", OBS_RECOVERY_HI)
+    print("   observed, volume basis 2 (%) ") emit("", OBS_RECOVERY_LO)
+    println("   Solving dissolution alone for the observed loss:")
+    // f = 1/(V/(RT KH) + 1)  ->  V = RT*KH*(1/f - 1)
+    let kh = henry_h2(t_k)
+    let rt = R_LATM * t_k
+    let f_hi = 1.0 - OBS_RECOVERY_HI / 100.0
+    let f_lo = 1.0 - OBS_RECOVERY_LO / 100.0
+    let v_hi = rt * kh * (1.0 / f_hi - 1.0)
+    let v_lo = rt * kh * (1.0 / f_lo - 1.0)
+    print("   V_gas needed, basis 1 ") emit("", v_hi)
+    print("      implied gas saturation Sg ") emit("", v_hi / (1.0 + v_hi))
+    print("   V_gas needed, basis 2 ") emit("", v_lo)
+    print("      implied gas saturation Sg ") emit("", v_lo / (1.0 + v_lo))
+    println("")
+    println("   So dissolution ALONE can reach the observed loss -- but only at")
+    println("   a gas saturation near 9 to 10 %. A gas storage operated at 9 %")
+    println("   gas saturation is not a gas storage: over 90 % of its pore space")
+    println("   would be water. At the saturation the rest of this study uses,")
+    println("   V_gas = 1 (Sg = 50 %), dissolution accounts for under 2 %.")
+    println("")
+
+    println("== the site's OWN abiotic control, which needs no model ==")
+    println("   Hellerschmied mesocosms M4 and M5: biocide plus 35 kGy gamma,")
+    println("   so sterile rather than merely gas-swapped.")
+    println("      abiotic total-pressure loss, day 10   1.22 % .. 2.20 %")
+    println("      biotic, same vessels, same 10 days   10.54 % .. 11.62 %")
+    print("   ratio, biotic over abiotic, low  ") emit("", 10.54 / 2.20)
+    print("   ratio, biotic over abiotic, high ") emit("", 11.62 / 1.22)
+    println("   Same site, same brine, same cores, same duration; the only")
+    println("   difference is whether the microbes were alive. Killing them")
+    println("   removes roughly 5 to 10 times the loss.")
+    println("")
+    println("   Note this abiotic control loses 1.22-2.20 %, which is close to")
+    println("   the under-2 % that dissolution alone predicts at Sg = 50 %.")
+    println("   The sterile control is consistent with dissolution and little")
+    println("   else -- channels (b), (c) and (d) are not visibly present in it.")
+    println("")
+
+    println("== channels (b), (c), (d): REFUSED ==")
+    println("   (b) abiotic mineral redox  -- no measured rate in this study")
+    println("   (c) abiotic methanation    -- K is 1e28..1e37, barrier is purely")
+    println("       kinetic, and no rate is supplied by any source here")
+    println("   (d) caprock diffusion, capillary trapping -- no transport data")
+    println("")
+    println("   THIS MODULE REFUSES TO EMIT A TOTAL ABIOTIC BAND.")
+    println("   Summing (a) alone and calling it the abiotic band would assert")
+    println("   that (b), (c) and (d) are ZERO. That null has not been measured")
+    println("   here, and asserting an unmeasured null is the same error as")
+    println("   inventing a number, with the sign reversed.")
+    println("")
+
+    println("== F3 verdict, on what IS measured ==")
+    println("   At the gas saturation this study uses throughout (Sg = 50 %),")
+    println("   the one abiotic channel that can be computed exactly accounts")
+    println("   for under 2 % H2 loss, against roughly 16 % observed. It does")
+    println("   NOT encompass the field point.")
+    println("")
+    println("   The site's own sterile control agrees: abiotic loss is 1.22 to")
+    println("   2.20 %, and killing the microbes removes 5 to 10 times the loss.")
+    println("")
+    println("   F3 DOES NOT FIRE. The abiotic band does not encompass the field")
+    println("   point, so the coupling is NOT superfluous on this evidence.")
+    println("   This is a NEGATIVE result for F3 and therefore a positive one")
+    println("   for keeping the biotic model -- stated as such, since F3 was")
+    println("   pre-registered as a chance to discard the whole apparatus.")
+    println("")
+    println("   CAVEAT, stated rather than buried: dissolution is treated here")
+    println("   as unrecovered. On drawdown some dissolved H2 exsolves and IS")
+    println("   recovered, so channel (a) as computed is an UPPER bound on the")
+    println("   dissolution loss. That makes the F3 verdict STRONGER, not")
+    println("   weaker: the true abiotic dissolution loss is smaller still.")
+    0
+}

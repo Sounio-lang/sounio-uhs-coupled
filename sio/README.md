@@ -797,3 +797,94 @@ variants differ by about 12× in the neutral mechanism.
 Dolomite is emerging as the operative carbonate phase on both the model side and
 the field side, while H1a is framed around calcite. That is recorded now, as a
 finding, not resolved.
+
+## Thaysen envelopes as a band — and zero viable methanogens at the reference site
+
+**What this dataset can and cannot band.** Thaysen gives *environmental* growth
+envelopes per strain, not kinetic parameters, so it cannot band μ_max or K_CO2 —
+those come from Strobel as central values, and Strobel states no uncertainty on
+them. What 512 strains *can* band is the **fraction of a metabolic group viable
+at a given condition**: a multiplier on activity, not a shift in a rate constant,
+and precisely what S6 asks for.
+
+Data are generated into `sio/thaysen_data.sio` by `tools/gen_thaysen_envelopes.py`,
+which carries the source DOI and the workbook's sha256 in its header and **fails
+closed** if any of the six excluded strains is absent from the source — a
+changed workbook must have its exclusion list re-derived rather than silently
+skipped. The engine refuses to report a fraction if the table is unpopulated.
+
+A strain reporting no bound for a field is counted **unreported** and drops out
+of that field's denominator. It is never counted as tolerant of everything, which
+would silently inflate every fraction.
+
+### S6: where the biology switches off
+
+40 °C, pH 7, viable fraction of strains reporting all three fields:
+
+| salinity (g/L) | METH | SRB | ACET |
+|---|---|---|---|
+| 0 | 62.8 % | 28.1 % | 38.5 % |
+| 35 (seawater) | 38.4 % | **38.3 %** | 30.8 % |
+| 60 | 19.8 % | 22.7 % | 0.0 % |
+| 100 | 4.7 % | 12.5 % | 7.7 % |
+| 128 | 1.2 % | 4.7 % | 7.7 % |
+| 175 | 1.2 % | 3.1 % | 7.7 % |
+| **250** | **0.0 %** | **0.0 %** | 7.7 % |
+| 292 (~5 M) | 0.0 % | 0.0 % | 0.0 % |
+
+**Both methanogens and sulfate reducers reach exactly zero between 175 and
+250 g/L.** That is the answer to S6, from data rather than from a threshold
+someone chose.
+
+Sulfate reducers peak at **seawater salinity**, not at zero — the documented
+strains are largely marine. Methanogens peak at zero.
+
+### Temperature
+
+0 g/L, pH 7:
+
+| T | METH | SRB | ACET |
+|---|---|---|---|
+| 25 °C | 67.0 % | 56.5 % | 68.0 % |
+| 28.2 °C | 68.9 % | 56.5 % | 64.0 % |
+| **40 °C** | **68.0 %** | **49.4 %** | **58.0 %** |
+| 70 °C | 14.6 % | 20.6 % | 8.0 % |
+| 100 °C | 2.9 % | 4.7 % | 0.0 % |
+| 120 °C | 2.9 % | 0.6 % | 0.0 % |
+
+At the field temperatures the biology is comfortable. Temperature is not what
+limits these sites.
+
+### Zero viable methanogens at the reference site
+
+Applying all three conditions at Aux Vases' own values — 28.2 °C, ~122 g/L,
+pH 6.1:
+
+| group | viable |
+|---|---|
+| **METH** | **0.0 % (0 of 86 reporting)** |
+| SRB | 1.6 % (2 of 128) |
+| ACET | 7.7 % (1 of 13) |
+
+**Not one of the 86 methanogens that report temperature, salinity and pH can
+grow at the conditions the reference model runs methanogenesis at.** The USGS
+model is not wrong to compute a rate there — it is a kinetic model, not a census
+— but the organisms whose parameters it uses are, on this evidence, not organisms
+that grow in that brine.
+
+That is the Thaysen distribution doing the job the protocol assigned it: it is
+carried as a distribution, and what it says is not a correction to a number but a
+statement about whether the number's subject exists at the site.
+
+### Two cautions on these figures
+
+**Denominators differ by group and are small for acetogens.** Only 13 acetogens
+report all three fields, so its column is noisy — the non-monotonic 0.0 % at
+60 g/L followed by 7.7 % at 100 g/L is a small-sample artifact, not a resurgence.
+METH and SRB rest on 86 and 128 strains and are more stable.
+
+**Salinity is what closes these sites, and Lehen's is unknown.** At 40 °C and
+pH 7 the temperature-and-pH viability is 68 %, 49 % and 58 %. Everything that
+follows depends on the salinity — and for Lehen no TDS, no salinity and no
+sodium measurement exists (`CORRECTIONS.md` C6). The single most consequential
+input for microbial viability at that site was never reported.

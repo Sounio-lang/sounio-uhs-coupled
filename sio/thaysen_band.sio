@@ -1,0 +1,172 @@
+// Thaysen envelopes as a band — 512 strains as a distribution, not a number.
+//
+// WHAT THAYSEN CAN AND CANNOT BAND. The dataset gives ENVIRONMENTAL growth
+// envelopes per strain -- temperature, salinity, pH, pressure -- not kinetic
+// parameters. It therefore cannot band mu_max or K_CO2; those come from Strobel
+// as central values, and Strobel states no uncertainty on them.
+//
+// What 512 strains CAN band is the fraction of a metabolic group that is viable
+// at a given condition. That is a real, data-derived quantity and it is the
+// band the protocol asks for: it multiplies activity, it does not shift a rate
+// constant. It is also exactly what S6 needs -- where the biology switches off.
+//
+// EXCLUSIONS AND MISSING DATA. Six strains whose reported optimum falls outside
+// their own reported bounds are excluded by name in the generated data, not
+// repaired. A strain that reports no bound for a field is counted as UNREPORTED
+// and drops out of the denominator for that field. It is never counted as
+// tolerant of everything, which would silently inflate every fraction.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use thaysen_data::{thaysen_init, TH_N, TH_GROUP, TH_T_LO, TH_T_UP,
+                   TH_S_LO, TH_S_UP, TH_PH_LO, TH_PH_UP}
+
+var UNREPORTED: f64 = 0.0 - 999.0
+var TH_READY: bool = false
+
+// Fail closed on provenance: if the generated table was not populated, refuse
+// rather than report a fraction of nothing.
+fn thaysen_ready() -> bool with Mut, Div, Panic {
+    if TH_N < 1 { return false }
+    if TH_T_LO[0] == 0.0 && TH_T_UP[0] == 0.0 && TH_PH_LO[0] == 0.0 { return false }
+    true
+}
+
+// Is this strain viable at the condition, for one field?
+//   returns  1 viable, 0 not viable, -1 unreported
+fn viable_field(lo: f64, up: f64, x: f64) -> i64 with Mut, Div, Panic {
+    let has_lo = lo > UNREPORTED + 1.0
+    let has_up = up > UNREPORTED + 1.0
+    if !has_lo && !has_up { return 0 - 1 }
+    if has_lo && x < lo { return 0 }
+    if has_up && x > up { return 0 }
+    1
+}
+
+var FRAC_VIABLE: f64 = 0.0
+var N_REPORTED: i64 = 0
+var N_VIABLE: i64 = 0
+
+// Fraction of `group` viable at (T, salinity, pH), counting only strains that
+// reported every field being tested. `use_t`, `use_s`, `use_ph` select which
+// conditions are applied.
+fn viable_fraction(group: i64, t_c: f64, salt_g_l: f64, ph: f64,
+                   use_t: bool, use_s: bool, use_ph: bool) with Mut, Div, Panic {
+    N_REPORTED = 0
+    N_VIABLE = 0
+    FRAC_VIABLE = 0.0
+    var i: i64 = 0
+    while i < TH_N {
+        if TH_GROUP[i] == group {
+            var reported = true
+            var ok = true
+            if use_t {
+                let v = viable_field(TH_T_LO[i], TH_T_UP[i], t_c)
+                if v < 0 { reported = false } else { if v == 0 { ok = false } }
+            }
+            if use_s && reported {
+                let v = viable_field(TH_S_LO[i], TH_S_UP[i], salt_g_l)
+                if v < 0 { reported = false } else { if v == 0 { ok = false } }
+            }
+            if use_ph && reported {
+                let v = viable_field(TH_PH_LO[i], TH_PH_UP[i], ph)
+                if v < 0 { reported = false } else { if v == 0 { ok = false } }
+            }
+            if reported {
+                N_REPORTED = N_REPORTED + 1
+                if ok { N_VIABLE = N_VIABLE + 1 }
+            }
+        }
+        i = i + 1
+    }
+    if N_REPORTED > 0 { FRAC_VIABLE = (N_VIABLE as f64) / (N_REPORTED as f64) }
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn pct(v: f64) with IO, Mut, Div, Panic {
+    let p = (v * 1000.0 + 0.5) as i64
+    pi64(p / 10) print(".") pi64(p % 10) print("%")
+}
+fn gname(g: i64) with IO, Mut { if g == 0 { print("METH") } else { if g == 1 { print("SRB ") } else { print("ACET") } } }
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    thaysen_init()
+    if !thaysen_ready() {
+        println("FAIL: the generated Thaysen table is not populated; refusing.")
+        return 1
+    }
+    println("THAYSEN ENVELOPES AS A BAND -- 512 strains, six excluded by name")
+    print("strains loaded: ") pi64(TH_N) println("")
+    println("")
+
+    println("== viable fraction vs SALINITY, at 40 C and pH 7 ==")
+    println("   (S6: where the biology switches off)")
+    var sl: [f64; 8] = [0.0; 8]
+    sl[0] = 0.0
+    sl[1] = 35.0        // seawater
+    sl[2] = 60.0
+    sl[3] = 100.0
+    sl[4] = 128.0       // Aux Vases TDS, ~122 g/kg
+    sl[5] = 175.0
+    sl[6] = 250.0
+    sl[7] = 292.0       // ~5 M NaCl
+    var g: i64 = 0
+    while g < 3 {
+        var i: i64 = 0
+        while i < 8 {
+            viable_fraction(g, 40.0, sl[i], 7.0, true, true, true)
+            print("   ") gname(g)
+            print("  salt ") pi64(sl[i] as i64) print(" g/L   viable ")
+            pct(FRAC_VIABLE)
+            print("   (") pi64(N_VIABLE) print(" of ") pi64(N_REPORTED)
+            println(" reporting all three)")
+            i = i + 1
+        }
+        g = g + 1
+    }
+    println("")
+
+    println("== viable fraction vs TEMPERATURE, at 0 g/L and pH 7 ==")
+    var tl: [f64; 6] = [0.0; 6]
+    tl[0] = 25.0
+    tl[1] = 28.2        // Aux Vases
+    tl[2] = 40.0        // Lehen
+    tl[3] = 70.0
+    tl[4] = 100.0
+    tl[5] = 120.0
+    var g2: i64 = 0
+    while g2 < 3 {
+        var j: i64 = 0
+        while j < 6 {
+            viable_fraction(g2, tl[j], 0.0, 7.0, true, false, true)
+            print("   ") gname(g2)
+            print("  T ") pi64(tl[j] as i64) print(" C   viable ")
+            pct(FRAC_VIABLE)
+            print("   (") pi64(N_VIABLE) print(" of ") pi64(N_REPORTED) println(")")
+            j = j + 1
+        }
+        g2 = g2 + 1
+    }
+    println("")
+
+    println("== the two field sites and the reference site ==")
+    println("   Lehen 40 C; Lobodice 25-45 C; Aux Vases 28.2 C, ~122 g/L")
+    var g3: i64 = 0
+    while g3 < 3 {
+        print("   ") gname(g3)
+        viable_fraction(g3, 40.0, 0.0, 7.0, true, false, true)
+        print("  Lehen 40C (T,pH only) ") pct(FRAC_VIABLE)
+        viable_fraction(g3, 28.2, 122.0, 6.1, true, true, true)
+        print("      Aux Vases full ") pct(FRAC_VIABLE)
+        print(" (") pi64(N_VIABLE) print("/") pi64(N_REPORTED) println(")")
+        g3 = g3 + 1
+    }
+    0
+}

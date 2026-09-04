@@ -386,17 +386,27 @@ cd sio && <gen3.elf> <module>.sio /tmp/out && /tmp/out
 Each module's unedited stdout is committed beside it as `<module>.output.txt`
 with compiler md5, repository commit, and capture date.
 
-Every claim in this repository that was **measured** rather than argued has an
-executable probe under `probes/`, with its expected outcome annotated beside the
-source and the claim it backs named in the comment. Run them with:
+Nothing in this repository revalidated anything until `tools/verify.sh`: the
+byte-identical check lived in a scratch harness outside version control, and the
+probes for the measured claims lived in `/tmp`. `CORRECTIONS.md` C21 is what that
+costs — a claim measured under one compiler travelled across a re-pin unexamined.
+One command now checks all three things that can drift:
 
 ```
-bash tools/run_feature_probes.sh [path-to-gen3.elf]
+bash tools/verify.sh [path-to-gen3.elf]
 ```
 
-The runner reads the pin out of the captured outputs themselves and **refuses to
-run against any other compiler**. That refusal is the point: `CORRECTIONS.md`
-C21 records a measured claim that was carried across a re-pin without being
-re-run, and it went unnoticed because nothing tied a claim to the compiler that
-measured it. Exit 2 means the pin does not match, exit 1 means a documented
-outcome no longer reproduces, exit 0 means both hold.
+1. **The pin.** It reads the compiler md5 out of `sio/*.output.txt` rather than
+   being told it, and refuses to run against any other build.
+2. **The captured numbers.** Every module is recompiled and its body compared
+   byte-for-byte against the committed output.
+3. **The measured claims.** Every probe in `probes/` is run against its
+   documented outcome, annotated beside the source in the same `//@` form the
+   compiler test suite uses. `tools/run_feature_probes.sh` runs this phase alone
+   if that is all you want.
+
+Exit 2 means the compiler is not the pinned one, or another run holds the lock;
+exit 1 means a number or a documented outcome no longer reproduces; exit 0 means
+all three hold. All four failure paths were exercised rather than assumed: a
+mismatched compiler, a concurrent run, a tampered digit in a committed output,
+and a probe whose expectation cannot be met.

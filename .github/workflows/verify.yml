@@ -1,0 +1,81 @@
+# Verification gate for this study.
+#
+# Two jobs, because they can guarantee different things.
+#
+# `structure` needs no compiler and gates every push. It catches the shape of
+# the failure recorded in CORRECTIONS.md C21 one layer earlier than the numbers
+# do: a pin that disagrees with itself, a claim with no probe, a probe that
+# asserts nothing.
+#
+# `reproduction` recompiles every module, compares each body byte-for-byte, and
+# runs the probes. It needs the exact compiler the captured outputs name. That
+# build is not obtainable from CI today: the pinned commit lives on a local
+# branch that has never been pushed, so there is nothing for a runner to fetch.
+# Rather than fail forever on infrastructure, or pass while verifying nothing,
+# this job says out loud which of the two it did. Commit the pinned binary to
+# vendor/gen3.elf, or publish the compiler commit and fetch it here, and the job
+# starts gating for real with no further change.
+
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  structure:
+    name: Structure
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Structural invariants
+        run: bash tools/check_structure.sh
+
+  reproduction:
+    name: Reproduction
+    runs-on: ubuntu-24.04
+    needs: structure
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve the pinned compiler
+        id: pin
+        run: |
+          PIN=$(grep -h "^compiler: gen3.elf, md5 " sio/*.output.txt | sed 's/.*md5 //' | sort -u)
+          echo "pin=$PIN" >> "$GITHUB_OUTPUT"
+          if [ -x vendor/gen3.elf ] && [ "$(md5sum vendor/gen3.elf | cut -d' ' -f1)" = "$PIN" ]; then
+            echo "have=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "have=no" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify the numbers and the measured claims
+        if: steps.pin.outputs.have == 'yes'
+        run: bash tools/verify.sh vendor/gen3.elf
+
+      - name: Report that the numbers were not verified here
+        if: steps.pin.outputs.have != 'yes'
+        run: |
+          echo "::warning title=Numbers not verified in CI::The pinned compiler ${{ steps.pin.outputs.pin }} is not available to this runner, so the captured outputs and the measured claims were NOT re-checked. Structure passed; that is all this run proves."
+          {
+            echo "### Reproduction: NOT verified in this run"
+            echo
+            echo "The captured outputs name compiler \`${{ steps.pin.outputs.pin }}\`."
+            echo "It is not present at \`vendor/gen3.elf\`, and the commit it was built"
+            echo "from lives on a branch that has not been pushed, so this runner has"
+            echo "nothing to fetch."
+            echo
+            echo "**What passed:** the structural invariants."
+            echo "**What did not run:** the byte-identical check on the ten captured"
+            echo "outputs, and the nine probes for the measured claims."
+            echo
+            echo "To make this job gate for real, commit the pinned build to"
+            echo "\`vendor/gen3.elf\` or publish the compiler commit and fetch it in"
+            echo "this step. No other change is needed."
+          } >> "$GITHUB_STEP_SUMMARY"

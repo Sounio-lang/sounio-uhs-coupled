@@ -410,3 +410,15 @@ exit 1 means a number or a documented outcome no longer reproduces; exit 0 means
 all three hold. All four failure paths were exercised rather than assumed: a
 mismatched compiler, a concurrent run, a tampered digit in a committed output,
 and a probe whose expectation cannot be met.
+
+`.github/workflows/verify.yml` gates every push with the structural half, which
+needs no compiler. The reproduction half — the byte-identical check and the
+probes — needs the exact build the captures name, and **cannot run in CI today**:
+that commit lives on a branch which has never been pushed, so a runner has
+nothing to fetch. The job says so in its summary rather than passing quietly, and
+starts gating for real the moment the pinned build is committed to
+`vendor/gen3.elf` or the compiler commit is published.
+
+That gap is worth stating plainly, because it is larger than CI. This section is
+titled Reproduction and pins a compiler that exists on one machine. Every number
+here is reproducible **in principle** and, by anyone else, not yet in practice.

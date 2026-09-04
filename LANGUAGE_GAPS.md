@@ -991,42 +991,77 @@ an `m/s²` parameter is still refused.
 
 ---
 
-## G14 — The return-type check exists and is never reached
+## G14 — Type errors are warnings: `tc_error` does not fail the build
 
 A function returning the wrong type compiles:
 
 ```sio
 struct S { a: i64 }
-fn f() -> S { return 5.0 }       // accepted
+fn f() -> S { return 5.0 }       // accepted, rc=0
 ```
 
-`compile_stmt` contains the check — it compares `CURRENT_RET_TY` /
-`CURRENT_RET_HASH` against the returned expression and calls `tc_error` with
-"return type does not match function signature". The lexer assigns `return`
-token kind 2 (line 6678), the branch is guarded on exactly that kind, and
-`compile_stmt` is what compiles function bodies (called from the body loop at
-30431 and 30446). Every link looks right, and the check still does not run.
+The check runs and reports. It reports a **warning**:
 
-**Measured, not inferred.** A compiler was built with an unconditional
-`tc_error` at that site. It does not fire for a program containing `return x`,
-neither for a terminal return nor for one inside an `if`. The same build
-correctly rejects a known-bad unit argument, so the binary is a working
-compiler and the instrument is sound. Some earlier branch consumes the `return`
-before the check is reached; which one is not yet identified.
+```
+warning: return type does not match function signature at <main>:6
+```
 
-Consistent with this, no test in the tree asserts that diagnostic, and grep
-finds no `error-pattern` for it — a check that never fires accumulates no tests.
+because the helper it calls is misnamed:
 
-**Consequences for units.** A call result now takes the unit of its declared
-return type (`25d4ac8183`), which is what makes a unit propagate through a
-pipeline at all. But the declaration is an unverified promise: nothing confirms
-the body returns what the signature states, so `fn f(x: molar) -> molal { x }`
-hands its caller a molal brand on a molar value. This is strictly better than
-carrying the brand of the last argument, which is what it replaced, and it is
-still a hole.
+```sio
+fn tc_error(tok: i64, msg: string) -> i64 with IO, Mut, Panic {
+    print("warning: ")           // not "error: "
+    ...
+    return 0                     // and no tc_mark_failed()
+}
+```
 
-The research is unambiguous that this is a defect rather than a design choice:
-across F#, Kennedy's calculi and CamFort, no dimensional type system surveyed
-declines to check returns. The other engine in this tree already does — Madaros
-reports `error[E008]: return value does not match function's declared return
-type` on the same probe that `lean_single` accepts.
+`tc_linear_violation`, which the unit checks use, prints `error:` and calls
+`tc_mark_failed()`. `tc_error` does neither. **366 call sites use `tc_error`**
+against **44** using `tc_linear_violation`, so a large fraction of this
+compiler's diagnostics cannot fail a build.
+
+### A correction to how this gap was first recorded
+
+An earlier version of this entry claimed the check was **unreachable** — that
+"the compiler contains a return-type check and never reaches it", concluded from
+a compiler built with an unconditional `tc_error` at that site which appeared not
+to fire.
+
+That was wrong, and the instrument was not at fault. The injected `tc_error`
+*did* fire. It printed `warning: PROBE2-RETURN-REACHED` and the compile
+succeeded, and the probe only inspected the **exit code**, never the text. rc=0
+was read as "not reached" when it meant "reached, and toothless".
+
+The distinction matters beyond bookkeeping: "unreachable" points at control flow
+and would have sent the fix into the statement dispatcher, where there is nothing
+wrong. The actual defect is one line in a helper, and it is shared by 366 checks.
+
+### Blast radius of giving it teeth, measured
+
+| corpus | affected |
+|---|---|
+| the 24 modules of this study | **0** |
+| 1893 `tests/run-pass` | **3** |
+
+The three are genuinely ill-typed — `hello.sio` declares `fn main() with IO`,
+with no return type, and does `return 0`. Only two warning categories appear
+anywhere in this study, `duplicate function name` and `cannot call non-pub
+function from imported module`, both artifacts of module bundling rather than of
+the science.
+
+So the severity model has to be per-check, not global: some of the 366 are
+legitimately warnings, and flipping all of them at once would break more than
+half of this study for reasons that have nothing to do with correctness.
+
+### Consequence for units
+
+A call result takes the unit of its declared return type, which is what lets a
+unit propagate through a pipeline at all. That declaration is an unverified
+promise while the return check cannot fail: `fn f(x: molar) -> molal { x }` hands
+its caller a molal brand on a molar value, and says so in a warning nobody has to
+read. The research is unambiguous that checking returns is the norm — across F#,
+Kennedy's calculi and CamFort, no dimensional type system surveyed declines to —
+and the other engine in this tree already does: Madaros reports
+`error[E008]: return value does not match function's declared return type` on the
+same probe `lean_single` accepts.

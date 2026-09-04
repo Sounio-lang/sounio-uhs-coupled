@@ -67,11 +67,19 @@ diagnostic. Dimensional checking at call boundaries is real.
 # unit molality = mol / kg;  unit molarity = mol / L;  then  b + c
 ./bin/souc check /tmp/uhsprobe/molal.sio
 ```
-→ rc=1, with **two** diagnostics:
+→ rc=1, with **four** diagnostics:
 ```
 error: unit mismatch at <main>:11
 error: unit dimension mismatch at <main>:11
+warning: unit mismatch at <main>:11
+error: arithmetic operands must have matching numeric types at <main>:11
 ```
+This entry previously reported *two*, quoting the two unit errors and dropping
+the warning that restates one of them and the generic numeric error that
+follows. Re-measured on a compiler built before any of the unit work in this
+series: four there as well, so the count was incomplete from the start rather
+than changed by that work.
+
 Molality (`amount·mass⁻¹`) and molarity (`amount·length⁻³`) are distinct packed
 dimensions and are refused against each other. **No new machinery is needed for
 that case.**
@@ -142,14 +150,31 @@ The same-dimension brand case, measured:
 # unit m3_stp = m / m;  unit m3_res = m / m;  takes_reservoir(stp)
 ./bin/souc check /tmp/uhsprobe/stp.sio
 ```
-→ **rc=0, accepted.** `unit_call_arg_mismatch` short-circuits when the packed
-dimensions are equal, so two distinct named units of the same dimension are
-interchangeable at a call boundary. Under `+` the same pair yields only a
-`warning: unit mismatch`, with the hard error coming from a generic numeric-type
-rule rather than a unit rule.
+→ **rc=1, rejected** — but not by the unit checker. `unit_call_arg_mismatch`
+does short-circuit when the packed dimensions are equal, so the unit machinery
+is permissive exactly as described. The call is refused one rule later, by the
+type rule: since the G12 fix a declared unit name resolves as a distinct type,
+so `m3_stp` and `m3_res` are different types and the argument fails with
+`error[E001]: Type mismatch in call argument`. Under `+` the pair yields
+`warning: unit mismatch` from the unit rule plus a hard `error: arithmetic
+operands must have matching numeric types` from the generic numeric rule, as
+this entry already described.
 
-This is the real gap for feature U, and the study needs it: the mission requires
-gas volume to carry its condition (STP vs reservoir) in the type.
+**This entry previously recorded `rc=0, accepted`.** That measurement predates
+the G12 fix and was carried across a re-pin without being re-run — an inherited
+number, which this study forbids, in the study's own documentation. It is
+corrected here and recorded as `CORRECTIONS.md` C21. Re-measured on four
+compilers, including one built before any of the unit work in this series:
+`rc=1` on all four.
+
+Feature U is therefore narrower than this document claimed, in the direction
+that matters. Gas volume **can** carry its condition in the type: `m3_stp` and
+`m3_res` are distinct types and are not interchangeable, and a dose in `mg`
+offered to a parameter in `kg` is refused for the same reason. What stays
+permissive is a quantity derived by arithmetic, which has no name to be distinct
+by and is compared on dimension alone: `a / b` over two lengths is accepted
+wherever a named dimensionless unit is expected. The gap is real; its boundary
+is not where this document put it.
 
 ### O — ontology
 
@@ -187,10 +212,10 @@ which the abiotic model requires (Van't Hoff, Arrhenius, log K, pH).
 
 ```
 Linux x86-64, 64 cores, 188 GB RAM
-Sounio: origin/main @ 57f87da54f, SOUNIO_SOUC_ENGINE=lean_single
-make build (boot → gen1 → gen2 → gen3 + fixed point): 6 s, ✓ FIXED POINT OK (c45d5cba730ff616c17a6e2a63a0bbc2)
-one self-compile of self-hosted/compiler/lean_single.sio (39,372 lines): 2 s
-test corpus: 1692 tests/run-pass + 289 tests/compile-fail; ~0.22 s/file
+Sounio: feat/w1-qd128-transcend @ 654ba36260, SOUNIO_SOUC_ENGINE=lean_single
+make build (boot → gen1 → gen2 → gen3 + fixed point): 7 s, ✓ FIXED POINT OK (1aa4317fcb7adef1b6ad6782d65dcb6b)
+one self-compile of self-hosted/compiler/lean_single.sio (40,769 lines): 2 s
+test corpus: 1893 tests/run-pass + 658 tests/compile-fail
 ```
 
 ---
@@ -199,7 +224,7 @@ test corpus: 1692 tests/run-pass + 289 tests/compile-fail; ~0.22 s/file
 
 Filled at the end of the study, by running the compiler against errors a
 scientist would actually make — not by expectation. Every row below is a
-command that was run, against `gen3.elf` md5 `c45d5cba730ff616c17a6e2a63a0bbc2`.
+command that was run, against `gen3.elf` md5 `1aa4317fcb7adef1b6ad6782d65dcb6b`.
 **A feature whose measured value is zero is reported with zero.**
 
 ## 3. What each feature caught, measured

@@ -24,15 +24,38 @@
 //
 // Units as published: P in bar, m in mol per kg of WATER, T in K.
 //
-// UNITS ARE TYPED HERE ON PURPOSE. The reference data for this study states
+// UNITS ARE TYPED HERE, AND NOW ACTUALLY CARRIED. The reference data states
 // aqueous concentrations two different ways -- the GWB input script uses mg/L
 // of SOLUTION while its own data dictionary reports mmol/kg of WATER -- and at
 // TDS 127744 those differ by several percent through a density that is never
-// stated. `molal` and `molar` below have different dimensions, so the checker
-// refuses to substitute one for the other.
+// stated.
+//
+// AN EARLIER VERSION OF THIS HEADER CLAIMED the checker "refuses to substitute
+// one for the other" while every signature below was bare `f64`, so the checker
+// was never asked. That is CORRECTIONS.md C20. The declarations are now carried
+// through every parameter, every module-level bound and every call site, and
+// the claim is one the file actually holds.
+//
+// WHAT THE CHECKER DOES AND DOES NOT DO HERE, measured (FEATURES.md):
+//   catches   assignment of one unit into another
+//   catches   addition or subtraction of different units
+//   catches   passing the wrong unit as any argument, at any position
+//   catches   a bare f64 or a bare literal where a unit is expected
+//   MISSES    the return position -- annotations there are documentation
+//   MISSES    products and quotients: molal * molal is accepted as molal
+//   MISSES    same dimension at a different scale -- mg and kg interchange
+//
+// THAT LAST MISS IS WHY PRESSURE CARRIES ONE UNIT HERE AND NOT TWO. bar and atm
+// share a dimension, so the checker cannot separate them (G4/G5) -- which is
+// precisely the "1 bar vs 1 atm" confusion the study's own negative control was
+// written to catch. Declaring `bar` and `atm` separately would look like a
+// guarantee and provide none, so pressure is a single brand and the bar-to-atm
+// conversion stays an explicit multiplication, visible in the source.
 
 unit molal = mol / kg;
 unit molar = mol / L;
+unit degK = K;
+unit press = Pa;
 
 // ── Table 4, model 2 ────────────────────────────────────────────────────────
 // Module-level arrays, splat-initialised and mutated only from within this
@@ -57,10 +80,10 @@ var ZETA_H2_C_A: f64 = 0.0 - 0.009470244669
 
 // Measured range of the fit. NOT an authors' statement of validity -- the paper
 // gives none -- so anything outside it is refused rather than returned.
-var T_MIN_K: f64 = 298.0
-var T_MAX_K: f64 = 373.0
-var P_MAX_BAR: f64 = 200.0
-var M_MAX_MOLAL: f64 = 4.0
+var T_MIN_K: degK = 298.0
+var T_MAX_K: degK = 373.0
+var P_MAX_BAR: press = 200.0
+var M_MAX_MOLAL: molal = 4.0
 
 fn chabab_init() with Mut {
     C_MU0[0] = 41.8266086
@@ -90,6 +113,19 @@ fn chabab_init() with Mut {
 
 // Equation 11, evaluated in the published term order. `which` selects the
 // coefficient row: 0 = mu0/RT, 1 = lambda_H2-cation.
+//
+// THIS TAKES RAW NUMBERS ON PURPOSE, AND THE CHECKER IS WHY. An empirical
+// correlation is a function of NUMBERS in declared units, not of dimensional
+// quantities: each C_i in equation 11 carries its own compensating units so
+// that the sum is dimensionless, and those units are not published. Typing the
+// arguments made the checker reject the polynomial itself --
+// `arithmetic operands must have matching numeric types` -- which is the
+// correct complaint about an expression that adds a term in T to a term in P.
+//
+// So the units stop at the interface, where mistakes actually happen, and the
+// correlation is fed stripped numbers through an explicit `as f64` at the one
+// call site. REQUIRED UNITS, since the signature can no longer state them:
+// t_k in KELVIN, p_bar in BAR.
 fn chabab_par(which: i64, t_k: f64, p_bar: f64) -> f64 with Mut, Div, Panic {
     var c0 = 0.0
     var c1 = 0.0
@@ -121,21 +157,38 @@ fn chabab_par(which: i64, t_k: f64, p_bar: f64) -> f64 with Mut, Div, Panic {
 //   -2.0  pressure above the fitted ceiling
 //   -3.0  salinity above the fitted ceiling
 //   -4.0  coefficients not initialised
-fn h2_molality(t_k: f64, p_bar: f64, m_nacl: f64, f_h2_bar: f64) -> f64 with Mut, Div, Panic {
+fn h2_molality(t_k: degK, p_bar: press, m_nacl: molal, f_h2_bar: press) -> molal with Mut, Div, Panic {
     if !CHABAB_READY { return 0.0 - 4.0 }
     if t_k < T_MIN_K { return 0.0 - 1.0 }
     if t_k > T_MAX_K { return 0.0 - 1.0 }
     if p_bar > P_MAX_BAR { return 0.0 - 2.0 }
     if m_nacl > M_MAX_MOLAL { return 0.0 - 3.0 }
 
-    let mu0 = chabab_par(0, t_k, p_bar)
-    let lam_c = chabab_par(1, t_k, p_bar)
+    // THE STRIP IS EXPLICIT, and as of the compiler pinned in RESULTS.md it is
+    // also real: `as f64` clears the unit brand. It did not before. The cast
+    // site set no brand and cleared none, so this line was documentation with
+    // no effect, and an earlier draft of this comment asserted a strip that was
+    // not happening. Measured both ways: a molal value cast to f64 and then
+    // offered to a molal parameter is ACCEPTED by the previous compiler and
+    // REJECTED by this one.
+    //
+    // A unit-typed value is still accepted by a bare `f64` parameter with no
+    // cast at all, silently, because a parameter of dimension zero accepts
+    // every dimension. That gap is unchanged. The cast is what makes this
+    // boundary visible in the source instead of relying on that hole.
+    let t_raw = t_k as f64
+    let p_raw = p_bar as f64
+    let mu0 = chabab_par(0, t_raw, p_raw)
+    let lam_c = chabab_par(1, t_raw, p_raw)
 
-    // NaCl: m(Na+) = m(Cl-) = m_nacl
-    let sum_lambda = 2.0 * lam_c * m_nacl + 2.0 * LAMBDA_H2_A * m_nacl
-    let sum_zeta = ZETA_H2_C_A * m_nacl * m_nacl
+    // NaCl: m(Na+) = m(Cl-) = m_nacl. Stripped for the same reason: the Pitzer
+    // sums combine molality with lambda and zeta coefficients that carry
+    // reciprocal molality units, unpublished.
+    let m_raw = m_nacl as f64
+    let sum_lambda = 2.0 * lam_c * m_raw + 2.0 * LAMBDA_H2_A * m_raw
+    let sum_zeta = ZETA_H2_C_A * m_raw * m_raw
 
-    let ln_m = log(f_h2_bar) - mu0 - sum_lambda - sum_zeta
+    let ln_m = log(f_h2_bar as f64) - mu0 - sum_lambda - sum_zeta
     exp(ln_m)
 }
 
@@ -163,6 +216,12 @@ fn pi64(x: i64) with IO, Mut, Div, Panic {
 
 // Emit v as an integer mantissa scaled by 1e15, with the decade printed, so a
 // reader can reconstruct the value exactly and compare it digit by digit.
+// TAKES f64, NOT molal, AND THAT IS A MEASURED LIMIT. The return position is
+// not unit-checked (FEATURES.md), so `h2_molality` declaring `-> molal` is
+// documentation: the value that actually comes out is a bare f64. Annotating
+// this parameter `molal` therefore FAILS -- "unit mismatch in call argument" --
+// because the unit does not survive the return. Units guard inputs here; they
+// do not propagate through a pipeline.
 fn emit_scaled(label: string, v: f64) with IO, Mut, Div, Panic {
     print(label)
     print(" ")
@@ -189,20 +248,31 @@ fn main() -> i32 with IO, Mut, Div, Panic {
     println("mantissa scaled to 16 significant digits, mol per kg water")
     println("T = 313.15 K (40 C), f(H2) = 91 bar, P = 91 bar")
 
-    let t_k = 313.15
-    let p_bar = 91.0
-    let f_h2 = 91.0
+    // Every argument is a unit-typed binding. A bare literal here is REJECTED
+    // -- measured, not assumed -- so the annotations cannot be quietly bypassed
+    // at a call site, which is what made the previous version's declarations
+    // inert.
+    let t_k: degK = 313.15
+    let p_bar: press = 91.0
+    let f_h2: press = 91.0
+    let m0: molal = 0.0
+    let m1: molal = 1.0
+    let m2: molal = 2.0
+    let m3: molal = 3.0
 
-    emit_scaled("m_nacl=0.0", h2_molality(t_k, p_bar, 0.0, f_h2))
-    emit_scaled("m_nacl=1.0", h2_molality(t_k, p_bar, 1.0, f_h2))
-    emit_scaled("m_nacl=2.0", h2_molality(t_k, p_bar, 2.0, f_h2))
-    emit_scaled("m_nacl=3.0", h2_molality(t_k, p_bar, 3.0, f_h2))
+    emit_scaled("m_nacl=0.0", h2_molality(t_k, p_bar, m0, f_h2))
+    emit_scaled("m_nacl=1.0", h2_molality(t_k, p_bar, m1, f_h2))
+    emit_scaled("m_nacl=2.0", h2_molality(t_k, p_bar, m2, f_h2))
+    emit_scaled("m_nacl=3.0", h2_molality(t_k, p_bar, m3, f_h2))
 
     // Fail-closed controls: each must return its sentinel, not a number.
     println("-- refusal controls (negative = refused, as intended) --")
-    emit_scaled("T=400K_out_of_range", h2_molality(400.0, p_bar, 1.0, f_h2))
-    emit_scaled("P=250bar_above_ceiling", h2_molality(t_k, 250.0, 1.0, f_h2))
-    emit_scaled("m=5_above_ceiling", h2_molality(t_k, p_bar, 5.0, f_h2))
+    let t_hot: degK = 400.0
+    let p_high: press = 250.0
+    let m5: molal = 5.0
+    emit_scaled("T=400K_out_of_range", h2_molality(t_hot, p_bar, m1, f_h2))
+    emit_scaled("P=250bar_above_ceiling", h2_molality(t_k, p_high, m1, f_h2))
+    emit_scaled("m=5_above_ceiling", h2_molality(t_k, p_bar, m5, f_h2))
 
     0
 }

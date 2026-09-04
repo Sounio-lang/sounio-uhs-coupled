@@ -927,15 +927,106 @@ correlation boundary — now reproduces the bare-`f64` version **byte for byte**
 (6313448550155170e-17 and the rest, all three refusal sentinels intact). The
 rewrite `CORRECTIONS.md` C20 called for is technically possible.
 
-**It is still not committed.** Two of the four measured limits in `FEATURES.md`
-survive the fix and are design gaps, not lowering bugs:
+**Superseded.** This paragraph recorded two of the four measured limits as
+surviving the G12 fix. Later work on unit propagation moved one, and
+re-measurement disproved the other. The annotated module is now committed.
 
-- **the return position is not unit-checked**, so a unit cannot propagate through
-  a pipeline — `-> molal` is documentation, and the value that emerges is `f64`;
-- **same dimension at a different scale is interchangeable** (G4/G5), so `bar`
-  and `atm` cannot be separated — which is precisely the "1 bar vs 1 atm"
-  confusion this study's own negative control was written to catch.
+- **The return position is still unchecked, but a result does carry a unit
+  now.** After the result-type fix a call result takes the unit of its declared
+  return type instead of the unit of its last argument, so a unit propagates
+  through a pipeline; `-> molal` is no longer only documentation. What is
+  missing is any verification that the body honours the signature, so
+  `fn f(x: molar) -> molal { x }` hands its caller a molal brand on a molar
+  value. The deeper finding is that the compiler already contains a return-type
+  check and never reaches it: measured with an instrumented build, an
+  unconditional error placed at that site does not fire, and
+  `fn f() -> S { return 5.0 }` compiles. Recorded as G14.
 
-A rewrite would therefore guard inputs and not outputs, and would still not
-catch the error the study most wanted caught. That is a judgement about value,
-not a blocker, and it is recorded here rather than made silently.
+- **Same dimension at a different scale is NOT interchangeable, and was not at
+  the previous pin either.** Re-measured on five compilers: after G12 two
+  distinct declared unit names are distinct types, so `mg` offered to a `kg`
+  parameter is refused — by the type rule rather than the unit rule, but
+  refused. The original claim predates G12 and was carried across a re-pin
+  without being re-run; see `CORRECTIONS.md` C21. What stays permissive is a
+  quantity derived by arithmetic, which has no name to be distinct by and is
+  compared on dimension alone.
+
+---
+
+## G13 — A quantity derived by arithmetic could not carry its unit (CLOSED)
+
+`VAR_UNIT[]` stored a unit **name**, and the dimension was recovered later
+through `unit_lookup_dim(name)`. A quantity composed by arithmetic has no name
+to be stored under:
+
+```sio
+unit velocity = m / s;
+let distance: m = 10.0
+let time: s = 2.0
+let speed = distance / time      // dimension m/s composed, name discarded
+takes_velocity(speed)            // REJECTED — speed arrives unbranded
+```
+
+The division composed the dimension correctly and the binding then dropped it,
+because there was nowhere to put it. Annotating the binding worked
+(`let speed: velocity = distance / time` is accepted), which isolated the
+diagnosis, but annotating every derived quantity is not viable in geochemistry,
+where nearly every quantity is produced by arithmetic rather than declared. The
+feature therefore worked for the rare case and failed for the common one.
+
+**Closed** in `Sounio-lang/sounio` `feat/w1-qd128-transcend` @ `810e060ac7`, by
+storing the packed exponent vector per variable alongside the name. It is
+written only when no name was stored and read only when the named brand is
+absent, so the named path computes exactly what it computed before.
+
+This aligns the implementation with the reference design. Kennedy and F# decide
+unit equality modulo the free-Abelian-group theory over a vector of integer
+exponents, not by comparing declared names; name lookup was the choice that made
+derived quantities impossible to express.
+
+**Measured:** `tests/frontend/unit_derived_velocity_decl_current_source.sio` and
+`unit_derived_acceleration_chain_current_source.sio` — two acceptance tests that
+had never passed — now pass with the expected stdout. An `m/s` value offered to
+an `m/s²` parameter is still refused.
+
+---
+
+## G14 — The return-type check exists and is never reached
+
+A function returning the wrong type compiles:
+
+```sio
+struct S { a: i64 }
+fn f() -> S { return 5.0 }       // accepted
+```
+
+`compile_stmt` contains the check — it compares `CURRENT_RET_TY` /
+`CURRENT_RET_HASH` against the returned expression and calls `tc_error` with
+"return type does not match function signature". The lexer assigns `return`
+token kind 2 (line 6678), the branch is guarded on exactly that kind, and
+`compile_stmt` is what compiles function bodies (called from the body loop at
+30431 and 30446). Every link looks right, and the check still does not run.
+
+**Measured, not inferred.** A compiler was built with an unconditional
+`tc_error` at that site. It does not fire for a program containing `return x`,
+neither for a terminal return nor for one inside an `if`. The same build
+correctly rejects a known-bad unit argument, so the binary is a working
+compiler and the instrument is sound. Some earlier branch consumes the `return`
+before the check is reached; which one is not yet identified.
+
+Consistent with this, no test in the tree asserts that diagnostic, and grep
+finds no `error-pattern` for it — a check that never fires accumulates no tests.
+
+**Consequences for units.** A call result now takes the unit of its declared
+return type (`25d4ac8183`), which is what makes a unit propagate through a
+pipeline at all. But the declaration is an unverified promise: nothing confirms
+the body returns what the signature states, so `fn f(x: molar) -> molal { x }`
+hands its caller a molal brand on a molar value. This is strictly better than
+carrying the brand of the last argument, which is what it replaced, and it is
+still a hole.
+
+The research is unambiguous that this is a defect rather than a design choice:
+across F#, Kennedy's calculi and CamFort, no dimensional type system surveyed
+declines to check returns. The other engine in this tree already does — Madaros
+reports `error[E008]: return value does not match function's declared return
+type` on the same probe that `lean_single` accepts.

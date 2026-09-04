@@ -375,8 +375,8 @@ to 8.6 times above the measured range.
 
 Engine is Sounio; harnesses are C++; Python appears only as data marshalling and
 oracle binding. Modules compile with `gen3.elf` md5
-`c45d5cba730ff616c17a6e2a63a0bbc2`, from `Sounio-lang/sounio`
-`feat/w1-qd128-transcend` @ `321e8aa90e` — **not** through `bin/souc`
+`1aa4317fcb7adef1b6ad6782d65dcb6b`, from `Sounio-lang/sounio`
+`feat/w1-qd128-transcend` @ `654ba36260` — **not** through `bin/souc`
 (`LANGUAGE_GAPS.md` G8).
 
 ```

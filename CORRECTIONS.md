@@ -811,3 +811,57 @@ compiler guarantee it never invoked is the same failure as inheriting a number
 without reading its source — smaller, and in our own file rather than someone
 else's. `FEATURES.md` §4 records the measured behaviour; this records that the
 claim preceded the measurement.
+
+---
+
+## C21 — A measured number was carried across a re-pin without being re-measured
+
+`FEATURES.md` recorded, for the same-dimension probe `stp.sio` (two distinct
+dimensionless units, `m3_stp` and `m3_res`, both `m / m`):
+
+> **rc=0, accepted.** `unit_call_arg_mismatch` short-circuits when the packed
+> dimensions are equal, so two distinct named units of the same dimension are
+> interchangeable at a call boundary.
+
+**It does not reproduce.** Measured on five compilers — one built before any of
+the unit work in this series, three intermediate ones, and the current pin — the
+probe gives **rc=1** on all five, with
+`error[E001]: Type mismatch in call argument`.
+
+The claim predates the G12 fix. When the study was re-pinned to a compiler
+carrying G12, the number was carried forward instead of being re-run. That is
+the class of error this study forbids, committed in the study's own
+documentation, and nothing caught it because a re-pin obliges nothing: no
+mechanism in this repository ties a measured claim to the compiler that measured
+it.
+
+### What actually happens
+
+The **unit** checker is permissive exactly as described: `unit_call_arg_mismatch`
+accepts when the packed dimensions are equal. The call is refused one rule
+later, by `call_arg_type_compatible`, because G12 made a declared unit name
+resolve as a distinct **type**. The rejection is real; the attribution of cause
+was wrong.
+
+### The practical consequence inverts a limit this study claimed to have
+
+`FEATURES.md` listed, among the limits that survived the G12 fix, that "same
+dimension at a different scale is interchangeable, so `bar` and `atm` cannot be
+separated — which is precisely the 1 bar vs 1 atm confusion this study's own
+negative control was written to catch."
+
+Measured: a dose in `mg` offered to a parameter in `kg` **is refused**, on the
+previous pin and on the current one. Two declared unit names are distinct types.
+
+This matches the reference design, and for the same stated reason: Kennedy
+parameterised numeric types on **units** rather than on dimensions precisely so
+that several units of one dimension do not collapse into a single type, and F#
+implements it that way — its measure grammar admits no numeric factor at all.
+
+### What remains true
+
+The refusal comes from the type rule, not the unit rule, and it only applies to
+**named** units. A quantity derived by arithmetic has no name to be distinct by
+and is compared on dimension alone: `a / b` over two lengths is accepted
+wherever a named dimensionless unit is expected, measured. The permissiveness
+this entry described is real — its boundary is not where the entry put it.

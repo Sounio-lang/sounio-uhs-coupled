@@ -3,14 +3,20 @@ Raw stdout of sio/coupled_finite.sio, unedited.
 command:
   cd sio && /workspace/uhs-feat/w1-qd128-transcend/gen3.elf coupled_finite.sio /tmp/out && /tmp/out
 
-compiler: gen3.elf, md5 c45d5cba730ff616c17a6e2a63a0bbc2
-          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 321e8aa90e
-          -- carries the G12 fix (LANGUAGE_GAPS.md): a declared unit name now
-          resolves as f64 in type position. Verified to leave every number in
-          this study byte-identical to the previous pin 0f3aa2c9dd3be4e407ce546130f7614c.
+compiler: gen3.elf, md5 1aa4317fcb7adef1b6ad6782d65dcb6b
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 654ba36260
+          -- carries unit-brand propagation across binding forms: the
+          dimension is cleared when an expression begins, parameters and
+          arithmetic-derived quantities carry their brand, and a result
+          takes the unit of its result type instead of the unit of the
+          last argument. Verified to leave every number in this study
+          byte-identical to the previous pin
+          c45d5cba730ff616c17a6e2a63a0bbc2.
+          The branch had advanced past this commit at capture time; the
+          pin names the commit that was measured, not the branch tip.
           Not through bin/souc, per LANGUAGE_GAPS.md G8.
-model:    sounio-uhs-coupled @ 8abb55ae90 (this repo, HEAD at capture time)
-date:     2026-09-03T20:27:05Z
+model:    sounio-uhs-coupled @ 80e3182 (this repo, HEAD at capture time)
+date:     2026-09-04T04:08:55Z
 
 FINITE-HORIZON INTEGRATION of the gas-phase coupled model
 

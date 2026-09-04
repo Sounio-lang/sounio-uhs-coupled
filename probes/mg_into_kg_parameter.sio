@@ -1,0 +1,18 @@
+//@ claim: CORRECTIONS.md C21 — the motivating clinical case. A dose in mg
+//@ claim: offered to a parameter in kg is refused. This study once recorded the
+//@ claim: opposite as a surviving limit.
+//@ expect-rc: 1
+//@ expect-diagnostic: Type mismatch in call argument
+
+unit mgm = g;
+unit kgm = g;
+
+fn takes_kg(w: kgm) -> f64 with Mut {
+    w
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let dose: mgm = 500.0
+    let bad = takes_kg(dose)
+    return 0
+}

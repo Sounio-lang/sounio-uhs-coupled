@@ -865,3 +865,28 @@ The refusal comes from the type rule, not the unit rule, and it only applies to
 and is compared on dimension alone: `a / b` over two lengths is accepted
 wherever a named dimensionless unit is expected, measured. The permissiveness
 this entry described is real — its boundary is not where the entry put it.
+
+### The remedy, because correcting the line is not the fix
+
+The wrong number was a symptom. The cause is that nothing here tied a measured
+claim to the compiler that measured it, so a re-pin obliged no re-verification
+and would have carried the next stale number forward just as silently.
+
+Every measured claim now has an executable probe in `probes/`, with its expected
+outcome annotated beside the source in the same `//@` form the compiler test
+suite uses, and with the claim it backs named in the comment. `tools/run_feature_probes.sh`
+runs them, and reads the pin out of the captured outputs themselves rather than
+being told it: handed any compiler other than the one `sio/*.output.txt` names,
+it refuses to run at all.
+
+Nine probes, all reproducing at the current pin. Two of them exist because
+writing them exposed a distinction this document had blurred: the
+single-diagnostic claim in FEATURES.md 2.1 holds only for **preloaded** SI
+symbols such as `mg` and `mL`. Between units the source **declares**, the same
+mismatch raises two diagnostics, because G12 makes a declared unit name resolve
+as a distinct type and the type rule fires alongside the unit rule. That
+distinction is the mechanism this correction turns on, and it was invisible
+while the claim was prose.
+
+The three exit codes are the contract: 2 the pin does not match, 1 a documented
+outcome no longer reproduces, 0 both hold.

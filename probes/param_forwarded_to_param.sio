@@ -1,0 +1,21 @@
+//@ claim: LANGUAGE_GAPS.md G13 area — a unit-typed parameter carries its brand
+//@ claim: and can be passed on to another unit-typed parameter. Before the
+//@ claim: parameter fix this correct program was REJECTED, because an unbranded
+//@ claim: value does not satisfy a unit-typed parameter.
+//@ expect-rc: 0
+
+unit molal = mol / kg;
+
+fn inner(x: molal) -> f64 with Mut {
+    x
+}
+
+fn relay(v: molal) -> f64 with Mut {
+    inner(v)
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let m: molal = 2.5
+    let r = relay(m)
+    return 0
+}

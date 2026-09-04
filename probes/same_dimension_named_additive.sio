@@ -1,0 +1,14 @@
+//@ claim: FEATURES.md 2.3 — under +, two same-dimension named units yield a
+//@ claim: unit warning plus a hard error from the generic numeric rule.
+//@ expect-rc: 1
+//@ expect-diagnostic: arithmetic operands must have matching numeric types
+
+unit m3_stp = m / m;
+unit m3_res = m / m;
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let a: m3_stp = 1.0
+    let b: m3_res = 2.0
+    let c = a + b
+    return 0
+}

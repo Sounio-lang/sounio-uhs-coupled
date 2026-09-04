@@ -385,3 +385,18 @@ cd sio && <gen3.elf> <module>.sio /tmp/out && /tmp/out
 
 Each module's unedited stdout is committed beside it as `<module>.output.txt`
 with compiler md5, repository commit, and capture date.
+
+Every claim in this repository that was **measured** rather than argued has an
+executable probe under `probes/`, with its expected outcome annotated beside the
+source and the claim it backs named in the comment. Run them with:
+
+```
+bash tools/run_feature_probes.sh [path-to-gen3.elf]
+```
+
+The runner reads the pin out of the captured outputs themselves and **refuses to
+run against any other compiler**. That refusal is the point: `CORRECTIONS.md`
+C21 records a measured claim that was carried across a re-pin without being
+re-run, and it went unnoticed because nothing tied a claim to the compiler that
+measured it. Exit 2 means the pin does not match, exit 1 means a documented
+outcome no longer reproduces, exit 0 means both hold.

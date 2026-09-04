@@ -1,0 +1,18 @@
+//@ claim: CORRECTIONS.md C21 — where the permissiveness is real. A quantity
+//@ claim: derived by arithmetic has no name to be distinct by and is compared on
+//@ claim: dimension alone, so it satisfies a named unit of the same dimension.
+//@ expect-rc: 0
+
+unit ratio = m / m;
+
+fn takes_ratio(r: ratio) -> f64 with Mut {
+    r
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let a: m = 10.0
+    let b: m = 2.0
+    let d = a / b
+    let x = takes_ratio(d)
+    return 0
+}

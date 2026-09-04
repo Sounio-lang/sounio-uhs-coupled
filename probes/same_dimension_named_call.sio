@@ -1,0 +1,20 @@
+//@ claim: CORRECTIONS.md C21 — two distinct NAMED units of one dimension are
+//@ claim: NOT interchangeable at a call boundary. The unit checker is permissive
+//@ claim: (equal packed dimensions short-circuit it); the type rule refuses,
+//@ claim: because a declared unit name resolves as a distinct type.
+//@ claim: This document once recorded rc=0 here. It never reproduced.
+//@ expect-rc: 1
+//@ expect-diagnostic: Type mismatch in call argument
+
+unit m3_stp = m / m;
+unit m3_res = m / m;
+
+fn takes_reservoir(v: m3_res) -> f64 with Mut {
+    v
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let stp: m3_stp = 119353.0
+    let bad = takes_reservoir(stp)
+    return 0
+}

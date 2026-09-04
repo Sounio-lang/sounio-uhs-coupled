@@ -1,0 +1,19 @@
+//@ claim: sio/h2_solubility.sio — the explicit strip at the correlation
+//@ claim: boundary is real: as f64 clears the unit brand, so the stripped value
+//@ claim: no longer satisfies a unit-typed parameter. Before the result-type fix
+//@ claim: the cast set no brand and cleared none, and this probe was accepted.
+//@ expect-rc: 1
+//@ expect-diagnostic: unit mismatch in call argument
+
+unit molal = mol / kg;
+
+fn takes_molal(y: molal) -> f64 with Mut {
+    y
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let m: molal = 2.0
+    let stripped = m as f64
+    let bad = takes_molal(stripped)
+    return 0
+}

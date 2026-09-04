@@ -1,0 +1,18 @@
+//@ claim: FEATURES.md 2.1 — dimensional checking at call boundaries is real and
+//@ claim: reports a single clean diagnostic. This is the case that claim was
+//@ claim: measured on: mg and mL are PRELOADED SI symbols, not names declared
+//@ claim: with `unit ... ;`, so the G12 rule that makes a declared unit name a
+//@ claim: distinct type does not apply and no type error is raised alongside.
+//@ expect-rc: 1
+//@ expect-diagnostic-count: 1
+//@ expect-diagnostic: unit mismatch in call argument
+
+fn takes_mg(d: mg) -> f64 with Mut {
+    d
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let volume: mL = 10.0
+    let r = takes_mg(volume)
+    return 0
+}

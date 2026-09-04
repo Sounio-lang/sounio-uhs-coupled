@@ -1,0 +1,16 @@
+//@ claim: FEATURES.md 2.1 — molality (amount/mass) and molarity (amount/volume)
+//@ claim: are distinct packed dimensions and are refused against each other.
+//@ claim: The count is four, not the two this document once reported.
+//@ expect-rc: 1
+//@ expect-diagnostic-count: 4
+//@ expect-diagnostic: unit dimension mismatch
+
+unit molality = mol / kg;
+unit molarity = mol / L;
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let b: molality = 0.5
+    let c: molarity = 0.5
+    let bad = b + c
+    return 0
+}

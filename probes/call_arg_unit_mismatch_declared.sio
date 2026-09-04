@@ -1,0 +1,22 @@
+//@ claim: The same mismatch between DECLARED units raises two diagnostics, not
+//@ claim: one: the unit rule fires, and so does the type rule, because G12 makes
+//@ claim: a declared unit name resolve as a distinct type. This is the mechanism
+//@ claim: CORRECTIONS.md C21 turns on, and the reason the single-diagnostic
+//@ claim: claim above holds only for preloaded symbols.
+//@ expect-rc: 1
+//@ expect-diagnostic-count: 2
+//@ expect-diagnostic: unit mismatch in call argument
+//@ expect-diagnostic: Type mismatch in call argument
+
+unit molal = mol / kg;
+unit molar = mol / L;
+
+fn takes_molal(x: molal) -> f64 with Mut {
+    x
+}
+
+fn main() -> i32 with IO, Mut, Panic, Div {
+    let c: molar = 0.5
+    let bad = takes_molal(c)
+    return 0
+}

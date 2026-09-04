@@ -42,6 +42,8 @@ if [ ! -x "$COMPILER" ]; then
   echo "FAIL: compiler not found or not executable: $COMPILER"
   exit 2
 fi
+# A relative path breaks phase 2, which runs the compiler from inside sio/.
+COMPILER=$(cd "$(dirname "$COMPILER")" && pwd)/$(basename "$COMPILER")
 ACTUAL=$(md5sum "$COMPILER" | cut -d" " -f1)
 echo "== pin =="
 echo "  captured outputs name: $PIN"

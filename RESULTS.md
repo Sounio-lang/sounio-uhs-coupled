@@ -411,14 +411,19 @@ all three hold. All four failure paths were exercised rather than assumed: a
 mismatched compiler, a concurrent run, a tampered digit in a committed output,
 and a probe whose expectation cannot be met.
 
-`.github/workflows/verify.yml` gates every push with the structural half, which
-needs no compiler. The reproduction half — the byte-identical check and the
-probes — needs the exact build the captures name, and **cannot run in CI today**:
-that commit lives on a branch which has never been pushed, so a runner has
-nothing to fetch. The job says so in its summary rather than passing quietly, and
-starts gating for real the moment the pinned build is committed to
-`vendor/gen3.elf` or the compiler commit is published.
+`.github/workflows/verify.yml` gates every push. The structural half needs no
+compiler. The reproduction half — the byte-identical check and the probes — runs
+against `vendor/gen3.elf`, the exact build these captures name, committed to this
+repository so that reproducing this study depends on nothing outside it.
 
-That gap is worth stating plainly, because it is larger than CI. This section is
-titled Reproduction and pins a compiler that exists on one machine. Every number
-here is reproducible **in principle** and, by anyone else, not yet in practice.
+That build is also obtainable from source: `Sounio-lang/sounio`
+`feat/w1-qd128-transcend` @ `654ba36260`, where `make build` is a fixed point —
+gen2 and gen3 come out bit-identical — and takes about seven seconds. Rebuilding
+should reproduce md5 `1aa4317fcb7adef1b6ad6782d65dcb6b` exactly; if it does not,
+that is a finding about the compiler.
+
+Until both of those were true, this section described a reproduction nobody else
+could perform: it pinned a compiler that existed on one machine, from a commit
+that had never been pushed. Every number here was reproducible in principle and,
+by anyone else, not in practice. `vendor/README.md` records why the binary is
+committed rather than merely referenced.

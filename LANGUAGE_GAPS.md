@@ -715,6 +715,76 @@ for IN PROGRESS is still untouched — this closes the *language* gap, not a
 mechanism, the tool now exists to reach for rather than a further estimate
 to make.
 
+### Update, 2026-09-09: applied to channel (c), and it sharpens the gap rather than closing it
+
+The paragraph above says the suite was never applied to this study's own
+models, and names the mineral-surface-catalyzed abiotic pathway as the
+trigger. It has now been applied, and what came back is worth recording
+precisely, because it is neither "done" nor "still nothing".
+
+**What was built.** `stdlib/chemistry/surface.sio` upstream
+(`Sounio-lang/sounio`, branch `feat/chemistry-surface-microkinetics`):
+elementary surface microkinetics with the free site as a real species at
+its own index rather than an implicit `1 - sum(theta)`. That single choice
+turns site conservation from an assumption into an arithmetic property —
+"every row of nu sums to zero" — decided by `sites_conserved()` and proved
+in Lean 4 as an **iff**, so the checker is complete and not merely sound.
+Five elementary step kinds, including dissociative adsorption, which is
+the one this study needs.
+
+**What it says about channel (c).** `f3_abiotic_band.sio` records that
+abiotic methanation has `K(T)` of 1e28 to 1e37 here, so the barrier is
+entirely kinetic, and that no source in this study supplies a rate. That is
+still true and no rate has been invented. But the rate constant is not the
+only thing the mechanism determines. **The apparent reaction order in H2
+follows from the mechanism alone**, and it is not the intuitive one:
+
+  - H2 dissociates on adsorption (H2 + 2* <-> 2H*), so the surface hydrogen
+    coverage goes as sqrt(K p) rather than K p, and **in the dilute limit
+    the order in p(H2) is 1/2, not 1**. Doubling the stored pressure
+    multiplies this channel by sqrt(2), not by 2.
+  - **Past a maximum the order goes negative**: hydrogen crowds CO2 off the
+    surface and the reaction consumes both.
+
+Measured across eight decades of pressure, every point agreeing with the
+closed-form order to six figures, and independently reproduced by a C++23
+oracle that solves the algebraic steady state by Newton iteration and never
+integrates anything:
+`Sounio-lang/sounio` `examples/chemistry/h2_surface_reaction_order.sio`.
+
+**WHAT IS STRUCTURAL AND WHAT IS NOT, because the distinction is the whole
+value of this entry.** The 1/2 in the dilute limit is structural: it is
+`d(ln r)/d(ln p) -> 1/2` as `u = sqrt(K_H p) -> 0`, for **any** K_H. So is
+the existence of a sign change. **The position of that maximum is not.** It
+sits at `u = 1 + K_CO2 p_CO2`, which needs the adsorption equilibrium
+constants for H2 and CO2 on the actual mineral surfaces at reservoir
+conditions — and this study does not have those either.
+
+**So the honest accounting is that the gap moved rather than closed.**
+Before: channel (c) needed a rate constant and had nothing. Now: channel
+(c) still cannot be totalled, and `f3_abiotic_band.sio` still refuses, but
+the missing measurement is better specified. Knowing the *order* costs
+nothing; knowing which regime a given reservoir sits in needs two adsorption
+constants, not a full rate law. That is a smaller and more targeted
+experimental ask than "measure the methanation rate", and naming it is more
+useful than another estimate.
+
+**Not claimed:** no rate has been computed for any real site, no channel (c)
+number enters `RESULTS.md`, and F3's verdict is unchanged. The rate
+constants used in the example are illustrative and labelled as such in its
+own header; only the limiting order and the sign change are carried here,
+because only those are independent of them.
+
+**A note on which binary, per G8.** The upstream work was measured on
+Madaros v0.80.0 (`bin/madaros-linux-x86_64`, md5 `92f2c566`, the committed
+gate-receipted ELF) and reproduced under `gen3.elf`. The same measurement
+pass found that unit types do not survive arithmetic on either engine that
+ships on `main` — Madaros rejects even same-brand addition, the lean_single
+seed accepts adding mol/s to mol/m — while `gen3.elf`, the compiler THIS
+STUDY pins, does both correctly. That is a sharper statement of G4 and G5
+than either entry currently carries: the dimensional checking this study
+relies on exists only on the unmerged branch it happens to have pinned.
+
 ## G11 — A string literal of 127 to 199 characters, passed as a function argument, segfaults
 
 **Status: OPEN. Found by the deliverable figure, not by a test suite.**

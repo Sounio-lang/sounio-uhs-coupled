@@ -890,3 +890,69 @@ while the claim was prose.
 
 The three exit codes are the contract: 2 the pin does not match, 1 a documented
 outcome no longer reproduces, 0 both hold.
+
+---
+
+## C22 — The novelty section claimed a comparison nobody had run; it has been run
+
+**Believed (`RESULTS.md` §5b, before 2026-09-15):** "No with-calcite /
+without-calcite comparison is run anywhere in the sources checked", and the
+extent formulation was "provisionally" new pending two unread candidates.
+
+**Source.** A second structured search, run on 2026-09-14 to clear those two
+candidates, found the comparison run experimentally, and the qualitative
+mechanism published. Access level is stated per source, because this study has
+had to separate "not found" from "does not exist" before (C16).
+
+- **Ranchou-Peyruse et al. 2024**, *FEMS Microbiol. Ecol.* 100:fiae066,
+  doi:10.1093/femsec/fiae066 (full text, PMC11092278). A 2×2 design, with and
+  without CO₂ and with and without calcite: *"In the condition without CO2 but
+  with calcite, calcite dissolution enabled methanogenesis"*. It uses
+  `4H2 + CO2 → CH4 + 2H2O` to apportion H₂ consumption, but states no extent
+  bound. It also reports pH up to 10.2 without CO₂, and *"competition for CO2
+  between lithoautotrophs and carbonate mineral precipitation, which could
+  limit microbial H2 consumption"*.
+- **Dopffel et al. 2026**, *FEMS Microbiol. Lett.* 373:fnag031,
+  doi:10.1093/femsle/fnag031 (full text, PMC13070560): *"the limiting factor
+  is CO2 when H2 is in excess"*. Adding carbonate-rich rock (26–50 % calcite)
+  *"boosted activity"*. They call for systematically testing starting CO₂/H₂
+  ratios. They give no closed-form bound.
+- **Ranchou-Peyruse et al. 2025**, *Int. J. Hydrogen Energy* 179:151443,
+  doi:10.1016/j.ijhydene.2025.151443 (abstract only): calcite as the sole
+  inorganic carbon source sustains H₂-consuming communities, *"with inorganic
+  carbon availability limiting microbial activity"*.
+- **Ke et al. 2025**, *Applied Geochemistry* 196:106649, the first unread
+  candidate (abstract and highlights only): mineral dissolution supplies
+  dissolved inorganic carbon as a carbon source. The framing is kinetic.
+- **Vialle & Wolff-Boenisch 2024**, *Chemical Geology* 665:122304, the second
+  candidate (abstract only): the inorganic path is unlikely. Abiotic only, so it
+  does not bear on the biotic claim.
+- **Hellerschmied et al. 2024**, *Nature Energy* 9:333–344 (full text), p. 338:
+  among the reasons the field and the mesocosm differ, *"mesocosms H2:CO2 =
+  4:1; field H2:CO2 = 52:1"*. The ratio this study turns into a bound was
+  already named there as an explanatory factor.
+- Not found in any source read in full: an extent bound of the form
+  `y_H₂/(4·y_CO₂)`. Six sources were read in full and eight at abstract level.
+
+**What it changes.**
+
+1. **The mechanism is not new and must not be presented as new.** Carbon
+   limitation of hydrogenotrophic methanogenesis in UHS, calcite as a carbon
+   source, and the with/without-calcite comparison are prior art.
+2. **The remaining candidate is the closed form only.** It is a formalisation
+   of Hellerschmied et al.'s 4:1 vs 52:1 observation and must credit it. Its
+   novelty is "not found", not "established". Five sources are still unread in
+   full (Ke 2025, Ghaedi et al. 2025, Vialle 2024, Ranchou-Peyruse 2025, Mura
+   2025), and several are open access and retrievable by hand.
+3. **The chemistry behind the bound has an unchecked assumption.** The
+   "with calcite" branch, where the ratio approaches `y_H₂/(4·y_CO₂)`, assumes
+   mineral carbon is available without restriction. The experiments above show
+   the opposite coupling as well: methanogenesis consumes protons, pH rises past
+   10, and carbonate *precipitates*, competing with the methanogens for CO₂.
+   Ranchou-Peyruse et al. 2024 saw the most methane with H₂/CO₂ and *no*
+   calcite. Until this study runs an alkalinity / charge-balance check on the
+   with-calcite branch, the approach to the bound is an assumption, not a
+   result.
+4. **H1a's verdicts in §2 are unaffected as stated.** They are extent bounds
+   under this study's model. What changes is how they may be described, and
+   what must be checked before they are called a property of a reservoir.

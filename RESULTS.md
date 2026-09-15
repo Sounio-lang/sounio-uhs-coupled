@@ -314,7 +314,19 @@ sets that differ by seven to eight orders of magnitude per cell.
 
 ---
 
-## 5b. Is the extent formulation new? Provisionally yes — with two priors uncleared
+## 5b. Is the extent formulation new? The mechanism is not; the closed form was not found
+
+> **Corrected 2026-09-15, recorded as `CORRECTIONS.md` C22.** This section was
+> headed "Provisionally yes — with two priors uncleared" and said no
+> with-calcite / without-calcite comparison is run anywhere. A second search,
+> run to clear those two priors, found that comparison run experimentally, and
+> carbon-limited methanogenesis with calcite as the carbon source is published.
+> What survives is narrower: the closed-form extent bound `y_H₂/(4·y_CO₂)` was
+> not found in any source read in full, and it must be presented as a
+> formalisation of an observation Hellerschmied et al. 2024 already make, with
+> credit. The chemistry of that bound also needs a check this study has not
+> run (C22, "What it changes"). The original text follows, with the bullet C22
+> refutes marked.
 
 A structured literature search was run against the specific claim, not against
 the topic. What it found:
@@ -328,8 +340,10 @@ the topic. What it found:
   divide measured concentrations of C, H, O, Ca, K, Na, S, Mg, P and Fe by
   per-cell nutrient masses and take the lowest result, so carbon *is* considered.
   What they exclude structurally is **mineral dissolution as a carbon source**.
-- **No with-calcite / without-calcite comparison is run anywhere** in the sources
-  checked. The Lobodice assemblage always contains calcite (13.55 wt%) and
+- ~~**No with-calcite / without-calcite comparison is run anywhere** in the sources
+  checked.~~ **Refuted, C22:** Ranchou-Peyruse et al. 2024 run exactly that
+  comparison, crossed with CO₂ (doi:10.1093/femsec/fiae066). What remains true
+  is narrower: the Lobodice work itself runs none. The Lobodice assemblage always contains calcite (13.55 wt%) and
   dolomite (16.06 wt%); the only mineral-omission variant reported in that work
   is for **gypsum**.
 - **Full-text scans returned zero occurrences of "stoichiometr", zero of "4 H2"
@@ -342,8 +356,8 @@ and could not be read**, and both must be cleared first:
 
 | candidate | status |
 |---|---|
-| *Applied Geochemistry* 2025, S0883292725003725 | **unverified — not accessed** |
-| *Chemical Geology* 2024, S000925412400384X (Vialle & Wolff-Boenisch) | **unverified — ScienceDirect blocked all retrieval; abstract-level only** |
+| *Applied Geochemistry* 2025, S0883292725003725 | ~~unverified — not accessed~~ **Identified (C22):** Ke et al. 2025, 196:106649, doi:10.1016/j.apgeochem.2025.106649. Abstract and highlights only: mineral dissolution supplies dissolved inorganic carbon to microbes. Adjacent, kinetic framing; the full text is still unread |
+| *Chemical Geology* 2024, S000925412400384X (Vialle & Wolff-Boenisch) | ~~unverified~~ **Identified (C22):** 665:122304, doi:10.1016/j.chemgeo.2024.122304. Abstract only (CC-BY, automated retrieval blocked): the purely inorganic path is unlikely. It addresses the abiotic path only and does not bear on the biotic claim |
 
 The second is the more serious: it is independently known to argue that
 inorganic hydrogen-driven carbonate reduction is *"thermodynamically and

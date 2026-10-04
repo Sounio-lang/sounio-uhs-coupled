@@ -956,3 +956,32 @@ had to separate "not found" from "does not exist" before (C16).
 4. **H1a's verdicts in §2 are unaffected as stated.** They are extent bounds
    under this study's model. What changes is how they may be described, and
    what must be checked before they are called a property of a reservoir.
+
+## C23 — The vendored compiler was never committed, and the README kept two verdicts the study had withdrawn
+
+**Believed (`vendor/README.md` and commit `3db30bd`, 2026-09-04):** "vendor/gen3.elf
+is the exact build these captures name … Reproducing this study now depends on
+nothing outside this repository."
+
+**Measured 2026-10-04:** `vendor/` held only its README. `.gitignore` contains
+`*.elf`, so `git add vendor/gen3.elf` was silently a no-op and the commit message
+described a file the commit did not contain. Anyone cloning the repository could
+not run `tools/verify.sh`, and its default compiler path pointed at a directory on
+one machine (`/workspace/uhs-feat/...`).
+
+**Fixed by rebuilding, not by trusting.** `Sounio-lang/sounio@654ba36260`, `make
+build`: gen2 = gen3, md5 `1aa4317fcb7adef1b6ad6782d65dcb6b`, the exact pin, in
+7.5 s. With that binary `bash tools/verify.sh` prints `VERIFIED: pin matches, 10
+outputs byte-identical, every probe reproduces.` The binary is now committed
+(`!vendor/gen3.elf` in `.gitignore`), and `verify.sh` defaults to it.
+
+**Second item, same kind.** `README.md`'s status table still read "F1 passes at a
+CO2-poor feed" and "H1a survives, in a sharper form" after `RESULTS.md` §2b–2c had
+revised F1 to "not settled" and C22 had found the mechanism to be prior art. A
+reader landing on the front page got the withdrawn verdict. The table now carries
+the current one, with this entry cited in it.
+
+**What it changes.** No number. Both are failures of the archive layer of the
+kind `sounio-gri30-crossvalidation` §6.3 documents: every check passed, and the
+thing a third party would actually do — clone and run, or read the front page —
+did not work.

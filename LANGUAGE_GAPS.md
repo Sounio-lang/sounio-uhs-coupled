@@ -1135,3 +1135,30 @@ Kennedy's calculi and CamFort, no dimensional type system surveyed declines to â
 and the other engine in this tree already does: Madaros reports
 `error[E008]: return value does not match function's declared return type` on the
 same probe `lean_single` accepts.
+
+## G15 â€” A private function in an imported module collides with the importer's own, and the error names the wrong thing
+
+*Found 2026-10-04, writing `sio/partial_buffer.sio`.*
+
+`sio/carbonate_equilibria.sio` declares `fn solve_ph(t_k, p_co2_atm, ph_lo, ph_hi, tol)`
+without `pub`. A module that imports **other, public** names from it with
+`use carbonate_equilibria::{log_k, p_k1, ...}` and defines its own
+`fn solve_ph(ctot, alk, v_gas)` fails to compile on the pinned `gen3.elf`
+(md5 `1aa4317f`):
+
+```
+error[E006]: arity mismatch at line 741 expected 3 got 5
+error[E006]: arity mismatch at line 786 expected 3 got 5
+```
+
+Two defects in one message:
+
+1. **A name that is not exported is visible to the importer** and shadows, or is
+   shadowed by, the importer's own definition. Selective `use` should bring in
+   only what it names, and a non-`pub` item should not be reachable at all.
+2. **The diagnostic reports the symptom, not the cause.** It cites lines of the
+   merged compilation unit (the importer has under 400), and it calls a
+   duplicate definition an arity mismatch.
+
+Workaround used: rename the importer's function (`solve_ph_buf`). Not yet
+re-measured on Madaros or on current `main`.

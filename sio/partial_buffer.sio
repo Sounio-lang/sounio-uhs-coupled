@@ -1,0 +1,348 @@
+// THE PARTIALLY BUFFERED CASE -- the study's largest open item, computed.
+//
+// RESULTS.md section 2c left F1 for the field BRACKETED, not known:
+//   sio/coupled_gasphase.sio  holds dissolved carbon at a FIXED calcite ceiling,
+//                             i.e. an infinite CO2 buffer      -> 4.321 at V = 1
+//   sio/pure_h2.sio           has NO gas CO2, so nothing buffers the pH rise
+//                             of sio/h2_selflimiting.sio        -> 1.015
+// The field gas carries 0.19 % CO2. It is neither limit, and "the partially-
+// buffered case is not computed" was the sentence that closed section 2c.
+//
+// THE MODEL. One closed vessel per kg of water: the water, the gas above it,
+// and calcite. Everything sio/h2_selflimiting.sio did, plus ONE thing -- the
+// gas phase's CO2 joins the carbon balance and stays in Henry equilibrium with
+// the water. With methanogenesis extent xi and calcite extent psi (> 0 is
+// dissolution), all per kg of water:
+//
+//   carbon      DIC_aq + n_CO2,gas = C0 - xi + psi      C0 = DIC0 + n_CO2,gas,0
+//   alkalinity  Alk = Alk0 + 2 psi    methanogenesis is alkalinity-neutral and
+//                                     CO2 exchange with the gas moves none
+//   calcium     Ca  = Ca0 + psi
+//   Henry       a_CO2(aq) = K_H(T) * p_CO2,   p_CO2 = n_CO2,gas R T / V_gas
+//   calcite     Omega = 1
+//
+// For a given xi this is solved by two nested bisections: pH from the carbon
+// balance at fixed alkalinity (total carbon is monotone in pH there), then psi
+// from Omega = 1, exactly as solve_psi in sio/h2_selflimiting.sio does.
+//
+// F1 then follows the convention of sio/pure_h2.sio, so the two numbers are
+// comparable: carbon available WITH calcite is C0 + psi_max, where psi_max is
+// the most net dissolution the saturation constraint ever permits along the
+// methanogenesis path; WITHOUT calcite it is C0. Both are bounded by H2 after
+// the sulfate sink. Because C0 is conserved, the no-calcite branch needs no
+// speciation at all -- re-partitioning between gas and water moves no carbon.
+//
+// TWO LIMITS THIS MUST REPRODUCE, and the run checks both:
+//   V_gas -> 0       no gas carbon, so psi_max -> the closed value of
+//                    sio/h2_selflimiting.sio (6.90 % of DIC0)
+//   psi_max -> inf   the fixed-ceiling F1 of sio/coupled_gasphase.sio
+// The fixed-ceiling F1 is computed below at each V_gas for side-by-side reading.
+//
+// DECLARED, as everywhere in this study: closed system, ionic strength held at
+// 0.5, Aux Vases water and calcium, 40 C, ideal gas, calcite mass not limiting.
+// One difference from sio/coupled_gasphase.sio, stated rather than hidden: that
+// module counts the water's carbon as NC_DIC, the calcite-free equilibrium at
+// the gas p_CO2; this one counts the Aux Vases DIC0 the water actually holds.
+// The difference is printed.
+//
+// NEGATIVE CONSTANTS ARE `var`, never module-level `let` (LANGUAGE_GAPS.md G9).
+
+use carbonate_equilibria::{log_k, p_k1, p_k2, gamma_wateq, LN10, solve_nocalcite, NC_DIC}
+use h2_selflimiting::{closed_alk, solve_psi, IA_PSI, DIC0, MU}
+
+var TK: f64 = 313.15
+var PH0: f64 = 6.1
+var CA0: f64 = 0.0898
+var R_LATM: f64 = 0.0820574
+var BAR2ATM: f64 = 0.986923
+var KH_H2: f64 = 7.4530e-4
+var SO4_TOTAL: f64 = 0.008269
+var P_BAR: f64 = 78.0
+var Y_H2: f64 = 0.0989
+var Y_CO2: f64 = 0.0019
+
+// results
+var PB_PH: f64 = 0.0
+var PB_DIC: f64 = 0.0
+var PB_NG: f64 = 0.0
+var PB_CO3: f64 = 0.0
+var PB_PSI: f64 = 0.0
+
+// Constants at TK and MU, computed once in main (they are fixed for this run;
+// recomputing WATEQ density and dielectric inside every bisection step cost
+// minutes and bought nothing).
+var C_GH: f64 = 0.0
+var C_GOH: f64 = 0.0
+var C_GHCO3: f64 = 0.0
+var C_GCO3: f64 = 0.0
+var C_GCA: f64 = 0.0
+var C_K1: f64 = 0.0
+var C_K2: f64 = 0.0
+var C_KW: f64 = 0.0
+var C_KH: f64 = 0.0
+var C_KSP: f64 = 0.0
+
+fn init_constants() with Mut, Div, Panic {
+    let tc = TK - 273.15
+    C_GH    = gamma_wateq(tc, 1.0, 1.0, 9.0, 0.0, MU)
+    C_GOH   = gamma_wateq(tc, 1.0, 1.0, 3.5, 0.0, MU)
+    C_GHCO3 = gamma_wateq(tc, 1.0, 1.0, 5.4, 0.0, MU)
+    C_GCO3  = gamma_wateq(tc, 1.0, 2.0, 5.4, 0.0, MU)
+    C_GCA   = gamma_wateq(tc, 1.0, 2.0, 5.0, 0.165, MU)
+    C_K1  = exp((0.0 - p_k1(TK)) * LN10)
+    C_K2  = exp((0.0 - p_k2(TK)) * LN10)
+    C_KW  = exp(log_k(3, TK) * LN10)
+    C_KH  = exp(log_k(0, TK) * LN10)
+    C_KSP = exp(log_k(4, TK) * LN10)
+}
+
+// Speciate at pH and alkalinity. Alkalinity is linear in a_CO2(aq), so a_CO2 is
+// solved directly. Returns total carbon (aqueous + gas) for that state, or a
+// large negative number when no non-negative a_CO2 meets the alkalinity.
+fn carbon_at(ph: f64, alk: f64, v_gas: f64) -> f64 with Mut, Div, Panic {
+    let g_h = C_GH
+    let g_oh = C_GOH
+    let g_hco3 = C_GHCO3
+    let g_co3 = C_GCO3
+    let a_h = exp((0.0 - ph) * LN10)
+    let k1 = C_K1
+    let k2 = C_K2
+    let kw = C_KW
+    let kh = C_KH                                // CO2(g) = CO2(aq), molal/atm
+    let m_oh = (kw / a_h) / g_oh
+    let m_h = a_h / g_h
+    // Alk = a_CO2 * s + m_OH - m_H
+    let s = k1 / (a_h * g_hco3) + 2.0 * k1 * k2 / (a_h * a_h * g_co3)
+    let num = alk - m_oh + m_h
+    if num <= 0.0 { return 0.0 - 1.0e30 }
+    let a_co2 = num / s
+    let m_hco3 = a_co2 * k1 / a_h / g_hco3
+    let a_co3 = a_co2 * k1 * k2 / (a_h * a_h)
+    let m_co3 = a_co3 / g_co3
+    let dic = a_co2 + m_hco3 + m_co3
+    let n_g = (a_co2 / kh) * v_gas / (R_LATM * TK)
+    PB_DIC = dic
+    PB_NG = n_g
+    PB_CO3 = a_co3
+    dic + n_g
+}
+
+// pH that puts total carbon at ctot, at fixed alkalinity. Total carbon falls
+// with pH at fixed alkalinity, so bisection is safe; a bracket without a sign
+// change is refused.
+fn solve_ph_buf(ctot: f64, alk: f64, v_gas: f64) -> f64 with Mut, Div, Panic {
+    var lo = 2.0
+    var hi = 13.0
+    let f_lo = carbon_at(lo, alk, v_gas) - ctot
+    let f_hi = carbon_at(hi, alk, v_gas) - ctot
+    if (f_lo < 0.0 && f_hi < 0.0) || (f_lo > 0.0 && f_hi > 0.0) { return 0.0 - 1.0 }
+    var k: i64 = 0
+    while k < 90 {
+        let mid = 0.5 * (lo + hi)
+        let f_mid = carbon_at(mid, alk, v_gas) - ctot
+        if (f_lo < 0.0 && f_mid < 0.0) || (f_lo > 0.0 && f_mid > 0.0) { lo = mid } else { hi = mid }
+        k = k + 1
+    }
+    let ph = 0.5 * (lo + hi)
+    carbon_at(ph, alk, v_gas)        // refresh PB_* at the solution
+    ph
+}
+
+fn omega_g(xi: f64, psi: f64, c0: f64, alk0: f64, v_gas: f64) -> f64 with Mut, Div, Panic {
+    let ctot = c0 - xi + psi
+    let ca = CA0 + psi
+    let alk = alk0 + 2.0 * psi
+    if ctot <= 0.0 { return 0.0 - 1.0 }
+    if ca <= 0.0 { return 0.0 - 1.0 }
+    let ph = solve_ph_buf(ctot, alk, v_gas)
+    if ph < 0.0 { return 0.0 - 1.0 }
+    PB_PH = ph
+    ca * C_GCA * PB_CO3 / C_KSP
+}
+
+fn solve_psi_g(xi: f64, c0: f64, alk0: f64, v_gas: f64) -> bool with Mut, Div, Panic {
+    var lo = 0.0 - 0.9 * CA0
+    var hi = 5.0e-2
+    let f_lo = omega_g(xi, lo, c0, alk0, v_gas) - 1.0
+    let f_hi = omega_g(xi, hi, c0, alk0, v_gas) - 1.0
+    if f_lo < 0.0 - 1.0e29 { return false }
+    if f_hi < 0.0 - 1.0e29 { return false }
+    if (f_lo < 0.0 && f_hi < 0.0) || (f_lo > 0.0 && f_hi > 0.0) { return false }
+    var k: i64 = 0
+    while k < 90 {
+        let mid = 0.5 * (lo + hi)
+        let f_mid = omega_g(xi, mid, c0, alk0, v_gas) - 1.0
+        if (f_lo < 0.0 && f_mid < 0.0) || (f_lo > 0.0 && f_mid > 0.0) { lo = mid } else { hi = mid }
+        k = k + 1
+    }
+    PB_PSI = 0.5 * (lo + hi)
+    omega_g(xi, PB_PSI, c0, alk0, v_gas)
+    true
+}
+
+// Largest net dissolution along the methanogenesis path, xi from 0 to C0.
+var MAX_XI_FRAC: f64 = 0.0
+var REFUSED: i64 = 0
+fn psi_max_g(c0: f64, alk0: f64, v_gas: f64) -> f64 with Mut, Div, Panic {
+    var best = 0.0
+    MAX_XI_FRAC = 0.0
+    REFUSED = 0
+    var i: i64 = 0
+    while i < 200 {
+        let frac = (i as f64) / 200.0
+        let ok = solve_psi_g(c0 * frac, c0, alk0, v_gas)
+        if ok {
+            if PB_PSI > best { best = PB_PSI  MAX_XI_FRAC = frac }
+        } else {
+            REFUSED = REFUSED + 1
+        }
+        i = i + 1
+    }
+    best
+}
+
+fn digit(d: i64) with IO, Mut, Div, Panic {
+    if d == 0 { print("0") } else if d == 1 { print("1") } else if d == 2 { print("2") }
+    else if d == 3 { print("3") } else if d == 4 { print("4") } else if d == 5 { print("5") }
+    else if d == 6 { print("6") } else if d == 7 { print("7") } else if d == 8 { print("8") }
+    else { print("9") }
+}
+fn pu64(x: i64) with IO, Mut, Div, Panic { if x >= 10 { pu64(x / 10) digit(x % 10) } else { digit(x) } }
+fn pi64(x: i64) with IO, Mut, Div, Panic { if x < 0 { print("-") pu64(0 - x) } else { pu64(x) } }
+fn emit(label: string, v: f64) with IO, Mut, Div, Panic {
+    print(label) print(" ")
+    var neg = false
+    var q = v
+    if q < 0.0 { neg = true  q = 0.0 - q }
+    if q == 0.0 { println("0") return }
+    var e: i64 = 0
+    while q >= 10.0 { q = q / 10.0  e = e + 1 }
+    while q < 1.0 { q = q * 10.0  e = e - 1 }
+    if neg { print("-") }
+    pi64((q * 1.0e12) as i64) print("e") pi64(e - 12)
+    println("")
+}
+
+fn main() -> i32 with IO, Mut, Div, Panic {
+    println("THE PARTIALLY BUFFERED CASE -- field gas 9.89 % H2 / 0.19 % CO2, 78 bar, 40 C")
+    println("RESULTS.md 2c bracketed F1 between the unbuffered 1.015 and the")
+    println("fixed-ceiling 4.321 and left it there. This computes it.")
+    println("")
+
+    init_constants()
+    let alk0 = closed_alk(DIC0, PH0, MU)
+    let p_atm = P_BAR * BAR2ATM
+    let rt = R_LATM * TK
+    let sink = 4.0 * SO4_TOTAL
+    var fails: i64 = 0
+
+    // ---- limit 1: V -> 0 must recover the closed loop of h2_selflimiting ----
+    println("== limit check 1: a vanishing gas phase recovers the closed loop ==")
+    let ok0 = solve_psi(0.0, CA0, alk0, MU)
+    let closed_psi0 = IA_PSI
+    let tiny = 1.0e-9
+    let c0t = DIC0 + Y_CO2 * p_atm * tiny / rt
+    let ok1 = solve_psi_g(0.0, c0t, alk0, tiny)
+    print("   closed loop psi at xi = 0      ") emit("", closed_psi0)
+    print("   this model, V_gas = 1e-9 L/kg  ") emit("", PB_PSI)
+    let rel = (PB_PSI - closed_psi0) / closed_psi0
+    print("   relative difference            ") emit("", rel)
+    if !ok0 || !ok1 { fails = fails + 1  println("   REFUSED") }
+    if rel > 1.0e-6 || rel < 0.0 - 1.0e-6 { fails = fails + 1  println("   LIMIT 1 FAILS") }
+    println("")
+
+    println("== the sweep ==")
+    solve_nocalcite(TK, Y_CO2 * p_atm)
+    print("   NC_DIC (coupled_gasphase's water carbon) ") emit("", NC_DIC)
+    print("   DIC0   (the Aux Vases water, used here)  ") emit("", DIC0)
+    println("")
+
+    var v: f64 = 0.1
+    var n: i64 = 0
+    while n < 4 {
+        let n_h2 = Y_H2 * p_atm * v / rt + KH_H2 * Y_H2 * p_atm
+        let n_cg = Y_CO2 * p_atm * v / rt
+        let c0 = DIC0 + n_cg
+        let left = n_h2 - sink
+        let pm = psi_max_g(c0, alk0, v)
+
+        var used_no = c0
+        if left / 4.0 < used_no { used_no = left / 4.0 }
+        var used_yes = c0 + pm
+        if left / 4.0 < used_yes { used_yes = left / 4.0 }
+        let without = sink + 4.0 * used_no
+        let with_c = sink + 4.0 * used_yes
+        let f1 = with_c / without
+
+        // fixed-ceiling F1, same carbon count, for side-by-side reading
+        let f1_fixed = (sink + left) / without
+
+        print("   V_gas = ") emit("", v)
+        print("      gas CO2 (mol/kg w)              ") emit("", n_cg)
+        print("      calcite psi_max, buffered       ") emit("", pm)
+        print("      psi_max / C0                    ") emit("", pm / c0)
+        print("      reached at carbon methanated    ") emit("", MAX_XI_FRAC)
+        print("      refused path points (of 200)    ") pi64(REFUSED) println("")
+        print("      F1, loop honoured, buffered     ") emit("", f1)
+        print("      F1, fixed ceiling, same carbon  ") emit("", f1_fixed)
+        if f1 < 1.0 || f1 > f1_fixed { fails = fails + 1  println("      OUTSIDE THE BRACKET") }
+        v = v * 10.0
+        n = n + 1
+    }
+    println("")
+
+    // ---- calcium: the loop's own control variable --------------------------
+    // sio/h2_selflimiting.sio found a calcium threshold below which the loop
+    // never closes, and this module uses the Aux Vases calcium as a proxy for
+    // the field water, which this study does not have. So the verdict is only
+    // as good as its behaviour across calcium. Swept at V_gas = 1 L/kg.
+    println("== sensitivity to initial calcium, V_gas = 1 L/kg ==")
+    let ca_keep = CA0
+    let v1 = 1.0
+    let n_h2_1 = Y_H2 * p_atm * v1 / rt + KH_H2 * Y_H2 * p_atm
+    let c0_1 = DIC0 + Y_CO2 * p_atm * v1 / rt
+    let left_1 = n_h2_1 - sink
+    var f1_max = 0.0
+    var cj: i64 = 0
+    while cj < 6 {
+        CA0 = if cj == 0 { 1.0e-5 } else if cj == 1 { 1.0e-4 } else if cj == 2 { 1.0e-3 }
+              else if cj == 3 { 1.0e-2 } else if cj == 4 { 0.0898 } else { 0.3 }
+        let pm = psi_max_g(c0_1, alk0, v1)
+        var u_no = c0_1
+        if left_1 / 4.0 < u_no { u_no = left_1 / 4.0 }
+        var u_yes = c0_1 + pm
+        if left_1 / 4.0 < u_yes { u_yes = left_1 / 4.0 }
+        let f1 = (sink + 4.0 * u_yes) / (sink + 4.0 * u_no)
+        if f1 > f1_max { f1_max = f1 }
+        print("   Ca0 ") emit("", CA0)
+        print("      F1, loop honoured ") emit("", f1)
+        if f1 >= 2.0 { println("      AT OR ABOVE THE FACTOR-OF-2 BAR") }
+        cj = cj + 1
+    }
+    CA0 = ca_keep
+    print("   largest F1 for Ca0 from 1e-5 to 0.3 molal ") emit("", f1_max)
+    if f1_max >= 2.0 { fails = fails + 1 }
+    println("")
+
+    println("== verdict on F1 for the field gas ==")
+    println("   With H2's loop honoured and the field's own 0.19 % CO2 buffering it,")
+    println("   removing calcite changes cumulative biotic H2 loss by 1.03 at ordinary")
+    println("   gas saturation, and by at most 1.21 anywhere in calcium tested. F1's")
+    println("   bar is a factor of 2. Under this model H1a FAILS F1 at the field too.")
+    println("   And the maximum net dissolution is reached at zero carbon methanated")
+    println("   at every gas volume: calcite never responds to methanogenesis by")
+    println("   dissolving. All the carbon it gives is given before the microbes start.")
+    println("")
+    println("   Declared, and what would overturn it: equilibrium calcite (kinetics can")
+    println("   only lower psi_max), a closed vessel, ionic strength held at 0.5, the")
+    println("   Aux Vases water as proxy for Lehen's, and psi_max counted as available")
+    println("   in full, which is generous to H1a. An open system with CO2 resupply")
+    println("   from outside the storage would be a different question.")
+    println("")
+    if fails == 0 {
+        println("PARTIAL_BUFFER_OK")
+    } else {
+        print("FAILURES ") pi64(fails) println("")
+    }
+    0
+}

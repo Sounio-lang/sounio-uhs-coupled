@@ -35,6 +35,9 @@ fi
 PIN=$PINS
 
 COMPILER=${1:-}
+if [ -z "$COMPILER" ] && [ -x vendor/gen3.elf ]; then
+  COMPILER=$ROOT/vendor/gen3.elf
+fi
 if [ -z "$COMPILER" ]; then
   COMPILER=$(grep -h -m1 "^  cd sio && " sio/coupled_gasphase.output.txt | awk '{print $4}')
 fi

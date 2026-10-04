@@ -1,6 +1,6 @@
 # Results
 
-**F1 is not settled: it passes at 4.3–13 for a CO₂-poor co-injected feed under a fixed-calcite-ceiling assumption this study has since shown false, and collapses to 1.015 — failing — in the unbuffered limit of pure hydrogen storage. F2 and F3 are both not evaluable as pre-registered; against the one usable field point F2 is satisfied and F3 cannot be settled. H2 is confirmed in form, and it is what caps H1a.**
+**F1 fails for the field gas: 1.033 at ordinary gas saturation and at most 1.21 across calcium 1e-5 to 0.3 molal, against a bar of 2, once H2's self-limiting loop is honoured with the field's own 0.19 % CO₂ buffering it (§2d, added 2026-10-04). The 4.3–13 figures were the fixed-ceiling upper bound, and pure hydrogen storage fails at 1.015. F2 and F3 are both not evaluable as pre-registered; against the one usable field point F2 is satisfied and F3 cannot be settled. H2 is confirmed in form, and it is what caps H1a.**
 
 Every number carries its producer in parentheses. `PREREGISTRATION.md` is
 unaltered and its sha256 unchanged. `PHASE4_GATE.md` is the running log,
@@ -29,11 +29,11 @@ much H₂ can convert before the co-injected CO₂ runs out — not by rate.
 
 ## 2. F1 — remove calcite; under a factor of 2 and H1a dies
 
-**Verdict: NOT SETTLED. Passes at 4.3–13 for a CO₂-poor co-injected feed under a
-fixed-calcite-ceiling assumption; inert for a stoichiometric or CO₂-rich feed;
-and fails at 1.015 in the unbuffered limit once that assumption is dropped
-(§2b, §2c).** The three sub-sections below are in the order the study produced
-them, and the later two revise the first.
+**Verdict: FAILS, under the model of §2d. 1.033 for the field gas at V = 1 with the
+loop honoured and the gas CO₂ buffering it; at most 1.21 across calcium; inert for a
+stoichiometric or CO₂-rich feed; 1.015 for pure hydrogen.** The 4.3–13 of §2 is a
+fixed-ceiling upper bound (§2b). The four sub-sections below are in the order the
+study produced them, and each later one revises the ones before it.
 
 Biotic H₂ loss with calcite over without, 40 °C (`sio/coupled_gasphase.sio`).
 `V_gas` maps to gas saturation with porosity cancelling, `Sg = V/(1+V)`
@@ -117,13 +117,66 @@ the loop; at y_CO₂ = 0 nothing does.
 field's 4.321 sits between two regimes: computed with a fixed ceiling, in a
 system that *does* have a CO₂ buffer (0.19 %). It is therefore an **upper
 bound**, and the true value lies somewhere between 4.321 and something nearer 1.
-**The partially-buffered case is not computed.** Until it is, F1's field value is
-bracketed, not known.
+**Superseded 2026-10-04 by §2d**, which computes the partially-buffered case.
 
 *Two caveats carried:* the with-calcite branch does not model calcite mass
 (`sio/abiotic_kinetics.sio` measured equilibration as fast relative to the
 microbial clock, which supports excess without establishing inventory); and
 §2b–2c assume a closed system at fixed calcium.
+
+### 2d. The partially buffered case — the field value, computed
+
+*Added 2026-10-04.* `sio/partial_buffer.sio` puts the field gas's CO₂ into the
+same closed vessel as §2b. The gas joins the carbon balance and stays in Henry
+equilibrium with the water, alkalinity moves only with calcite, and Ω = 1 is
+solved for the calcite extent ψ at each methanogenesis extent ξ. F1 follows
+`sio/pure_h2.sio`'s convention, so the numbers compare: carbon with calcite is
+C₀ + ψ_max, without it C₀, both capped by H₂ after the sulfate sink.
+
+| V_gas (L/kg) | ψ_max (molal) | ψ_max reached at | **F1, loop honoured** | F1, fixed ceiling, same carbon |
+|---|---|---|---|---|
+| 0.1 | 2.428e-4 | ξ = 0 | 1.000 | 1.000 |
+| **1** | 5.274e-4 | ξ = 0 | **1.0325** | 4.655 |
+| 10 | 7.100e-4 | ξ = 0 | 1.0105 | 11.00 |
+| 100 | 7.387e-4 | ξ = 0 | 1.0013 | 12.78 |
+
+(`sio/partial_buffer.sio`. The fixed-ceiling column differs from §2's 4.321
+because this module counts the Aux Vases DIC₀ the water holds, 2.257e-3, where
+`sio/coupled_gasphase.sio` counts the calcite-free equilibrium NC_DIC, 3.510e-3.
+Both are printed.)
+
+**Calcium does not rescue it.** The loop has a calcium threshold (§2b), and the
+field water is represented by the Aux Vases proxy, so calcium is swept at V = 1:
+F1 = 1.2139, 1.2124, 1.1987, 1.1248, 1.0325 and 1.0040 for Ca₀ = 1e-5, 1e-4,
+1e-3, 1e-2, 0.0898 and 0.3 molal. The largest value anywhere tested is **1.214**
+(`sio/partial_buffer.sio`).
+
+**The mechanism, read off the ξ column.** ψ_max is reached at ξ = 0 at every gas
+volume and every calcium: calcite never responds to methanogenesis by
+dissolving. The carbon it contributes is the initial equilibration of the water
+with the gas CO₂, given before the microbes start. After that, methanogenesis
+raises pH and the mineral only takes carbon back. In this model calcite is a
+one-time carbon deposit, not a feedback that relieves carbon limitation.
+
+**Two limits, checked.** At V_gas = 1e-9 the module reproduces the closed-loop ψ
+of `sio/h2_selflimiting.sio` to a relative 6.6e-9. Honoured F1 sits inside
+[1, fixed-ceiling F1] at every point, as it must.
+
+**Independent oracle.** `crosscheck/partial_buffer_crosscheck.cpp` is written in
+C++23 and uses Brent's method on both levels instead of nested bisection. It
+reproduces every row above to 10 significant figures
+(`crosscheck/partial_buffer_crosscheck.output.txt`). It inherits the activity
+coefficients and constants at 40 °C and μ = 0.5 from
+`sio/carbonate_equilibria.sio`, whose WATEQ model this study already validated
+against the PHREEQC oracle; what it checks independently is the new model and
+its solver.
+
+**What would overturn it.** ψ_max is counted as available in full, which is
+generous to H1a, and calcite is at equilibrium, which kinetics can only lower.
+The vessel is closed, ionic strength is held at 0.5, and the field water is a
+proxy. An open system with CO₂ resupplied from outside the store, or a field
+water chemistry far from these, is a different question and is not answered
+here.
 
 ---
 

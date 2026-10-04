@@ -1,0 +1,92 @@
+Raw stdout of sio/partial_buffer.sio, unedited.
+
+command:
+  cd sio && ../vendor/gen3.elf partial_buffer.sio /tmp/out && /tmp/out
+
+compiler: gen3.elf, md5 1aa4317fcb7adef1b6ad6782d65dcb6b
+          built from Sounio-lang/sounio feat/w1-qd128-transcend @ 654ba36260
+          -- rebuilt from that commit on 2026-10-04 with `make build`
+          (fixed point gen2 = gen3, 7.5 s) and committed to vendor/ for
+          the first time; see CORRECTIONS.md C23. Same md5 as every
+          other capture in this directory.
+          Not through bin/souc, per LANGUAGE_GAPS.md G8.
+model:    sounio-uhs-coupled @ d9bad71 plus this module (uncommitted at capture time)
+date:     2026-10-04T13:21:39Z
+
+THE PARTIALLY BUFFERED CASE -- field gas 9.89 % H2 / 0.19 % CO2, 78 bar, 40 C
+RESULTS.md 2c bracketed F1 between the unbuffered 1.015 and the
+fixed-ceiling 4.321 and left it there. This computes it.
+
+== limit check 1: a vanishing gas phase recovers the closed loop ==
+   closed loop psi at xi = 0       1558040910364e-16
+   this model, V_gas = 1e-9 L/kg   1558040920605e-16
+   relative difference             6572686173291e-21
+
+== the sweep ==
+   NC_DIC (coupled_gasphase's water carbon)  3510143832426e-15
+   DIC0   (the Aux Vases water, used here)   2256521000000e-15
+
+   V_gas =  1000000000000e-13
+      gas CO2 (mol/kg w)               5691953004140e-16
+      calcite psi_max, buffered        2428020783868e-16
+      psi_max / C0                     8592585120851e-14
+      reached at carbon methanated     0
+      refused path points (of 200)    0
+      F1, loop honoured, buffered      1000000000000e-12
+      F1, fixed ceiling, same carbon   1000000000000e-12
+   V_gas =  1000000000000e-12
+      gas CO2 (mol/kg w)               5691953004140e-15
+      calcite psi_max, buffered        5274100936569e-16
+      psi_max / C0                     6635362880752e-14
+      reached at carbon methanated     0
+      refused path points (of 200)    0
+      F1, loop honoured, buffered      1032521099988e-12
+      F1, fixed ceiling, same carbon   4654783800739e-12
+   V_gas =  1000000000000e-11
+      gas CO2 (mol/kg w)               5691953004140e-14
+      calcite psi_max, buffered        7099943459483e-16
+      psi_max / C0                     1199800144574e-14
+      reached at carbon methanated     0
+      refused path points (of 200)    0
+      F1, loop honoured, buffered      1010527004353e-12
+      F1, fixed ceiling, same carbon   1100334824238e-11
+   V_gas =  1000000000000e-10
+      gas CO2 (mol/kg w)               5691953004140e-13
+      calcite psi_max, buffered        7387465174981e-16
+      psi_max / C0                     1292753806734e-15
+      reached at carbon methanated     0
+      refused path points (of 200)    0
+      F1, loop honoured, buffered      1001274314273e-12
+      F1, fixed ceiling, same carbon   1277933549336e-11
+
+== sensitivity to initial calcium, V_gas = 1 L/kg ==
+   Ca0  1000000000000e-17
+      F1, loop honoured  1213850132742e-12
+   Ca0  1000000000000e-16
+      F1, loop honoured  1212374346294e-12
+   Ca0  1000000000000e-15
+      F1, loop honoured  1198742501618e-12
+   Ca0  1000000000000e-14
+      F1, loop honoured  1124817447690e-12
+   Ca0  8980000000000e-14
+      F1, loop honoured  1032521099988e-12
+   Ca0  3000000000000e-13
+      F1, loop honoured  1004001023718e-12
+   largest F1 for Ca0 from 1e-5 to 0.3 molal  1213850132742e-12
+
+== verdict on F1 for the field gas ==
+   With H2's loop honoured and the field's own 0.19 % CO2 buffering it,
+   removing calcite changes cumulative biotic H2 loss by 1.03 at ordinary
+   gas saturation, and by at most 1.21 anywhere in calcium tested. F1's
+   bar is a factor of 2. Under this model H1a FAILS F1 at the field too.
+   And the maximum net dissolution is reached at zero carbon methanated
+   at every gas volume: calcite never responds to methanogenesis by
+   dissolving. All the carbon it gives is given before the microbes start.
+
+   Declared, and what would overturn it: equilibrium calcite (kinetics can
+   only lower psi_max), a closed vessel, ionic strength held at 0.5, the
+   Aux Vases water as proxy for Lehen's, and psi_max counted as available
+   in full, which is generous to H1a. An open system with CO2 resupply
+   from outside the storage would be a different question.
+
+PARTIAL_BUFFER_OK

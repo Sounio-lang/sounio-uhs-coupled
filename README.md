@@ -3,25 +3,36 @@
 A pre-registered attempt to **falsify** a hypothesis about what controls
 hydrogen loss in underground hydrogen storage — not to confirm it.
 
-**Status: Phases 0-4 complete. All three pre-registered criteria have
-verdicts, in [`RESULTS.md`](RESULTS.md), which opens with them.**
-`PHASE4_GATE.md` is the running log behind it, written as a log rather than a
-summary: it contains a wrong answer, the defect that produced it, and the
-correction, in that order.
+**Status: Phases 0-4 complete, and F1 settled on 2026-10-04 (`RESULTS.md` §2d).
+[`RESULTS.md`](RESULTS.md) opens with the verdicts.** `PHASE4_GATE.md` is the
+running log behind it, written as a log rather than a summary: it contains a
+wrong answer, the defect that produced it, and the correction, in that order.
+
+> **This table was stale until 2026-10-04.** It still read "F1 passes at a
+> CO2-poor feed" after `RESULTS.md` §2b–2c had revised that to "not settled", and
+> it called the mechanism a sharper form of H1a after `CORRECTIONS.md` C22 had
+> found it is prior art. Both are corrected below (`CORRECTIONS.md` C23).
 
 | criterion | verdict | where |
 |---|---|---|
-| **F1** — remove calcite; under a factor 2 and H1a dies | **passes at a CO2-poor feed** (4.3x at ordinary gas saturation, approaching 13x), **but is inert at a stoichiometric or CO2-rich feed** (1.00 to 1.13) | `sio/coupled_gasphase.sio` |
+| **F1** — remove calcite; under a factor 2 and H1a dies | **fails.** For the field gas (0.19 % CO2), with H2's self-limiting loop honoured and the gas CO2 buffering it: **1.033** at ordinary gas saturation, **at most 1.21** across calcium 1e-5 to 0.3 molal. Pure hydrogen storage: 1.015. The 4.3–13 once reported here was a fixed-ceiling upper bound | `sio/partial_buffer.sio`, `sio/pure_h2.sio`, `sio/h2_selflimiting.sio` |
 | **F2** — band must encompass both field points, nothing tuned | **not evaluable as pre-registered.** Lobodice's reported data fail four independent consistency checks (`CORRECTIONS.md` C13). **Satisfied against Sun Storage alone**, which falls inside the model's reachable range with nothing tuned | `sio/coupled_finite.sio`, `sio/lobodice_massbalance.sio` |
 | **F3** — if the abiotic band alone encompasses both points, the coupling is superfluous | **not evaluable as pre-registered, and cannot be settled against Sun Storage alone.** A reaction-free simulation spans the observation; the dominant physical term is unmeasured in the field and spans a factor of 20 in the laboratory. But methanogenesis at the site is directly measured, and no physical process explains an isotopic signature | `sio/f3_abiotic_band.sio`, `sio/field_mass_balance.sio` |
 
-**H1a survives, in a sharper and more falsifiable form than it was
-pre-registered in.** The mechanism is not kinetic — the CO2 half-saturation term
-is worth 0.055 % — but stoichiometric: the ratio of biotic H2 loss with calcite
-to without approaches `y_H2 / (4 * y_CO2)`, the excess of stored hydrogen over
-the CO2 stored with it. That is 13.0 for the 52:1 field gas and 1.0 for the 4:1
-mesocosm feed, so the hypothesis is **true only for a CO2-poor feed** and this
-study says where it is false.
+**H1a does not survive F1.** Carbon limitation of hydrogenotrophic
+methanogenesis, and calcite as a carbon source, are real and published
+(`CORRECTIONS.md` C22). But in a closed vessel the methanogenesis they enable is
+alkalinity-neutral, so pH rises and calcite turns from source to sink. With the
+loop honoured, calcite's whole contribution is dissolved **before** the microbes
+start (ψ_max is reached at zero carbon methanated at every gas volume and
+calcium tested), and removing it changes biotic H2 loss by 3 %, not by a factor
+of 2. The stoichiometric bound `y_H2 / (4 * y_CO2)` remains the right ceiling for
+an *infinite* carbon buffer, and it is a formalisation of Hellerschmied et al.
+2024's own 4:1 versus 52:1 remark, credited as such.
+
+**What would overturn F1** is stated in `RESULTS.md` §2d: an open system with
+CO2 resupplied from outside the store, or a field water chemistry far from the
+Aux Vases proxy.
 
 **Two things are open, and both are data gaps rather than modelling ones.** No
 microbial kinetic parameter set appropriate to a 285-day reservoir observation
@@ -30,6 +41,10 @@ and the fast one is stated in units that cannot be converted without inventing a
 mass per cell. And three of the four abiotic channels in F3 have no measured
 rate, which is why that module refuses to emit a total band rather than
 silently treating them as zero.
+
+**Reproduce everything:** `bash tools/verify.sh` (≈1.5 min). It uses the vendored
+compiler `vendor/gen3.elf`, md5 `1aa4317f…`, which rebuilds bit-identically from
+`Sounio-lang/sounio@654ba36260` with `make build` in about 8 s.
 
 The engine is [Sounio](https://github.com/sounio-lang/sounio), a self-hosted
 systems and scientific language. Harnesses are C++. Python appears only as an

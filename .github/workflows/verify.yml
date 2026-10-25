@@ -24,6 +24,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Both jobs only check out the tree and run local scripts. GITHUB_OUTPUT and
+# the step summary are files on the runner; they do not need a token scope.
+# If a job later writes to the repository, packages, or pull requests, grant
+# that scope on the job, not here.
+permissions:
+  contents: read
+
 concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
